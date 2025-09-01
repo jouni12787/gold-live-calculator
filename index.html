@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -67,7 +68,7 @@
 <body>
 <header>
   <h1>أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
-  <p>سعر الأونصة XAU/USD من <strong>gold-api.com</strong> (مجاني) — أو أدخل السعر يدويًا.</p>
+  <p>سعر الأونصة XAU/USD من <strong>gold-api.com</strong>  — أو أدخل السعر يدويًا.</p>
 </header>
 
 <main class="grid grid-2">
@@ -90,15 +91,16 @@
 
   <!-- per-gram + coin -->
   <section class="card">
-    <h2>الأسعار الأساسية من دون صياغة (دولار/غرام)</h2>
-    <div class="out" id="perg">بيع 18K: — / غ
-شراء 18K: — / غ
-بيع 21K: — / غ
-شراء 21K: — / غ</div>
+    <h2>الأسعار الأساسية من دون صياغة(دولار/غرام)</h2>
+    <div class="out" id="perg">
+شراء18K: — / غ
+بيع18K: — / غ
+شراء21K: — / غ
+بيع21K: — / غ</div>
 
     <h2 style="margin-top:14px">ليرة ذهبية</h2>
-    <div class="out" id="coin">ليرة — مبيع: — دولار
-ليرة — شراء: — دولار
+    <div class="out" id="coin">ليرة — شراء: — دولار
+ليرة — مبيع: — دولار
 <div class="mini">مبيع = ٨ × بيع ٢١ /غ — شراء = ٨ × بيع ٢١ /غ + ٨ دولار.</div></div>
   </section>
 
@@ -108,7 +110,7 @@
     <div class="totals-grid" style="margin-top:8px">
       <!-- Sell 18 -->
       <div class="panel">
-        <h2>بيع 18 قيراط</h2>
+        <h2>شراء 18 قيراط</h2>
         <div class="row">
           <div>
             <label>الوزن (غ)</label>
@@ -124,7 +126,7 @@
 
       <!-- Buy 18 -->
       <div class="panel">
-        <h2>شراء 18 قيراط</h2>
+        <h2>بيع 18 قيراط</h2>
         <div class="row">
           <div>
             <label>الوزن (غ)</label>
@@ -140,7 +142,7 @@
 
       <!-- Sell 21 -->
       <div class="panel">
-        <h2>بيع 21 قيراط</h2>
+        <h2>شراء 21 قيراط</h2>
         <div class="row">
           <div>
             <label>الوزن (غ)</label>
@@ -156,7 +158,7 @@
 
       <!-- Buy 21 -->
       <div class="panel">
-        <h2>شراء 21 قيراط</h2>
+        <h2>بيع 21 قيراط</h2>
         <div class="row">
           <div>
             <label>الوزن (غ)</label>
@@ -176,19 +178,19 @@
   <section class="card" style="grid-column:1 / -1">
     <h2>الصيغ المستخدمة</h2>
     <div class="out" style="direction:ltr;text-align:left">
-Sell 18K = (oz − 30)/31.1034768 × (740/1000)
-Buy  18K = (oz + 30)/31.1034768 × (750/995)
-Sell 21K = (oz − 30)/31.1034768 × (865/1000)
-Buy  21K = (oz + 30)/31.1034768 × (875/995)
-Coin Sell = 8 × Sell21
-Coin Buy  = 8 × Sell21 + 8
+buy 18K =(oz−30)*32*740
+sell  18K =(oz+30)*32*750/995
+buy 21K =(oz−30)*32*865
+sell  21K =(oz+30)*32*875/995
+Coin buy = 8 × sell21k
+Coin sell = 8 × sell21k + 8
     </div>
   </section>
 </main>
 
 <script>
   // --- helpers ---
-  const OZT_TO_G = 31.1034768;
+  const OZT_TO_G = 32;
   const $ = id => document.getElementById(id);
   const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
   const cleanDec = s => (s||"").replace(/[^\d.,]/g,"").replace(",",".");
@@ -202,22 +204,22 @@ Coin Buy  = 8 × Sell21 + 8
     const oz = fval("oz");
     if(!isFinite(oz)||oz<=0) return false;
 
-    per.s18 = ((oz-30)/OZT_TO_G)*(740/1000);
-    per.b18 = ((oz+30)/OZT_TO_G)*(750/995);
-    per.s21 = ((oz-30)/OZT_TO_G)*(865/1000);
-    per.b21 = ((oz+30)/OZT_TO_G)*(875/995);
+    per.s18 = (oz-30)*(OZT_TO_G)*(740/1000)/1000;
+    per.b18 = (oz+30)*(OZT_TO_G)*(750)/(995)/1000;
+    per.s21 = (oz-30)*(OZT_TO_G)*(865/1000)/1000;
+    per.b21 = (oz+30)*(OZT_TO_G)*(875/995)/1000;
 
     $("perg").textContent =
-`بيع 18K: $ ${fmt(per.s18)} / غ
-شراء 18K: $ ${fmt(per.b18)} / غ
-بيع 21K: $ ${fmt(per.s21)} / غ
-شراء 21K: $ ${fmt(per.b21)} / غ`;
+`شراء 18K: $ ${fmt(per.s18)} / غ
+بيع 18K: $ ${fmt(per.b18)} / غ
+شراء 21K: $ ${fmt(per.s21)} / غ
+بيع 21K: $ ${fmt(per.b21)} / غ`;
 
     const coinSell = 8*per.b21;
     const coinBuy  = 8*per.b21 + 8;
-    $("coin").innerHTML = `ليرة — مبيع: $ ${fmt(coinSell)}
-ليرة — شراء: $ ${fmt(coinBuy)}
-<div class="mini">مبيع = ٨ × بيع ٢١ /غ — شراء = ٨ × بيع ٢١ /غ + ٨ دولار.</div>`;
+    $("coin").innerHTML = `ليرة — شراء: $ ${fmt(coinSell)}
+ليرة — مبيع: $ ${fmt(coinBuy)}
+<div class="mini">شراء = ٨ × شراء ٢١ /غ — مبيع = ٨ × شراء ٢١ /غ + ٨ دولار.</div>`;
 
     $("meta").textContent = "تم الحساب من سعر الأونصة.";
     return true;
@@ -297,5 +299,5 @@ Coin Buy  = 8 × Sell21 + 8
   window.addEventListener("load", fetchSpot);
 </script>
 </body>
-</html>
 <footer>© 2025 جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني</footer>
+</html>
