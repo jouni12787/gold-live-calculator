@@ -40,8 +40,7 @@
     caret-color: var(--ink);
   }
   input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.25)}
-  /* iOS safest combo: telephone type + numeric/decimal inputmode + LTR visual flow */
-  .num{ direction:ltr; text-align:left; }
+  .num{ direction:ltr; text-align:left; }          /* iOS-friendly numeric typing */
   .row{display:grid;gap:10px;grid-template-columns:1fr 160px;align-items:end}
   .btn{
     border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;
@@ -68,7 +67,7 @@
 <body>
 <header>
   <h1>أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
-  <p>سعر الأونصة XAU/USD من GoldAPI (أو إدخال يدوي). الحساب مبسّط فقط.</p>
+  <p>سعر الأونصة XAU/USD من <strong>gold-api.com</strong> (مجاني) — أو أدخل السعر يدويًا.</p>
 </header>
 
 <main class="grid grid-2">
@@ -188,10 +187,6 @@ Coin Buy  = 8 × Sell21 + 8
 </main>
 
 <script>
-  // --- API (optional auto-fetch) ---
-  const API_KEY = "goldapi-3hvzsmf0w9v53-io";
-  const ENDPOINTS = ["https://www.goldapi.io/api/XAU/USD","https://www.goldapi.io/api/price/XAU/USD"];
-
   // --- helpers ---
   const OZT_TO_G = 31.1034768;
   const $ = id => document.getElementById(id);
@@ -244,19 +239,52 @@ Coin Buy  = 8 × Sell21 + 8
 
   function runAll(){ if(calcPerGram()) updateTotals(); }
 
+  // --- FREE provider: gold-api.com (no key) ---
+  // We'll try a few common endpoints and normalize different payload shapes.
+  const GOLDAPI_FREE_ENDPOINTS = [
+    "https://api.gold-api.com/price/XAU",
+    "https://api.gold-api.com/price/XAU/USD",
+    "https://www.gold-api.com/price/XAU",
+    "https://www.gold-api.com/price/XAU/USD"
+  ];
+
+  function pickOuncePrice(data){
+    // Try typical fields first
+    const candidates = [
+      data && data.price,
+      data && data.usd,
+      data && data.usd_ounce,
+      data && data.price_ounce,
+      data && data.ounce,
+      data && data.oz,
+      data && data?.result?.price,
+      data && data?.XAU?.USD
+    ].map(Number).filter(x => isFinite(x) && x>0);
+    if (candidates.length) return candidates[0];
+
+    // Fallback: if API returns 24K gram price, convert to ounce
+    const g24 = Number(data && (data.gram_24k || data.price_gram_24k || data.g24 || data.per_gram));
+    if (isFinite(g24) && g24>0) return g24 * OZT_TO_G;
+
+    return NaN;
+  }
+
   async function fetchSpot(){
-    $("btnFetch").disabled=true; const err=document.getElementById("err"); err.style.display="none"; err.textContent="";
+    $("btnFetch").disabled=true; const err=$("err"); err.style.display="none"; err.textContent="";
     let last=null;
-    for(const url of ENDPOINTS){
+
+    for(const url of GOLDAPI_FREE_ENDPOINTS){
       try{
-        const r=await fetch(url,{headers:{"x-access-token":API_KEY}});
+        const r=await fetch(url, {cache:"no-store"});
         if(!r.ok){ last=`HTTP ${r.status} @ ${url}`; continue; }
-        const d=await r.json(); const p= typeof d.price==="number"? d.price : (typeof d.price_ounce==="number"? d.price_ounce : NaN);
-        if(!isFinite(p)){ last=`No numeric price @ ${url}`; continue; }
+        const d=await r.json();
+        const p = pickOuncePrice(d);
+        if(!isFinite(p)){ last=`No ounce price in response @ ${url} → ${JSON.stringify(d).slice(0,120)}…`; continue; }
         $("oz").value=p.toFixed(2); runAll(); $("btnFetch").disabled=false; return;
       }catch(e){ last=e.message+" @ "+url; }
     }
-    err.style.display="block"; err.textContent="فشل الجلب من الـAPI.\n"+last;
+    err.style.display="block";
+    err.textContent="فشل الجلب من gold-api.com.\n" + (last || "");
     $("btnFetch").disabled=false;
   }
 
