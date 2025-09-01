@@ -213,8 +213,8 @@ Coin Buy  = 8 × Sell21 + 8
 بيع 21K: $ ${fmt(per.s21)} / غ
 شراء 21K: $ ${fmt(per.b21)} / غ`;
 
-    const coinSell = 8*per.s21;
-    const coinBuy  = 8*per.s21 + 8;
+    const coinSell = 8*per.b21;
+    const coinBuy  = 8*per.b21 + 8;
     $("coin").innerHTML = `ليرة — مبيع: $ ${fmt(coinSell)}
 ليرة — شراء: $ ${fmt(coinBuy)}
 <div class="mini">مبيع = ٨ × بيع ٢١ /غ — شراء = ٨ × بيع ٢١ /غ + ٨ دولار.</div>`;
