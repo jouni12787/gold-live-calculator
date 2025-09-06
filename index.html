@@ -67,7 +67,7 @@
 <body>
 <header>
   <h1>أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
-  <p>سعر الأونصة XAU/USD من <strong>gold-api.com</strong>  — أو أدخل السعر يدويًا.</p>
+  <p>سعر الأونصة XAU/USD من <strong>gold-api.com</strong> — أو أدخل السعر يدويًا.</p>
 </header>
 
 <main class="grid grid-2">
@@ -90,16 +90,16 @@
 
   <!-- per-gram + coin -->
   <section class="card">
-    <h2>الأسعار الأساسية من دون صياغة(دولار/غرام)</h2>
+    <h2>الأسعار الأساسية من دون صياغة (دولار/غرام)</h2>
     <div class="out" id="perg">
-‎شراء18K: — / غ
-‎بيع18K: — / غ
-‎شراء21K: — / غ
-‎بيع21K: — / غ</div>
+شراء18K: — / غ
+بيع18K: — / غ
+شراء21K: — / غ
+بيع21K: — / غ</div>
 
     <h2 style="margin-top:14px">ليرة ذهبية</h2>
     <div class="out" id="coin">ليرة — شراء: — دولار
-‎ليرة — مبيع: — دولار
+ليرة — مبيع: — دولار
 <div class="mini">شراء = ٨ × شراء ٢١ /غ — مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.</div></div>
   </section>
 
@@ -107,7 +107,6 @@
   <section class="card" style="grid-column:1 / -1">
     <h2>حساب الإجمالي حسب الوزن</h2>
     <div class="totals-grid" style="margin-top:8px">
-      <!-- Sell 18 -->
       <div class="panel">
         <h2>شراء 18 قيراط</h2>
         <div class="row">
@@ -123,7 +122,6 @@
         <div id="t_s18" class="tot">الإجمالي: —</div>
       </div>
 
-      <!-- Buy 18 -->
       <div class="panel">
         <h2>بيع 18 قيراط</h2>
         <div class="row">
@@ -139,7 +137,6 @@
         <div id="t_b18" class="tot">الإجمالي: —</div>
       </div>
 
-      <!-- Sell 21 -->
       <div class="panel">
         <h2>شراء 21 قيراط</h2>
         <div class="row">
@@ -155,7 +152,6 @@
         <div id="t_s21" class="tot">الإجمالي: —</div>
       </div>
 
-      <!-- Buy 21 -->
       <div class="panel">
         <h2>بيع 21 قيراط</h2>
         <div class="row">
@@ -173,7 +169,6 @@
     </div>
   </section>
 
-  <!-- formulas -->
   <section class="card" style="grid-column:1 / -1">
     <h2>الصيغ المستخدمة</h2>
     <div class="out" style="direction:ltr;text-align:left">
@@ -183,7 +178,7 @@ buy 21K =(oz−30)*32*865
 sell  21K =(oz+30)*32*875/995
 Coin buy = 8 × sell21k
 Coin sell = 8 × sell21k + 8
-for the sell of 18 and 21 k a 5.5 $ per gram have been added as shop merge
+(بيع 18/21) +5.5 $/غ ربح محل قبل الصياغة
     </div>
   </section>
 </main>
@@ -196,7 +191,7 @@ for the sell of 18 and 21 k a 5.5 $ per gram have been added as shop merge
   const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
   const cleanDec = s => (s||"").replace(/[^\d.,]/g,"").replace(",","."); // يدعم الفاصلة
   const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
-‎  // صياغة: نسمح بفواصل/عشري ونحدّ من 0 إلى 50
+  // صياغة: نسمح بفواصل/عشري ونحدّ من 0 إلى 50
   const clampDec = (id,min=0,max=50)=>{
     const n = parseFloat(cleanDec($(id).value));
     return isFinite(n) ? Math.min(max, Math.max(min, n)) : NaN;
@@ -207,7 +202,7 @@ for the sell of 18 and 21 k a 5.5 $ per gram have been added as shop merge
 
   function calcPerGram(){
     const oz = fval("oz");
-    if(!isFinite(oz)||oz<=0) return false;
+    if(!isFinite(oz) || oz<=0) return false;
 
     per.s18 = (oz-30)*(OZT_TO_G)*(740/1000)/1000;
     per.b18 = (oz+30)*(OZT_TO_G)*(750)/(995)/1000;
@@ -215,15 +210,15 @@ for the sell of 18 and 21 k a 5.5 $ per gram have been added as shop merge
     per.b21 = (oz+30)*(OZT_TO_G)*(875/995)/1000;
 
     $("perg").textContent =
-‎`شراء 18K: $ ${fmt(per.s18)} / غ
-‎بيع 18K: $ ${fmt(per.b18)} / غ
-‎شراء 21K: $ ${fmt(per.s21)} / غ
-‎بيع 21K: $ ${fmt(per.b21)} / غ`;
+`شراء 18K: $ ${fmt(per.s18)} / غ
+بيع 18K: $ ${fmt(per.b18)} / غ
+شراء 21K: $ ${fmt(per.s21)} / غ
+بيع 21K: $ ${fmt(per.b21)} / غ`;
 
     const coinSell = 8*per.s21;
     const coinBuy  = 8*per.b21 + 8;
     $("coin").innerHTML = `ليرة — شراء: $ ${fmt(coinSell)}
-‎ليرة — مبيع: $ ${fmt(coinBuy)}
+ليرة — مبيع: $ ${fmt(coinBuy)}
 <div class="mini">شراء = ٨ × شراء ٢١ /غ — مبيع = ٨ × شراء ٢١ /غ + ٨ دولار.</div>`;
 
     $("meta").textContent = "تم الحساب من سعر الأونصة.";
@@ -236,7 +231,6 @@ for the sell of 18 and 21 k a 5.5 $ per gram have been added as shop merge
     const ws18=fval("w_s18");
     $("t_s18").textContent = "الإجمالي: " + (isFinite(ws18)? "$ "+(per.s18*ws18).toFixed(2) : "—");
 
-‎    // بيع 18: ربح المحل + الصياغة (حتى 50$/غ) ثم الوزن
     const wb18=fval("w_b18"), a18=clampDec("add18");
     const base18 = per.b18 + STORE_MARGIN;
     $("t_b18").textContent = "الإجمالي: " + (isFinite(wb18)? "$ "+((base18 + (isFinite(a18)?a18:0))*wb18).toFixed(2) : "—");
@@ -244,7 +238,6 @@ for the sell of 18 and 21 k a 5.5 $ per gram have been added as shop merge
     const ws21=fval("w_s21");
     $("t_s21").textContent = "الإجمالي: " + (isFinite(ws21)? "$ "+(per.s21*ws21).toFixed(2) : "—");
 
-‎    // بيع 21: ربح المحل + الصياغة (حتى 50$/غ) ثم الوزن
     const wb21=fval("w_b21"), a21=clampDec("add21");
     const base21 = per.b21 + STORE_MARGIN;
     $("t_b21").textContent = "الإجمالي: " + (isFinite(wb21)? "$ "+((base21 + (isFinite(a21)?a21:0))*wb21).toFixed(2) : "—");
@@ -288,9 +281,12 @@ for the sell of 18 and 21 k a 5.5 $ per gram have been added as shop merge
         const r=await fetch(url, {cache:"no-store"});
         if(!r.ok){ last=`HTTP ${r.status} @ ${url}`; continue; }
         const d=await r.json();
-        const p = pickOuncePrice(d);
+        const p=pickOuncePrice(d);
         if(!isFinite(p)){ last=`No ounce price in response @ ${url} → ${JSON.stringify(d).slice(0,120)}…`; continue; }
-        $("oz").value=p.toFixed(2); runAll(); $("btnFetch").disabled=false; return;
+        $("oz").value=p.toFixed(2);
+        runAll();
+        $("btnFetch").disabled=false;
+        return;
       }catch(e){ last=e.message+" @ "+url; }
     }
     err.style.display="block";
@@ -298,9 +294,11 @@ for the sell of 18 and 21 k a 5.5 $ per gram have been added as shop merge
     $("btnFetch").disabled=false;
   }
 
-  ["oz","w_s18","w_b18","add18","w_s21","w_b21","add21"].forEach(id=>{
+  // listeners — recompute per-gram when oz changes
+  ["w_s18","w_b18","add18","w_s21","w_b21","add21"].forEach(id=>{
     $(id).addEventListener("input", updateTotals);
   });
+  document.getElementById("oz").addEventListener("input", runAll);
   document.getElementById("btnCalc").addEventListener("click", runAll);
   document.getElementById("btnFetch").addEventListener("click", fetchSpot);
   window.addEventListener("load", fetchSpot);
