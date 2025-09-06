@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -41,7 +40,7 @@
     caret-color: var(--ink);
   }
   input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.25)}
-  .num{ direction:ltr; text-align:left; }          /* iOS-friendly numeric typing */
+  .num{ direction:ltr; text-align:left; }
   .row{display:grid;gap:10px;grid-template-columns:1fr 160px;align-items:end}
   .btn{
     border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;
@@ -93,15 +92,15 @@
   <section class="card">
     <h2>الأسعار الأساسية من دون صياغة(دولار/غرام)</h2>
     <div class="out" id="perg">
-شراء18K: — / غ
-بيع18K: — / غ
-شراء21K: — / غ
-بيع21K: — / غ</div>
+‎شراء18K: — / غ
+‎بيع18K: — / غ
+‎شراء21K: — / غ
+‎بيع21K: — / غ</div>
 
     <h2 style="margin-top:14px">ليرة ذهبية</h2>
     <div class="out" id="coin">ليرة — شراء: — دولار
-ليرة — مبيع: — دولار
-<div class="mini">مبيع = ٨ × بيع ٢١ /غ — شراء = ٨ × بيع ٢١ /غ + ٨ دولار.</div></div>
+‎ليرة — مبيع: — دولار
+<div class="mini">شراء = ٨ × شراء ٢١ /غ — مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.</div></div>
   </section>
 
   <!-- totals -->
@@ -133,8 +132,8 @@
             <input id="w_b18" class="num" type="tel" inputmode="decimal" placeholder="">
           </div>
           <div>
-            <label>صياغة (0–20 $/غ)</label>
-            <input id="add18" class="num" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="">
+            <label>صياغة (0–50 $/غ)</label>
+            <input id="add18" class="num" type="tel" inputmode="decimal" step="0.01" placeholder="">
           </div>
         </div>
         <div id="t_b18" class="tot">الإجمالي: —</div>
@@ -165,8 +164,8 @@
             <input id="w_b21" class="num" type="tel" inputmode="decimal" placeholder="">
           </div>
           <div>
-            <label>صياغة (0–20 $/غ)</label>
-            <input id="add21" class="num" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="">
+            <label>صياغة (0–50 $/غ)</label>
+            <input id="add21" class="num" type="tel" inputmode="decimal" step="0.01" placeholder="">
           </div>
         </div>
         <div id="t_b21" class="tot">الإجمالي: —</div>
@@ -191,11 +190,16 @@ Coin sell = 8 × sell21k + 8
 <script>
   // --- helpers ---
   const OZT_TO_G = 32;
+  const STORE_MARGIN = 5.5; // ربح المحل $/غ قبل الصياغة في البيع
   const $ = id => document.getElementById(id);
   const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
-  const cleanDec = s => (s||"").replace(/[^\d.,]/g,"").replace(",",".");
+  const cleanDec = s => (s||"").replace(/[^\d.,]/g,"").replace(",","."); // يدعم الفاصلة
   const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
-  const clampInt = (id,min=0,max=20)=>{ const n=parseInt(cleanDec($(id).value),10); return isFinite(n)? Math.min(max,Math.max(min,n)) : NaN; };
+‎  // صياغة: نسمح بفواصل/عشري ونحدّ من 0 إلى 50
+  const clampDec = (id,min=0,max=50)=>{
+    const n = parseFloat(cleanDec($(id).value));
+    return isFinite(n) ? Math.min(max, Math.max(min, n)) : NaN;
+  };
 
   // per-gram prices
   let per = { s18:NaN, b18:NaN, s21:NaN, b21:NaN };
@@ -210,15 +214,15 @@ Coin sell = 8 × sell21k + 8
     per.b21 = (oz+30)*(OZT_TO_G)*(875/995)/1000;
 
     $("perg").textContent =
-`شراء 18K: $ ${fmt(per.s18)} / غ
-بيع 18K: $ ${fmt(per.b18)} / غ
-شراء 21K: $ ${fmt(per.s21)} / غ
-بيع 21K: $ ${fmt(per.b21)} / غ`;
+‎`شراء 18K: $ ${fmt(per.s18)} / غ
+‎بيع 18K: $ ${fmt(per.b18)} / غ
+‎شراء 21K: $ ${fmt(per.s21)} / غ
+‎بيع 21K: $ ${fmt(per.b21)} / غ`;
 
     const coinSell = 8*per.s21;
     const coinBuy  = 8*per.b21 + 8;
     $("coin").innerHTML = `ليرة — شراء: $ ${fmt(coinSell)}
-ليرة — مبيع: $ ${fmt(coinBuy)}
+‎ليرة — مبيع: $ ${fmt(coinBuy)}
 <div class="mini">شراء = ٨ × شراء ٢١ /غ — مبيع = ٨ × شراء ٢١ /غ + ٨ دولار.</div>`;
 
     $("meta").textContent = "تم الحساب من سعر الأونصة.";
@@ -228,21 +232,26 @@ Coin sell = 8 × sell21k + 8
   function updateTotals(){
     if(!isFinite(per.s18)) return;
 
-    const ws18=fval("w_s18"); $("t_s18").textContent = "الإجمالي: " + (isFinite(ws18)? "$ "+(per.s18*ws18).toFixed(2) : "—");
+    const ws18=fval("w_s18");
+    $("t_s18").textContent = "الإجمالي: " + (isFinite(ws18)? "$ "+(per.s18*ws18).toFixed(2) : "—");
 
-    const wb18=fval("w_b18"), a18=clampInt("add18");
-    $("t_b18").textContent = "الإجمالي: " + (isFinite(wb18)? "$ "+((per.b18+(isFinite(a18)?a18:0))*wb18).toFixed(2) : "—");
+‎    // بيع 18: ربح المحل + الصياغة (حتى 50$/غ) ثم الوزن
+    const wb18=fval("w_b18"), a18=clampDec("add18");
+    const base18 = per.b18 + STORE_MARGIN;
+    $("t_b18").textContent = "الإجمالي: " + (isFinite(wb18)? "$ "+((base18 + (isFinite(a18)?a18:0))*wb18).toFixed(2) : "—");
 
-    const ws21=fval("w_s21"); $("t_s21").textContent = "الإجمالي: " + (isFinite(ws21)? "$ "+(per.s21*ws21).toFixed(2) : "—");
+    const ws21=fval("w_s21");
+    $("t_s21").textContent = "الإجمالي: " + (isFinite(ws21)? "$ "+(per.s21*ws21).toFixed(2) : "—");
 
-    const wb21=fval("w_b21"), a21=clampInt("add21");
-    $("t_b21").textContent = "الإجمالي: " + (isFinite(wb21)? "$ "+((per.b21+(isFinite(a21)?a21:0))*wb21).toFixed(2) : "—");
+‎    // بيع 21: ربح المحل + الصياغة (حتى 50$/غ) ثم الوزن
+    const wb21=fval("w_b21"), a21=clampDec("add21");
+    const base21 = per.b21 + STORE_MARGIN;
+    $("t_b21").textContent = "الإجمالي: " + (isFinite(wb21)? "$ "+((base21 + (isFinite(a21)?a21:0))*wb21).toFixed(2) : "—");
   }
 
   function runAll(){ if(calcPerGram()) updateTotals(); }
 
   // --- FREE provider: gold-api.com (no key) ---
-  // We'll try a few common endpoints and normalize different payload shapes.
   const GOLDAPI_FREE_ENDPOINTS = [
     "https://api.gold-api.com/price/XAU",
     "https://api.gold-api.com/price/XAU/USD",
@@ -251,7 +260,6 @@ Coin sell = 8 × sell21k + 8
   ];
 
   function pickOuncePrice(data){
-    // Try typical fields first
     const candidates = [
       data && data.price,
       data && data.usd,
@@ -264,7 +272,6 @@ Coin sell = 8 × sell21k + 8
     ].map(Number).filter(x => isFinite(x) && x>0);
     if (candidates.length) return candidates[0];
 
-    // Fallback: if API returns 24K gram price, convert to ounce
     const g24 = Number(data && (data.gram_24k || data.price_gram_24k || data.g24 || data.per_gram));
     if (isFinite(g24) && g24>0) return g24 * OZT_TO_G;
 
@@ -290,7 +297,6 @@ Coin sell = 8 × sell21k + 8
     $("btnFetch").disabled=false;
   }
 
-  // live updates
   ["oz","w_s18","w_b18","add18","w_s21","w_b21","add21"].forEach(id=>{
     $(id).addEventListener("input", updateTotals);
   });
