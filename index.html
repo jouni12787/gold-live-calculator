@@ -41,7 +41,10 @@
   }
   input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.25)}
   .num{ direction:ltr; text-align:left; }
+
+  /* الصف الافتراضي */
   .row{display:grid;gap:10px;grid-template-columns:1fr 160px;align-items:end}
+
   .btn{
     border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;
     background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2b1f10;
@@ -71,12 +74,12 @@
     background:#4b3a22;border:1px solid rgba(212,175,55,.35);transition:.25s;
   }
   .slider::after{
-    content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+    content:"";position:absolute;top:50%;left:2px;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;
     background:linear-gradient(135deg,var(--gold),var(--gold2));transition:.25s;
     box-shadow:0 4px 10px rgba(0,0,0,.35);
   }
   .switch input:checked + .slider{background:#c0992b}
-  .switch input:checked + .slider::after{transform:translateX(20px)}
+  .switch input:checked + .slider::after{transform:translate(20px, -50%)}
   .switch .txt{font-size:12px;color:var(--muted)}
 </style>
 </head>
@@ -90,16 +93,17 @@
   <!-- spot -->
   <section class="card">
     <h2>سعر الأونصة بالدولار</h2>
-    <div class="row" style="grid-template-columns:1fr auto">
+    <!-- صف خاص بالمراقبة: محاذاة وسط بدل end -->
+    <div class="row" style="grid-template-columns:1fr auto; align-items:center">
       <div>
         <label>USD/oz (إدخال يدوي)</label>
         <input id="oz" class="num" type="tel" inputmode="decimal" placeholder="مثال: 2350" value="">
       </div>
-      <!-- نحتفظ بزر التحديث ونضيف بجانبه السويتش داخل حاوية مرنة بدون تغيير الشبكة -->
+      <!-- زر التحديث + السويتش -->
       <div style="display:flex;align-items:center;gap:10px">
         <button id="btnFetch" class="btn">تحديث • Refresh</button>
-        <label class="switch">
-          <input id="auto" type="checkbox"/>
+        <label class="switch" aria-label="تحديث تلقائي">
+          <input id="auto" type="checkbox" checked>
           <span class="slider" aria-hidden="true"></span>
           <span class="txt">تحديث تلقائي</span>
         </label>
@@ -352,8 +356,8 @@ Coin sell = 8 × sell21k + 8
   }
 
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
-  // افتراضيًا: إيقاف (وما زال عندك جلب أولي عند التحميل)
-  window.addEventListener("load", () => setAuto(false));
+  // افتراضيًا: تشغيل تلقائي
+  window.addEventListener("load", () => setAuto(true));
 </script>
 </body>
 <footer>© 2025 جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني</footer>
