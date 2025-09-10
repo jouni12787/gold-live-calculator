@@ -13,13 +13,13 @@
   :root{
     --bg:#1c140b;      /* لون الخلفية العلوي للتدرج */
     --bg2:#120d07;     /* لون الخلفية السفلي للتدرج */
-    --card:#241a0e;    /* لون بطاقات المحتوى */
+    --card:#211a0e;    /* لون بطاقات المحتوى */
     --ink:#fff7e6;     /* لون النص الرئيسي */
     --muted:#e8d9b3;   /* لون النص الثانوي */
     --gold:#d4af37;    /* لون ذهبي 1 */
     --gold2:#b88a1a;   /* لون ذهبي 2 */
     --radius:16px;     /* نصف قطر حواف البطاقات */
-    --gap:14px;        /* مسافة بين أقسام الصفحة */
+    --gap:7px;        /* مسافة بين أقسام الصفحة */
   }
 
   /* توحيد حساب المسافات */
@@ -132,7 +132,7 @@
   /* =========================================
      4) شريط أدوات سعر الأونصة (الحقل/زر/سويتش)
      ========================================= */
-  .spot-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .spot-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
   .spot-toolbar .priceField{flex:1 1 180px;min-width:170px}
   .spot-toolbar .priceField input{font-weight:700} /* إبراز قيمة الأونصة */
   .spot-toolbar .btn{flex:0 0 auto}
@@ -192,6 +192,28 @@
 
   /* تقليل المسافة أسفل عناوين البطاقات قليلاً */
   .card h2{ margin-bottom:6px; }
+    /* ===== Compact the basic-prices box (#perg) only ===== */
+#perg{
+  /* outer gap above & below the box */
+  margin-block: 6px;          /* tweak 2–10px to taste */
+
+  /* inner spacing */
+  padding: 6px 10px;          /* was 12px from .out */
+  line-height: 1.25;          /* override 1.6 from .out */
+  white-space: normal;        /* cancel pre-wrap from .out */
+}
+
+/* tighter rows inside the list */
+#perg .prices{ gap: 2px 12px; }        /* was 6px 16px */
+#perg .prices > div{ padding: 2px 0; } /* was 4px 0 */
+
+/* smaller label text (optional) */
+#perg .label{ font-size: 13px; }
+
+/* ensure a small gap under the heading and before next heading */
+.card h2 + #perg{ margin-top: 6px; }         /* space under the title */
+#perg + h2{ margin-top: 8px !important; }    /* space before the next title */
+
   </style>
 </head>
 
@@ -266,8 +288,11 @@
           alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١" loading="lazy" decoding="async">
 
         <!-- الصيغة: كيف حُسب مبلغ الليرة -->
-        <div class="mini">شراء = ٨ × شراء ٢١ /غ — مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.</div>
-      </div>
+       <div class="mini">
+  شراء = ٨ × شراء ٢١ /غ<br>
+  مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.
+</div>
+
     </section>
 
     <!-- بطاقة: حساب الإجمالي حسب الوزن لكل حالة -->
