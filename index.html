@@ -264,10 +264,10 @@
       <!-- يملأه JS بقيم 18K و21K لكل من الشراء/البيع -->
       <div class="out" id="perg">
         <div class="prices">
+          <div class="label">مبيع 18K</div><div class="value">—</div>
           <div class="label">شراء 18K</div><div class="value">—</div>
-          <div class="label">بيع 18K</div><div class="value">—</div>
+          <div class="label">مبيع 21K</div><div class="value">—</div>
           <div class="label">شراء 21K</div><div class="value">—</div>
-          <div class="label">بيع 21K</div><div class="value">—</div>
         </div>
       </div>
 
@@ -278,8 +278,8 @@
       <div class="out" id="coin">
         <!-- تُحقن هذه الأسطر من JS -->
         <div class="prices" id="coinPrices">
-          <div class="label">ليرة — شراء</div><div class="value">—</div>
           <div class="label">ليرة — مبيع</div><div class="value">—</div>
+          <div class="label">ليرة — شراء</div><div class="value">—</div>
         </div>
 
         <!-- الصورة أسفل الأسعار مباشرة -->
@@ -288,12 +288,14 @@
           src="https://wikgold.com/wp-content/uploads/2023/09/%D9%84%D9%8A%D8%B1%D8%A9-%D8%A7%D9%84%D8%B0%D9%87%D8%A8-%D8%A7%D9%84%D8%A5%D9%86%D8%AC%D9%84%D9%8A%D8%B2%D9%8A%D8%A9.jpg"
           alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١" loading="lazy" decoding="async">
 
-        <!-- الصيغة: كيف حُسب مبلغ الليرة -->
-       <div class="mini">
-  شراء = ٨ × شراء ٢١ /غ<br>
-  مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.
-</div>
+        <!-- الصيغة: كيف حُسب مبلغ الليرة (عرض فقط) -->
+        <div class="mini">
+     شراء = ٨ × شراء ٢١ /غ<br>
+     مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.
+  </div>
 
+
+      </div>
     </section>
 
     <!-- بطاقة: حساب الإجمالي حسب الوزن لكل حالة -->
@@ -301,15 +303,14 @@
       <h2>حساب الإجمالي حسب الوزن</h2>
 
       <div class="totals-grid" style="margin-top:8px">
-        <!-- شراء 18 -->
+        <!-- (تم قلب العناوين فقط) -->
         <div class="panel">
-          <h2>شراء 18 قيراط</h2>
+          <h2>مبيع 18 قيراط</h2>
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
               <input id="w_s18" class="num" type="tel" inputmode="decimal" placeholder="">
             </div>
-            <!-- عمود ثانٍ مخفي فقط للحفاظ على تخطيط عمودين -->
             <div style="visibility:hidden">
               <label>صياغة</label>
               <input disabled class="num" placeholder="">
@@ -318,9 +319,8 @@
           <div id="t_s18" class="tot">الإجمالي: —</div>
         </div>
 
-        <!-- بيع 18 -->
         <div class="panel">
-          <h2>بيع 18 قيراط</h2>
+          <h2>شراء 18 قيراط</h2>
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
@@ -334,9 +334,8 @@
           <div id="t_b18" class="tot">الإجمالي: —</div>
         </div>
 
-        <!-- شراء 21 -->
         <div class="panel">
-          <h2>شراء 21 قيراط</h2>
+          <h2>مبيع 21 قيراط</h2>
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
@@ -350,9 +349,8 @@
           <div id="t_s21" class="tot">الإجمالي: —</div>
         </div>
 
-        <!-- بيع 21 -->
         <div class="panel">
-          <h2>بيع 21 قيراط</h2>
+          <h2>شراء 21 قيراط</h2>
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
@@ -368,17 +366,17 @@
       </div>
     </section>
 
-    <!-- بطاقة: الصيغ الرياضية المستخدمة (للتوثيق) -->
+    <!-- بطاقة: الصيغ الرياضية المستخدمة (عرض فقط) -->
     <section class="card" style="grid-column:1 / -1">
       <h2>الصيغ المستخدمة</h2>
       <div class="out" style="direction:ltr;text-align:left">
-buy 18K =(oz−30)*32*740
-sell  18K =(oz+30)*32*750/995
-buy 21K =(oz−30)*32*865
-sell  21K =(oz+30)*32*875/995
-Coin buy = 8 × buy21k
-Coin sell = 8 × sell21k + 8
-(بيع 18/21) +5.5 $/غ ربح محل قبل الصياغة
+sell 18K =(oz−30)*32*740
+buy  18K =(oz+30)*32*750/995
+sell 21K =(oz−30)*32*865
+buy  21K =(oz+30)*32*875/995
+Coin sell = 8 × sell21k
+Coin buy  = 8 × buy21k + 8
+(شراء 18/21) +5.5 $/غ ربح محل قبل الصياغة
       </div>
     </section>
   </main>
@@ -390,7 +388,7 @@ Coin sell = 8 × sell21k + 8
 
   <script>
   /* ==========================================================
-     JavaScript — المنطق الوظيفي
+     JavaScript — المنطق الوظيفي (لم يتغيّر إطلاقاً)
      ========================================================== */
 
   /* ثوابت وأدوات مساعدة عامة */
@@ -424,24 +422,23 @@ Coin sell = 8 × sell21k + 8
     per.s21 = (oz-30)*(OZT_TO_G)*(865/1000)/1000;
     per.b21 = (oz+30)*(OZT_TO_G)*(875/995)/1000;
 
-    // حقن أسعار الغرام في #perg
+    // حقن أسعار الغرام في #perg (قلب الكلمات الظاهرة فقط)
     $("perg").innerHTML = `
       <div class="prices">
-        <div class="label">شراء 18K</div><div class="value">$ ${fmt(per.s18)} / غ</div>
-        <div class="label">بيع 18K</div><div class="value">$ ${fmt(per.b18)} / غ</div>
-        <div class="label">شراء 21K</div><div class="value">$ ${fmt(per.s21)} / غ</div>
-        <div class="label">بيع 21K</div><div class="value">$ ${fmt(per.b21)} / غ</div>
+        <div class="label">مبيع 18K</div><div class="value">$ ${fmt(per.s18)} / غ</div>
+        <div class="label">شراء 18K</div><div class="value">$ ${fmt(per.b18)} / غ</div>
+        <div class="label">مبيع 21K</div><div class="value">$ ${fmt(per.s21)} / غ</div>
+        <div class="label">شراء 21K</div><div class="value">$ ${fmt(per.b21)} / غ</div>
       </div>
     `;
 
-    // أسعار الليرة: شراء = ٨ × شراء ٢١ /غ | مبيع = ٨ × مبيع ٢١ /غ + ٨
+    // أسعار الليرة (العناوين فقط مقلوبة)
     const coinSell = 8*per.s21;
     const coinBuy  = 8*per.b21 + 8;
 
-    // حقن أسعار الليرة في #coinPrices
     $("coinPrices").innerHTML = `
-      <div class="label">ليرة — شراء</div><div class="value">$ ${fmt(coinSell)}</div>
-      <div class="label">ليرة — مبيع</div><div class="value">$ ${fmt(coinBuy)}</div>
+      <div class="label">ليرة — مبيع</div><div class="value">$ ${fmt(coinSell)}</div>
+      <div class="label">ليرة — شراء</div><div class="value">$ ${fmt(coinBuy)}</div>
     `;
 
     // تحديث رسالة الحالة
