@@ -8,7 +8,7 @@
      crossorigin="anonymous"></script>
   <style>
   /* =========================================
-‎     1) متغيّرات التصميم (Theme Tokens)
+     1) متغيّرات التصميم (Theme Tokens)
      ========================================= */
   :root{
     --bg:#1c140b;
@@ -25,7 +25,7 @@
   *{box-sizing:border-box}
 
   /* =========================================
-‎     2) إعداد الصفحة
+     2) إعداد الصفحة
      ========================================= */
   body{
     margin:0;
@@ -121,7 +121,7 @@
   .switch .txt{font-size:12px;color:var(--muted)}
 
   /* =========================================
-‎     4) أدوات سعر الأونصة
+     4) أدوات سعر الأونصة
      ========================================= */
   .spot-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
   .spot-toolbar .priceField{flex:1 1 180px;min-width:170px}
@@ -133,7 +133,7 @@
   .spot-meta .badge{white-space:nowrap}
 
   /* =========================================
-‎     5) شبكة الأسعار (label/value)
+     5) شبكة الأسعار (label/value)
      ========================================= */
   .prices{
     display:grid;
@@ -149,7 +149,7 @@
   .prices .value{font-weight:700;direction:ltr;text-align:left}
 
   /* =========================================
-‎     6) صورة الليرة
+     6) صورة الليرة
      ========================================= */
   .coin-img{
     display:block;
@@ -166,7 +166,7 @@
   @media (min-width:700px){ .coin-img{ width:500px } }
 
   /* =========================================
-‎     7) ضغط صندوق الليرة
+     7) ضغط صندوق الليرة
      ========================================= */
   #coin{
     white-space:normal;
@@ -230,15 +230,15 @@
 </head>
 
 <body>
-‎  <!-- رأس الصفحة -->
+  <!-- رأس الصفحة -->
   <header>
     <h1>أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
     <p>سعر الأونصة XAU/USD من <strong>gold-api.com</strong> — أو أدخل السعر يدويًا.</p>
   </header>
 
-‎  <!-- المحتوى -->
+  <!-- المحتوى -->
   <main class="grid grid-2">
-‎    <!-- بطاقة الأونصة -->
+    <!-- بطاقة الأونصة -->
     <section class="card">
       <h2>سعر الأونصة بالدولار</h2>
 
@@ -266,11 +266,11 @@
       <div id="err" class="error" style="display:none;margin-top:8px"></div>
     </section>
 
-‎    <!-- بطاقة الأسعار + الليرة -->
+    <!-- بطاقة الأسعار + الليرة -->
     <section class="card">
       <h2>الأسعار الأساسية من دون صياغة (دولار/غرام)</h2>
 
-‎      <!-- يملأه JS -->
+      <!-- يملأه JS -->
       <div class="out" id="perg">
         <div class="prices">
           <div class="label">مبيع 18K</div><div class="value">—</div>
@@ -280,7 +280,7 @@
         </div>
       </div>
 
-‎      <!-- شريط التواصل (بين السعرين) -->
+      <!-- شريط التواصل (بين السعرين) -->
       <div class="contact-bar" role="note" aria-label="التواصل للإعلانات">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/>
@@ -288,14 +288,14 @@
         <div>
           <strong>لإعلاناتكم:</strong>
           
-‎التواصل عبر البريد الإلكتروني
+التواصل عبر البريد الإلكتروني
           <a id="adEmail" href="mailto:ajouni913@gmail.com">ajouni913@gmail.com</a>
         </div>
         <span class="spacer"></span>
         <button id="copyAdMail" class="btn-mini gold" type="button">نسخ الإيميل</button>
       </div>
 
-‎      <!-- عنوان وصندوق الليرة -->
+      <!-- عنوان وصندوق الليرة -->
       <h2 style="margin-top:4px">ليرة ذهبية أنجليزية ٨ غ عيار ٢١</h2>
 
       <div class="out" id="coin">
@@ -310,13 +310,13 @@
           alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١" loading="lazy" decoding="async">
 
         <div class="mini">
-‎          شراء = ٨ × شراء ٢١ /غ<br>
-‎          مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.
+          شراء = ٨ × شراء ٢١ /غ<br>
+          مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.
         </div>
       </div>
     </section>
 
-‎    <!-- بطاقة الإجماليات -->
+    <!-- بطاقة الإجماليات -->
     <section class="card" style="grid-column:1 / -1">
       <h2>حساب الإجمالي حسب الوزن</h2>
 
@@ -383,7 +383,7 @@
       </div>
     </section>
 
-‎    <!-- بطاقة الصيغ -->
+    <!-- بطاقة الصيغ -->
     <section class="card" style="grid-column:1 / -1">
       <h2>الصيغ المستخدمة</h2>
       <div class="out" style="direction:ltr;text-align:left">
@@ -393,14 +393,14 @@ sell 21K =(oz−30)*32*865
 buy  21K =(oz+30)*32*875/995
 Coin sell = 8 × sell21k
 Coin buy  = 8 × buy21k + 8
-‎(شراء 18/21) +5.5 $/غ ربح محل قبل الصياغة
+(شراء 18/21) +5.5 $/غ ربح محل قبل الصياغة
       </div>
     </section>
   </main>
 
-‎  <!-- ذيل -->
+  <!-- ذيل -->
   <footer style="text-align:center;color:var(--muted);font-size:12px;padding:18px 0;">
-‎    © 2025 جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني
+    © 2025 جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني
   </footer>
 
   <script>
@@ -556,7 +556,7 @@ Coin buy  = 8 × buy21k + 8
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
   window.addEventListener("load", () => { fetchSpot(); setAuto(true); });
 
-‎  /* ===== نسخ إيميل شريط التواصل ===== */
+  /* ===== نسخ إيميل شريط التواصل ===== */
   (function(){
     const copyBtn = document.getElementById("copyAdMail");
     const emailEl = document.getElementById("adEmail");
