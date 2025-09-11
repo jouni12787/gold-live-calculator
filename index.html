@@ -8,26 +8,24 @@
      crossorigin="anonymous"></script>
   <style>
   /* =========================================
-     1) متغيّرات التصميم (Theme Tokens)
-     - ألوان عامة، نصف قطر الحواف، مسافات
+‎     1) متغيّرات التصميم (Theme Tokens)
      ========================================= */
   :root{
-    --bg:#1c140b;      /* لون الخلفية العلوي للتدرج */
-    --bg2:#120d07;     /* لون الخلفية السفلي للتدرج */
-    --card:#211a0e;    /* لون بطاقات المحتوى */
-    --ink:#fff7e6;     /* لون النص الرئيسي */
-    --muted:#e8d9b3;   /* لون النص الثانوي */
-    --gold:#d4af37;    /* لون ذهبي 1 */
-    --gold2:#b88a1a;   /* لون ذهبي 2 */
-    --radius:16px;     /* نصف قطر حواف البطاقات */
-    --gap:7px;        /* مسافة بين أقسام الصفحة */
+    --bg:#1c140b;
+    --bg2:#120d07;
+    --card:#211a0e;
+    --ink:#fff7e6;
+    --muted:#e8d9b3;
+    --gold:#d4af37;
+    --gold2:#b88a1a;
+    --radius:16px;
+    --gap:7px;
   }
 
-  /* توحيد حساب المسافات */
   *{box-sizing:border-box}
 
   /* =========================================
-     2) إعداد الصفحة: خلفية، خط، تخطيط عام
+‎     2) إعداد الصفحة
      ========================================= */
   body{
     margin:0;
@@ -40,7 +38,6 @@
     min-height:100vh;
   }
 
-  /* شريط العنوان مثبت أعلى الصفحة */
   header{
     position:sticky; top:0; z-index:10;
     backdrop-filter:blur(8px);
@@ -52,12 +49,10 @@
   header h1{margin:0;font-size:20px}
   header p{margin:6px 0 0;color:var(--muted);font-size:12px}
 
-  /* الحاوية الرئيسية + شبكة الأعمدة */
   main{max-width:980px;margin:20px auto;padding:0 16px 40px}
   .grid{display:grid;gap:var(--gap)}
-  @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}} /* عمودان على الكبير */
+  @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
 
-  /* بطاقة المحتوى */
   .card{
     background:linear-gradient(180deg,#2b1f10 0%,var(--card) 100%);
     border:1px solid rgba(212,175,55,.25);
@@ -65,9 +60,8 @@
     padding:16px;
     box-shadow:0 12px 30px rgba(0,0,0,.35);
   }
-  h2{margin:0 0 10px;font-size:17px}
+  h2{margin:0 0 6px;font-size:17px}
 
-  /* مدخلات ونصوص مساعدة */
   label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}
   input{
     width:100%; background:#171008; color:var(--ink);
@@ -76,12 +70,10 @@
     caret-color: var(--ink);
   }
   input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.25)}
-  .num{direction:ltr;text-align:left} /* لضبط أرقام إنجليزية من اليسار */
+  .num{direction:ltr;text-align:left}
 
-  /* صف ثنائي الأعمدة في لوحات الإجماليات */
   .row{display:grid;gap:10px;grid-template-columns:1fr 160px;align-items:end}
 
-  /* الأزرار */
   .btn{
     border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;
     background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2b1f10;
@@ -89,19 +81,17 @@
   }
   .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(212,175,55,.35)}
 
-  /* الشارات والصناديق النصية العامة */
   .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#171008;border:1px solid rgba(212,175,55,.25);color:var(--muted);font-size:12px}
   .out{
     font-family:ui-monospace,Menlo,Consolas,monospace;
-    white-space:pre-wrap;      /* موروث: يحافظ على الأسطر */
-    line-height:1.6;           /* موروث: سطر مرتفع */
+    white-space:pre-wrap;
+    line-height:1.6;
     background:#171008; border:1px solid rgba(212,175,55,.22);
     padding:12px; border-radius:12px;
   }
 
   .error{background:#3a120c;border:1px solid rgba(255,150,120,.6);color:#ffe1db;padding:10px;border-radius:10px;font-size:12px}
 
-  /* شبكة لوحات الإجماليات */
   .totals-grid{display:grid;gap:10px}
   @media(min-width:700px){.totals-grid{grid-template-columns:1fr 1fr}}
   .panel{background:#1f150a;border:1px solid rgba(212,175,55,.28);border-radius:14px;padding:12px}
@@ -112,10 +102,10 @@
   .mini{font-size:12px;color:var(--muted)}
 
   /* =========================================
-     3) مفتاح التحديث التلقائي (Switch)
+     3) Switch
      ========================================= */
   .switch{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
-  .switch input{display:none}       /* إخفاء الـcheckbox الأصلي */
+  .switch input{display:none}
   .slider{
     position:relative;width:44px;height:24px;border-radius:999px;
     background:#4b3a22;border:1px solid rgba(212,175,55,.35);transition:.25s;
@@ -131,11 +121,11 @@
   .switch .txt{font-size:12px;color:var(--muted)}
 
   /* =========================================
-     4) شريط أدوات سعر الأونصة (الحقل/زر/سويتش)
+‎     4) أدوات سعر الأونصة
      ========================================= */
   .spot-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
   .spot-toolbar .priceField{flex:1 1 180px;min-width:170px}
-  .spot-toolbar .priceField input{font-weight:700} /* إبراز قيمة الأونصة */
+  .spot-toolbar .priceField input{font-weight:700}
   .spot-toolbar .btn{flex:0 0 auto}
   .spot-toolbar .switch .txt{margin-inline-start:6px}
   .spot-meta{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
@@ -143,31 +133,30 @@
   .spot-meta .badge{white-space:nowrap}
 
   /* =========================================
-     5) بنية عرض الأسعار (label/value) كسطور
-     - تُستخدم داخل #perg وأيضًا داخل #coinPrices
+‎     5) شبكة الأسعار (label/value)
      ========================================= */
   .prices{
     display:grid;
-    grid-template-columns:auto 1fr; /* يسار: عنوان / يمين: قيمة */
+    grid-template-columns:auto 1fr;
     gap:6px 16px;
     align-items:center;
-    white-space:normal;             /* نلغي pre-wrap هنا */
+    white-space:normal;
     font-family:inherit;
   }
   .prices > div{padding:4px 0;border-bottom:1px dashed rgba(212,175,55,.18)}
-  .prices > div:nth-last-child(-n+2){border-bottom:none} /* لا خط سفلي لآخر صف */
+  .prices > div:nth-last-child(-n+2){border-bottom:none}
   .prices .label{color:var(--muted);font-size:14px}
   .prices .value{font-weight:700;direction:ltr;text-align:left}
 
   /* =========================================
-     6) صورة الليرة (أسفل أسعار الليرة)
+‎     6) صورة الليرة
      ========================================= */
   .coin-img{
     display:block;
-    width:500px;           /* يمكن تغييرها لتصغير/تكبير الصورة */
+    width:500px;
     max-width:100%;
     height:auto;
-    margin:6px auto;       /* يوسّط الصورة ويضبط مسافة صغيرة حولها */
+    margin:6px auto;
     border-radius:10px;
     border:1px solid rgba(212,175,55,.25);
     background:#0b0b0b;
@@ -177,61 +166,82 @@
   @media (min-width:700px){ .coin-img{ width:500px } }
 
   /* =========================================
-     7) وضع فائق الانضغاط لصندوق الليرة فقط
-     - يلغي تأثير .out (pre-wrap + line-height العالي)
-     - يقلّص كل الفراغات داخله (العنوان ← الأسعار ← الصورة ← الصيغة)
+‎     7) ضغط صندوق الليرة
      ========================================= */
   #coin{
-    white-space:normal;   /* إلغاء pre-wrap الموروث من .out */
-    line-height:1.25;     /* أسطر أقرب */
-    padding:6px 8px;      /* حشو داخلي أصغر */
+    white-space:normal;
+    line-height:1.25;
+    padding:6px 8px;
   }
-  #coin .prices{ gap:2px 10px; }     /* مسافات رأسية أصغر بين صفوف السعر */
-  #coin .prices > div{ padding:0; }  /* إزالة ارتفاع زائد للصف */
-  #coin .coin-img{ margin:4px auto; }/* تقليل المسافة حول الصورة */
-  #coin .mini{ margin-top:2px; line-height:1.2; } /* تقليل المسافة للصيغة */
+  #coin .prices{ gap:2px 10px; }
+  #coin .prices > div{ padding:0; }
+  #coin .coin-img{ margin:4px auto; }
+  #coin .mini{ margin-top:2px; line-height:1.2; }
 
-  /* تقليل المسافة أسفل عناوين البطاقات قليلاً */
   .card h2{ margin-bottom:6px; }
-    /* ===== Compact the basic-prices box (#perg) only ===== */
-#perg{
-  /* outer gap above & below the box */
-  margin-block: 6px;          /* tweak 2–10px to taste */
 
-  /* inner spacing */
-  padding: 6px 10px;          /* was 12px from .out */
-  line-height: 1.25;          /* override 1.6 from .out */
-  white-space: normal;        /* cancel pre-wrap from .out */
-}
+  /* ===== Compact the basic-prices box (#perg) only ===== */
+  #perg{
+    margin-block:6px;
+    padding:6px 10px;
+    line-height:1.25;
+    white-space:normal;
+  }
+  #perg .prices{ gap:2px 12px; }
+  #perg .prices > div{ padding:2px 0; }
+  #perg .label{ font-size:13px; }
 
-/* tighter rows inside the list */
-#perg .prices{ gap: 2px 12px; }        /* was 6px 16px */
-#perg .prices > div{ padding: 2px 0; } /* was 4px 0 */
+  /* spacing before next sections (account for the new contact bar) */
+  .card h2 + #perg{ margin-top:6px; }
+  #perg + .contact-bar{ margin-top:8px; }
+  .contact-bar + h2{ margin-top:8px !important; }
 
-/* smaller label text (optional) */
-#perg .label{ font-size: 13px; }
-
-/* ensure a small gap under the heading and before next heading */
-.card h2 + #perg{ margin-top: 6px; }         /* space under the title */
-#perg + h2{ margin-top: 8px !important; }    /* space before the next title */
-
+  /* =========================================
+     Contact bar (between prices and coin)
+     ========================================= */
+  .contact-bar{
+    display:flex; align-items:center; gap:12px;
+    padding:10px 12px; margin:8px 0;
+    background:#1f150a;
+    border:1px solid rgba(212,175,55,.28);
+    border-radius:12px;
+    box-shadow:0 6px 16px rgba(0,0,0,.25);
+    direction:rtl;
+    font-size:14px; color:var(--ink);
+  }
+  .contact-bar .icon{
+    width:18px; height:18px; flex:0 0 18px; display:inline-block;
+  }
+  .contact-bar a{
+    color:var(--gold); text-decoration:none;
+    border-bottom:1px dashed rgba(212,175,55,.4);
+  }
+  .contact-bar .spacer{ flex:1; }
+  .contact-bar .btn-mini{
+    border:1px solid rgba(212,175,55,.35);
+    background:#171008; color:var(--ink);
+    border-radius:10px; padding:6px 10px; cursor:pointer; font-size:12px;
+  }
+  .contact-bar .btn-mini.gold{
+    background:linear-gradient(135deg,var(--gold),var(--gold2));
+    color:#2b1f10; border:0;
+  }
   </style>
 </head>
 
 <body>
-  <!-- رأس الصفحة: عنوان ومصدر البيانات -->
+‎  <!-- رأس الصفحة -->
   <header>
     <h1>أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
     <p>سعر الأونصة XAU/USD من <strong>gold-api.com</strong> — أو أدخل السعر يدويًا.</p>
   </header>
 
-  <!-- محتوى الصفحة: عمودان على الشاشات الكبيرة -->
+‎  <!-- المحتوى -->
   <main class="grid grid-2">
-    <!-- بطاقة: سعر الأونصة وأدوات التحكم -->
+‎    <!-- بطاقة الأونصة -->
     <section class="card">
       <h2>سعر الأونصة بالدولار</h2>
 
-      <!-- شريط الأدوات: إدخال/تحديث/سويتش/احسب -->
       <div class="spot-toolbar">
         <div class="priceField">
           <label>USD/oz (إدخال يدوي)</label>
@@ -249,7 +259,6 @@
         <button class="btn ghost" id="btnCalc" title="احسب من القيمة الحالية">احسب</button>
       </div>
 
-      <!-- سطر حالة بسيط + مكان رسالة الخطأ -->
       <div class="spot-meta">
         <span id="meta" class="badge">—</span>
         <span class="spacer"></span>
@@ -257,11 +266,11 @@
       <div id="err" class="error" style="display:none;margin-top:8px"></div>
     </section>
 
-    <!-- بطاقة: أسعار الغرام + صندوق الليرة -->
+‎    <!-- بطاقة الأسعار + الليرة -->
     <section class="card">
       <h2>الأسعار الأساسية من دون صياغة (دولار/غرام)</h2>
 
-      <!-- يملأه JS بقيم 18K و21K لكل من الشراء/البيع -->
+‎      <!-- يملأه JS -->
       <div class="out" id="perg">
         <div class="prices">
           <div class="label">مبيع 18K</div><div class="value">—</div>
@@ -271,39 +280,47 @@
         </div>
       </div>
 
-      <!-- عنوان صندوق الليرة -->
+‎      <!-- شريط التواصل (بين السعرين) -->
+      <div class="contact-bar" role="note" aria-label="التواصل للإعلانات">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/>
+        </svg>
+        <div>
+          <strong>لإعلاناتكم:</strong>
+          
+‎التواصل عبر البريد الإلكتروني
+          <a id="adEmail" href="mailto:ajouni913@gmail.com">ajouni913@gmail.com</a>
+        </div>
+        <span class="spacer"></span>
+        <button id="copyAdMail" class="btn-mini gold" type="button">نسخ الإيميل</button>
+      </div>
+
+‎      <!-- عنوان وصندوق الليرة -->
       <h2 style="margin-top:4px">ليرة ذهبية أنجليزية ٨ غ عيار ٢١</h2>
 
-      <!-- صندوق الليرة: أسعار + صورة + الصيغة المختصرة -->
       <div class="out" id="coin">
-        <!-- تُحقن هذه الأسطر من JS -->
         <div class="prices" id="coinPrices">
           <div class="label">ليرة — مبيع</div><div class="value">—</div>
           <div class="label">ليرة — شراء</div><div class="value">—</div>
         </div>
 
-        <!-- الصورة أسفل الأسعار مباشرة -->
         <img
           class="coin-img"
           src="https://wikgold.com/wp-content/uploads/2023/09/%D9%84%D9%8A%D8%B1%D8%A9-%D8%A7%D9%84%D8%B0%D9%87%D8%A8-%D8%A7%D9%84%D8%A5%D9%86%D8%AC%D9%84%D9%8A%D8%B2%D9%8A%D8%A9.jpg"
           alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١" loading="lazy" decoding="async">
 
-        <!-- الصيغة: كيف حُسب مبلغ الليرة (عرض فقط) -->
         <div class="mini">
-     شراء = ٨ × شراء ٢١ /غ<br>
-     مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.
-  </div>
-
-
+‎          شراء = ٨ × شراء ٢١ /غ<br>
+‎          مبيع = ٨ × مبيع ٢١ /غ + ٨ دولار.
+        </div>
       </div>
     </section>
 
-    <!-- بطاقة: حساب الإجمالي حسب الوزن لكل حالة -->
+‎    <!-- بطاقة الإجماليات -->
     <section class="card" style="grid-column:1 / -1">
       <h2>حساب الإجمالي حسب الوزن</h2>
 
       <div class="totals-grid" style="margin-top:8px">
-        <!-- (تم قلب العناوين فقط) -->
         <div class="panel">
           <h2>مبيع 18 قيراط</h2>
           <div class="row">
@@ -366,7 +383,7 @@
       </div>
     </section>
 
-    <!-- بطاقة: الصيغ الرياضية المستخدمة (عرض فقط) -->
+‎    <!-- بطاقة الصيغ -->
     <section class="card" style="grid-column:1 / -1">
       <h2>الصيغ المستخدمة</h2>
       <div class="out" style="direction:ltr;text-align:left">
@@ -376,53 +393,43 @@ sell 21K =(oz−30)*32*865
 buy  21K =(oz+30)*32*875/995
 Coin sell = 8 × sell21k
 Coin buy  = 8 × buy21k + 8
-(شراء 18/21) +5.5 $/غ ربح محل قبل الصياغة
+‎(شراء 18/21) +5.5 $/غ ربح محل قبل الصياغة
       </div>
     </section>
   </main>
 
-  <!-- ذيل بسيط -->
+‎  <!-- ذيل -->
   <footer style="text-align:center;color:var(--muted);font-size:12px;padding:18px 0;">
-    © 2025 جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني
+‎    © 2025 جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني
   </footer>
 
   <script>
   /* ==========================================================
-     JavaScript — المنطق الوظيفي (لم يتغيّر إطلاقاً)
+     JavaScript — المنطق الوظيفي
      ========================================================== */
 
-  /* ثوابت وأدوات مساعدة عامة */
-  const OZT_TO_G = 32;           // معامل تحويل (حسب صيغتك)
-  const STORE_MARGIN = 5.5;      // ربح المحل ($/غ) يضاف لسعر البيع
-  const $ = id => document.getElementById(id); // مختصر getElementById
-  const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—"; // تنسيق رقم
-  const cleanDec = s => (s||"").replace(/[^\d.,]/g,"").replace(",",".");  // تنظيف نص إلى رقم عشري
-  const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; }; // قراءة قيمة حقل
-  const clampDec = (id,min=0,max=50)=>{ // تقييد الصياغة بين 0 و50
+  const OZT_TO_G = 32;
+  const STORE_MARGIN = 5.5;
+  const $ = id => document.getElementById(id);
+  const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
+  const cleanDec = s => (s||"").replace(/[^\d.,]/g,"").replace(",",".");
+  const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
+  const clampDec = (id,min=0,max=50)=>{
     const n = parseFloat(cleanDec($(id).value));
     return isFinite(n) ? Math.min(max, Math.max(min, n)) : NaN;
   };
 
-  // متغير يحتفظ بأسعار الغرام الناتجة من سعر الأونصة
   let per = { s18:NaN, b18:NaN, s21:NaN, b21:NaN };
 
-  /* ----------------------------------------------------------
-     calcPerGram()
-     - يحسب أسعار الغرام 18/21 (شراء/بيع) من سعر الأونصة
-     - يحقنها في صندوق "الأسعار الأساسية"
-     - يحسب أسعار الليرة ويعرضها
-     ---------------------------------------------------------- */
   function calcPerGram(){
     const oz = fval("oz");
     if(!isFinite(oz) || oz<=0) return false;
 
-    // صيغ التحويل (مطابقة لقسم "الصيغ المستخدمة")
     per.s18 = (oz-30)*(OZT_TO_G)*(740/1000)/1000;
     per.b18 = (oz+30)*(OZT_TO_G)*(750)/(995)/1000;
     per.s21 = (oz-30)*(OZT_TO_G)*(865/1000)/1000;
     per.b21 = (oz+30)*(OZT_TO_G)*(875/995)/1000;
 
-    // حقن أسعار الغرام في #perg (قلب الكلمات الظاهرة فقط)
     $("perg").innerHTML = `
       <div class="prices">
         <div class="label">مبيع 18K</div><div class="value">$ ${fmt(per.s18)} / غ</div>
@@ -432,7 +439,6 @@ Coin buy  = 8 × buy21k + 8
       </div>
     `;
 
-    // أسعار الليرة (العناوين فقط مقلوبة)
     const coinSell = 8*per.s21;
     const coinBuy  = 8*per.b21 + 8;
 
@@ -441,46 +447,30 @@ Coin buy  = 8 × buy21k + 8
       <div class="label">ليرة — شراء</div><div class="value">$ ${fmt(coinBuy)}</div>
     `;
 
-    // تحديث رسالة الحالة
     $("meta").textContent = "تم الحساب من سعر الأونصة.";
     return true;
   }
 
-  /* ----------------------------------------------------------
-     updateTotals()
-     - يحسب إجمالي المبلغ حسب الوزن المُدخل
-       (للشراء: السعر × الوزن)
-       (للبيع: (سعر البيع + ربح المحل + الصياغة) × الوزن)
-     ---------------------------------------------------------- */
   function updateTotals(){
-    if(!isFinite(per.s18)) return; // لا نحسب قبل توفر أسعار الغرام
+    if(!isFinite(per.s18)) return;
 
-    // شراء 18
     const ws18=fval("w_s18");
     $("t_s18").textContent = "الإجمالي: " + (isFinite(ws18)? "$ "+(per.s18*ws18).toFixed(2) : "—");
 
-    // بيع 18
     const wb18=fval("w_b18"), a18=clampDec("add18");
     const base18 = per.b18 + STORE_MARGIN;
     $("t_b18").textContent = "الإجمالي: " + (isFinite(wb18)? "$ "+((base18 + (isFinite(a18)?a18:0))*wb18).toFixed(2) : "—");
 
-    // شراء 21
     const ws21=fval("w_s21");
     $("t_s21").textContent = "الإجمالي: " + (isFinite(ws21)? "$ "+(per.s21*ws21).toFixed(2) : "—");
 
-    // بيع 21
     const wb21=fval("w_b21"), a21=clampDec("add21");
     const base21 = per.b21 + STORE_MARGIN;
     $("t_b21").textContent = "الإجمالي: " + (isFinite(wb21)? "$ "+((base21 + (isFinite(a21)?a21:0))*wb21).toFixed(2) : "—");
   }
 
-  // يجمع بين الحساب وتحديث الإجماليات
   function runAll(){ if(calcPerGram()) updateTotals(); }
 
-  /* ----------------------------------------------------------
-     جلب سعر الأونصة من gold-api.com (بدون مفتاح)
-     - نحاول عدة روابط مجانية ونختار أول استجابة صحيحة
-     ---------------------------------------------------------- */
   const GOLDAPI_FREE_ENDPOINTS = [
     "https://api.gold-api.com/price/XAU",
     "https://api.gold-api.com/price/XAU/USD",
@@ -488,7 +478,6 @@ Coin buy  = 8 × buy21k + 8
     "https://www.gold-api.com/price/XAU/USD"
   ];
 
-  // انتقاء حقل السعر الصحيح بغض النظر عن اسم الحقل في الاستجابة
   function pickOuncePrice(data){
     const candidates = [
       data && data.price,
@@ -502,14 +491,12 @@ Coin buy  = 8 × buy21k + 8
     ].map(Number).filter(x => isFinite(x) && x>0);
     if (candidates.length) return candidates[0];
 
-    // بديل: إن أعاد سعر 24k للغرام، نحوله لأونصة تقريبية
     const g24 = Number(data && (data.gram_24k || data.price_gram_24k || data.g24 || data.per_gram));
     if (isFinite(g24) && g24>0) return g24 * OZT_TO_G;
 
     return NaN;
   }
 
-  // جلب السعر وتعبئة الحقل ثم إعادة الحساب
   async function fetchSpot(){
     $("btnFetch").disabled=true;
     const err=$("err"); err.style.display="none"; err.textContent="";
@@ -530,26 +517,19 @@ Coin buy  = 8 × buy21k + 8
       }catch(e){ last=e.message+" @ "+url; }
     }
 
-    // لو فشل كل شيء
     err.style.display="block";
     err.textContent="فشل الجلب من gold-api.com.\n" + (last || "");
     $("btnFetch").disabled=false;
   }
 
-  /* مستمعو الأحداث:
-     - أي تغيير في المدخلات يحدث تحديث فوري للإجماليات
-     - أزرار التحديث/الحساب
-     - تفعيل التحديث التلقائي */
   ["w_s18","w_b18","add18","w_s21","w_b21","add21"].forEach(id=>{
-    $(id).addEventListener("input", updateTotals);
+    const el = $(id);
+    if(el) el.addEventListener("input", updateTotals);
   });
   $("oz").addEventListener("input", runAll);
   $("btnCalc").addEventListener("click", runAll);
   $("btnFetch").addEventListener("click", fetchSpot);
 
-  /* ----------------------------------------------------------
-     التحديث التلقائي كل 10 ثوانٍ
-     ---------------------------------------------------------- */
   let autoTimer = null;
   const AUTO_MS = 10_000;
 
@@ -560,9 +540,9 @@ Coin buy  = 8 × buy21k + 8
 
     if(on){
       if(autoTimer) clearInterval(autoTimer);
-      btn.disabled = true;               // تعطيل التحديث اليدوي أثناء التشغيل الآلي
+      btn.disabled = true;
       meta.textContent = "تحديث تلقائي كل 10 ثوانٍ.";
-      fetchSpot();                       // جلب أولي فور التشغيل
+      fetchSpot();
       autoTimer = setInterval(fetchSpot, AUTO_MS);
       auto.checked = true;
     }else{
@@ -573,9 +553,33 @@ Coin buy  = 8 × buy21k + 8
     }
   }
 
-  // تهيئة عند التحميل
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
   window.addEventListener("load", () => { fetchSpot(); setAuto(true); });
+
+‎  /* ===== نسخ إيميل شريط التواصل ===== */
+  (function(){
+    const copyBtn = document.getElementById("copyAdMail");
+    const emailEl = document.getElementById("adEmail");
+    if(copyBtn && emailEl){
+      const emailText = emailEl.textContent.trim();
+      copyBtn.addEventListener("click", async () => {
+        try{
+          await navigator.clipboard.writeText(emailText);
+          const old = copyBtn.textContent;
+          copyBtn.textContent = "نُسخ!";
+          setTimeout(()=> copyBtn.textContent = old, 1200);
+        }catch{
+          const ta = document.createElement("textarea");
+          ta.value = emailText; document.body.appendChild(ta);
+          ta.select(); document.execCommand("copy");
+          document.body.removeChild(ta);
+          const old = copyBtn.textContent;
+          copyBtn.textContent = "نُسخ!";
+          setTimeout(()=> copyBtn.textContent = old, 1200);
+        }
+      });
+    }
+  })();
   </script>
 </body>
 </html>
