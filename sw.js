@@ -3,7 +3,7 @@
    - Cache the app shell for offline UI
    - Let API requests go to network
    ========================================= */
-const CACHE = "gold-app-v1"; // bump to invalidate old cache
+const CACHE = "gold-app-v2"; // bump to invalidate old cache
 
 /* PWA-PATH: Add your real paths here if using a subpath */
 const ASSETS = [
