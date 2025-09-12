@@ -1,6 +1,6 @@
 {
-  "name": "أسعار الذهب",
-  "short_name": "الذهب",
+  "name": "أسعار الذهب الان",
+  "short_name": "أسعار الذهب",
   "dir": "rtl",
   "lang": "ar",
   "start_url": "/index.html",
