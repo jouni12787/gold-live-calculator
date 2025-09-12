@@ -7,11 +7,13 @@ const CACHE = "gold-app-v1"; // bump to invalidate old cache
 
 /* PWA-PATH: Add your real paths here if using a subpath */
 const ASSETS = [
-  "/",            // change to "/SUBPATH/" if hosted under a subpath
-  "/index.html",
-  "/manifest.json",
-  "/favicon.svg"
+  "/", "/index.html", "/manifest.json", "/favicon.svg",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/maskable-512.png",
+  "/icons/apple-touch-icon.png"
 ];
+
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
