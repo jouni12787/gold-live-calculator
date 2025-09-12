@@ -6,6 +6,22 @@
   <title>أسعار الذهب — 18 و 21 قيراط (دولار/غرام)</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4797992845421121"
      crossorigin="anonymous"></script>
+
+  <!-- =========================================
+       PWA: Manifest + theme + icons (ADDED)
+       - If your site is under a subpath (e.g. /gold-app/),
+         change href="/manifest.json" to href="/gold-app/manifest.json"
+         (see also sw.js & manifest.json notes for paths)
+       ========================================= -->
+  <link rel="manifest" href="/manifest.json"><!-- PWA -->
+  <meta name="theme-color" content="#d4af37"><!-- PWA: match your --gold -->
+
+  <!-- PWA: favicons / Apple icon (ADDED) -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml"><!-- PWA -->
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180"><!-- PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes"><!-- PWA -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- PWA -->
+
   <style>
   /* =========================================
      1) متغيّرات التصميم (Theme Tokens)
@@ -287,8 +303,7 @@
         </svg>
         <div>
           <strong>لإعلاناتكم:</strong>
-          
-التواصل عبر البريد الإلكتروني
+          التواصل عبر البريد الإلكتروني
           <a id="adEmail" href="mailto:ajouni913@gmail.com">ajouni913@gmail.com</a>
         </div>
         <span class="spacer"></span>
@@ -580,6 +595,16 @@ Coin buy  = 8 × buy21k + 8
       });
     }
   })();
+
+  /* =========================================
+     PWA: Register Service Worker (ADDED)
+     - If deployed under a subpath, change '/sw.js' to '/SUBPATH/sw.js'
+     ========================================= */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    });
+  }
   </script>
 </body>
 </html>
