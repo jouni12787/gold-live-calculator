@@ -1,0 +1,48 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c140b"/>
+      <stop offset="100%" stop-color="#120d07"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#b88a1a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="80%" cy="10%" r="60%">
+      <stop offset="0%" stop-color="rgba(212,175,55,0.28)"/>
+      <stop offset="100%" stop-color="rgba(212,175,55,0)"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1024" height="1024" rx="220" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1024" height="1024" rx="220" fill="url(#glow)"/>
+
+  <!-- coin -->
+  <g transform="translate(512 512)">
+    <circle r="270" fill="#2b1f10"/>
+    <circle r="260" fill="url(#gold)"/>
+    <circle r="205" fill="none" stroke="#fff7e6" stroke-opacity="0.16" stroke-width="10"/>
+    <g stroke="#fff7e6" stroke-opacity="0.16" stroke-width="10">
+      <line x1="0" y1="-240" x2="0" y2="-220"/>
+      <line x1="0" y1="240" x2="0" y2="220"/>
+      <line x1="-240" y1="0" x2="-220" y2="0"/>
+      <line x1="240" y1="0" x2="220" y2="0"/>
+      <line x1="170" y1="-170" x2="155" y2="-155"/>
+      <line x1="-170" y1="170" x2="-155" y2="155"/>
+      <line x1="-170" y1="-170" x2="-155" y2="-155"/>
+      <line x1="170" y1="170" x2="155" y2="155"/>
+    </g>
+
+    <path d="M -190 70 L -110 0 L -40 60 L 40 -60 L 110 -10 L 190 -40"
+          fill="none" stroke="#2b1f10" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -190 70 L -110 0 L -40 60 L 40 -60 L 110 -10 L 190 -40"
+          fill="none" stroke="#fff7e6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <g transform="translate(210,-160)" fill="url(#gold)">
+      <path d="M0-28 L6-6 L28 0 L6 6 L0 28 L-6 6 L-28 0 L-6 -6 Z"/>
+    </g>
+  </g>
+
+  <rect x="16" y="16" width="992" height="992" rx="210"
+        fill="none" stroke="rgba(212,175,55,0.35)" stroke-width="8"/>
+</svg>
