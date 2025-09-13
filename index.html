@@ -108,6 +108,9 @@
   .settings-row{display:grid;gap:6px}
   .settings-note{margin-top:8px;color:var(--muted);font-size:12px}
   .bar-head{display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .bar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .badge.hint{border-color:rgba(212,175,55,.5)}
+
   </style>
 </head>
 
@@ -255,10 +258,12 @@
     </section>
 
     <!-- Formulas + per-shop settings -->
-    <section class="card" style="grid-column:1 / -1">
       <div class="bar-head">
         <h2>الصيغ المستخدمة</h2>
-        <button id="toggleCfg" class="btn-mini">تعديل القيم</button>
+        <div class="bar-actions">
+          <span class="badge hint">يمكنك تعديل طريقة الحساب بالضغط على هذا الزر</span>
+          <button id="toggleCfg" class="btn-mini gold" type="button" title="تحرير القيم">تعديل القيم</button>
+        </div>
       </div>
 
       <div id="formulaBox" class="out" style="direction:ltr;text-align:left"></div>
