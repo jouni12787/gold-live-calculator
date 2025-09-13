@@ -470,7 +470,6 @@ Coin buy  = 8 × buy21k + 8
       <div class="label">ليرة — شراء</div><div class="value">$ ${fmt(coinBuy)}</div>
     `;
 
-    $("meta").textContent = "تم الحساب من سعر الأونصة.";
     return true;
   }
 
@@ -560,11 +559,14 @@ Coin buy  = 8 × buy21k + 8
     const btn = $("btnFetch");
     const meta = $("meta");
     const auto = $("auto");
+    const btnCalc = $("btnCalc"); // [أضِف هذا السطر هنا]
+
 
     if(on){
       if(autoTimer) clearInterval(autoTimer);
       btn.disabled = true;
       meta.textContent = "تحديث تلقائي كل 10 ثوانٍ.";
+      btnCalc.classList.add("ghost"); // الزر غير أصفر أثناء التحديث التلقائي
       fetchSpot();
       autoTimer = setInterval(fetchSpot, AUTO_MS);
       auto.checked = true;
@@ -572,6 +574,7 @@ Coin buy  = 8 × buy21k + 8
       if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
       btn.disabled = false;
       meta.textContent = "التحديث اليدوي مفعّل.";
+      btnCalc.classList.remove("ghost"); // الزر يصير أصفر بارز عند الإيقاف
       auto.checked = false;
     }
   }
