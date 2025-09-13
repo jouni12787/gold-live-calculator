@@ -4,48 +4,24 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>أسعار الذهب — 18 و 21 قيراط (دولار/غرام)</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4797992845421121"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4797992845421121" crossorigin="anonymous"></script>
 
-  <!-- =========================================
-       PWA: Manifest + theme + icons (ADDED)
-       - If your site is under a subpath (e.g. /gold-app/),
-         change href="/manifest.json" to href="/gold-app/manifest.json"
-         (see also sw.js & manifest.json notes for paths)
-       ========================================= -->
-  <link rel="manifest" href="/manifest.json"><!-- PWA -->
-  <meta name="theme-color" content="#d4af37"><!-- PWA: match your --gold -->
-
-  <!-- PWA: favicons / Apple icon (ADDED) -->
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml"><!-- PWA -->
-  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180"><!-- PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes"><!-- PWA -->
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><!-- PWA -->
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#d4af37">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <style>
-  /* =========================================
-     1) متغيّرات التصميم (Theme Tokens)
-     ========================================= */
   :root{
-    --bg:#1c140b;
-    --bg2:#120d07;
-    --card:#211a0e;
-    --ink:#fff7e6;
-    --muted:#e8d9b3;
-    --gold:#d4af37;
-    --gold2:#b88a1a;
-    --radius:16px;
-    --gap:7px;
+    --bg:#1c140b; --bg2:#120d07; --card:#211a0e; --ink:#fff7e6; --muted:#e8d9b3;
+    --gold:#d4af37; --gold2:#b88a1a; --radius:16px; --gap:7px;
   }
-
   *{box-sizing:border-box}
-
-  /* =========================================
-     2) إعداد الصفحة
-     ========================================= */
   body{
-    margin:0;
-    color:var(--ink);
+    margin:0; color:var(--ink);
     background:
       radial-gradient(1100px 520px at 110% -10%, rgba(212,175,55,.18), transparent 60%),
       radial-gradient(800px 520px at -10% -10%, rgba(184,138,26,.18), transparent 60%),
@@ -53,213 +29,101 @@
     font-family:"Noto Naskh Arabic","Segoe UI",system-ui,-apple-system,Arial;
     min-height:100vh;
   }
-
-  header{
-    position:sticky; top:0; z-index:10;
-    backdrop-filter:blur(8px);
+  header{position:sticky;top:0;z-index:10;backdrop-filter:blur(8px);
     background:linear-gradient(180deg, rgba(36,26,14,.85), rgba(28,20,11,.85));
-    border-bottom:1px solid rgba(212,175,55,.35);
-    padding:18px 16px;
-    text-align:center;
-  }
+    border-bottom:1px solid rgba(212,175,55,.35); padding:18px 16px; text-align:center}
   header h1{margin:0;font-size:20px}
   header p{margin:6px 0 0;color:var(--muted);font-size:12px}
-
   main{max-width:980px;margin:20px auto;padding:0 16px 40px}
   .grid{display:grid;gap:var(--gap)}
   @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
-
-  .card{
-    background:linear-gradient(180deg,#2b1f10 0%,var(--card) 100%);
-    border:1px solid rgba(212,175,55,.25);
-    border-radius:var(--radius);
-    padding:16px;
-    box-shadow:0 12px 30px rgba(0,0,0,.35);
-  }
+  .card{background:linear-gradient(180deg,#2b1f10 0%,var(--card) 100%);
+    border:1px solid rgba(212,175,55,.25); border-radius:var(--radius); padding:16px;
+    box-shadow:0 12px 30px rgba(0,0,0,.35)}
   h2{margin:0 0 6px;font-size:17px}
-
   label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}
-  input{
-    width:100%; background:#171008; color:var(--ink);
-    border:1px solid rgba(212,175,55,.28);
-    padding:12px; border-radius:12px; outline:none;
-    caret-color: var(--ink);
-  }
+  input{width:100%; background:#171008; color:var(--ink); border:1px solid rgba(212,175,55,.28);
+    padding:12px; border-radius:12px; outline:none; caret-color: var(--ink)}
   input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.25)}
   .num{direction:ltr;text-align:left}
-
   .row{display:grid;gap:10px;grid-template-columns:1fr 160px;align-items:end}
-
-  .btn{
-    border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;
+  .btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;
     background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2b1f10;
-    box-shadow:0 10px 22px rgba(212,175,55,.35);
-  }
+    box-shadow:0 10px 22px rgba(212,175,55,.35)}
   .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(212,175,55,.35)}
-
+  .btn-mini{border:1px solid rgba(212,175,55,.35);background:#171008;color:var(--ink);
+    border-radius:10px;padding:6px 10px;cursor:pointer;font-size:12px}
+  .btn-mini.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2b1f10;border:0}
   .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#171008;border:1px solid rgba(212,175,55,.25);color:var(--muted);font-size:12px}
-  .out{
-    font-family:ui-monospace,Menlo,Consolas,monospace;
-    white-space:pre-wrap;
-    line-height:1.6;
-    background:#171008; border:1px solid rgba(212,175,55,.22);
-    padding:12px; border-radius:12px;
-  }
-
+  .out{font-family:ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;line-height:1.6;background:#171008;border:1px solid rgba(212,175,55,.22);padding:12px;border-radius:12px}
   .error{background:#3a120c;border:1px solid rgba(255,150,120,.6);color:#ffe1db;padding:10px;border-radius:10px;font-size:12px}
-
   .totals-grid{display:grid;gap:10px}
   @media(min-width:700px){.totals-grid{grid-template-columns:1fr 1fr}}
   .panel{background:#1f150a;border:1px solid rgba(212,175,55,.28);border-radius:14px;padding:12px}
-  .tot{
-    margin-top:10px; background:#0f0a05;border:1px solid rgba(212,175,55,.28);border-radius:12px;
-    padding:10px 12px; font-size:20px; text-align:center; letter-spacing:.3px;
-  }
+  .tot{margin-top:10px;background:#0f0a05;border:1px solid rgba(212,175,55,.28);border-radius:12px;padding:10px 12px;font-size:20px;text-align:center;letter-spacing:.3px}
   .mini{font-size:12px;color:var(--muted)}
 
-  /* =========================================
-     3) Switch
-     ========================================= */
+  /* switch */
   .switch{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
   .switch input{display:none}
-  .slider{
-    position:relative;width:44px;height:24px;border-radius:999px;
-    background:#4b3a22;border:1px solid rgba(212,175,55,.35);transition:.25s;
-  }
-  .slider::after{
-    content:"";position:absolute;top:50%;left:2px;transform:translateY(-50%);
-    width:20px;height:20px;border-radius:50%;
-    background:linear-gradient(135deg,var(--gold),var(--gold2));transition:.25s;
-    box-shadow:0 4px 10px rgba(0,0,0,.35);
-  }
+  .slider{position:relative;width:44px;height:24px;border-radius:999px;background:#4b3a22;border:1px solid rgba(212,175,55,.35);transition:.25s}
+  .slider::after{content:"";position:absolute;top:50%;left:2px;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));transition:.25s;box-shadow:0 4px 10px rgba(0,0,0,.35)}
   .switch input:checked + .slider{background:#c0992b}
   .switch input:checked + .slider::after{transform:translate(20px,-50%)}
   .switch .txt{font-size:12px;color:var(--muted)}
 
-  /* =========================================
-     4) أدوات سعر الأونصة
-     ========================================= */
-  .spot-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
-  .spot-toolbar .priceField{flex:1 1 180px;min-width:170px}
-  .spot-toolbar .priceField input{font-weight:700}
-  .spot-toolbar .btn{flex:0 0 auto}
-  .spot-toolbar .switch .txt{margin-inline-start:6px}
-  .spot-meta{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
-  .spot-meta .spacer{flex:1}
-  .spot-meta .badge{white-space:nowrap}
-
-  /* =========================================
-     5) شبكة الأسعار (label/value)
-     ========================================= */
-  .prices{
-    display:grid;
-    grid-template-columns:auto 1fr;
-    gap:6px 16px;
-    align-items:center;
-    white-space:normal;
-    font-family:inherit;
-  }
+  /* prices grid */
+  .prices{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;align-items:center;white-space:normal;font-family:inherit}
   .prices > div{padding:4px 0;border-bottom:1px dashed rgba(212,175,55,.18)}
   .prices > div:nth-last-child(-n+2){border-bottom:none}
   .prices .label{color:var(--muted);font-size:14px}
   .prices .value{font-weight:700;direction:ltr;text-align:left}
 
-  /* =========================================
-     6) صورة الليرة
-     ========================================= */
-  .coin-img{
-    display:block;
-    width:500px;
-    max-width:100%;
-    height:auto;
-    margin:6px auto;
-    border-radius:10px;
-    border:1px solid rgba(212,175,55,.25);
-    background:#0b0b0b;
-    box-shadow:0 6px 16px rgba(0,0,0,.35);
-    object-fit:contain;
-  }
-  @media (min-width:700px){ .coin-img{ width:500px } }
+  /* coin image */
+  .coin-img{display:block;width:500px;max-width:100%;height:auto;margin:6px auto;border-radius:10px;border:1px solid rgba(212,175,55,.25);background:#0b0b0b;box-shadow:0 6px 16px rgba(0,0,0,.35);object-fit:contain}
+  @media(min-width:700px){ .coin-img{ width:500px } }
 
-  /* =========================================
-     7) ضغط صندوق الليرة
-     ========================================= */
-  #coin{
-    white-space:normal;
-    line-height:1.25;
-    padding:6px 8px;
-  }
-  #coin .prices{ gap:2px 10px; }
-  #coin .prices > div{ padding:0; }
-  #coin .coin-img{ margin:4px auto; }
-  #coin .mini{ margin-top:2px; line-height:1.2; }
+  /* compact boxes */
+  #coin{white-space:normal;line-height:1.25;padding:6px 8px}
+  #coin .prices{gap:2px 10px}
+  #coin .prices > div{padding:0}
+  #coin .coin-img{margin:4px auto}
+  #coin .mini{margin-top:2px;line-height:1.2}
+  .card h2{margin-bottom:6px}
+  #perg{margin-block:6px;padding:6px 10px;line-height:1.25;white-space:normal}
+  #perg .prices{gap:2px 12px}
+  #perg .prices > div{padding:2px 0}
+  #perg .label{font-size:13px}
+  .card h2 + #perg{margin-top:6px}
 
-  .card h2{ margin-bottom:6px; }
+  /* contact bar */
+  .contact-bar{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:8px 0;background:#1f150a;border:1px solid rgba(212,175,55,.28);border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,.25);direction:rtl;font-size:14px;color:var(--ink)}
+  .contact-bar .icon{width:18px;height:18px;flex:0 0 18px;display:inline-block}
+  .contact-bar a{color:var(--gold);text-decoration:none;border-bottom:1px dashed rgba(212,175,55,.4)}
+  .contact-bar .spacer{flex:1}
 
-  /* ===== Compact the basic-prices box (#perg) only ===== */
-  #perg{
-    margin-block:6px;
-    padding:6px 10px;
-    line-height:1.25;
-    white-space:normal;
-  }
-  #perg .prices{ gap:2px 12px; }
-  #perg .prices > div{ padding:2px 0; }
-  #perg .label{ font-size:13px; }
-
-  /* spacing before next sections (account for the new contact bar) */
-  .card h2 + #perg{ margin-top:6px; }
-  #perg + .contact-bar{ margin-top:8px; }
-  .contact-bar + h2{ margin-top:8px !important; }
-
-  /* =========================================
-     Contact bar (between prices and coin)
-     ========================================= */
-  .contact-bar{
-    display:flex; align-items:center; gap:12px;
-    padding:10px 12px; margin:8px 0;
-    background:#1f150a;
-    border:1px solid rgba(212,175,55,.28);
-    border-radius:12px;
-    box-shadow:0 6px 16px rgba(0,0,0,.25);
-    direction:rtl;
-    font-size:14px; color:var(--ink);
-  }
-  .contact-bar .icon{
-    width:18px; height:18px; flex:0 0 18px; display:inline-block;
-  }
-  .contact-bar a{
-    color:var(--gold); text-decoration:none;
-    border-bottom:1px dashed rgba(212,175,55,.4);
-  }
-  .contact-bar .spacer{ flex:1; }
-  .contact-bar .btn-mini{
-    border:1px solid rgba(212,175,55,.35);
-    background:#171008; color:var(--ink);
-    border-radius:10px; padding:6px 10px; cursor:pointer; font-size:12px;
-  }
-  .contact-bar .btn-mini.gold{
-    background:linear-gradient(135deg,var(--gold),var(--gold2));
-    color:#2b1f10; border:0;
-  }
+  /* settings editor */
+  .settings-grid{display:grid;grid-template-columns:repeat(2, minmax(180px,1fr));gap:8px}
+  @media(min-width:900px){.settings-grid{grid-template-columns:repeat(3, minmax(180px,1fr))}}
+  .settings-row{display:grid;gap:6px}
+  .settings-note{margin-top:8px;color:var(--muted);font-size:12px}
+  .bar-head{display:flex;align-items:center;gap:10px;justify-content:space-between}
   </style>
 </head>
 
 <body>
-  <!-- رأس الصفحة -->
-   <header>
+  <header>
     <h1>أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
-     <p>حاليًا نحدّث السعر تلقائيًا كل 10 ثوانٍ. إذا أردت الإدخال يدويًا، أوقف التحديث، اكتب سعر الأونصة، ثم اضغط «احسب».</p>
+    <p>حاليًا نحدّث السعر تلقائيًا كل 10 ثوانٍ. إذا أردت الإدخال يدويًا، أوقف التحديث، اكتب سعر الأونصة، ثم اضغط «احسب».</p>
   </header>
 
-  <!-- المحتوى -->
   <main class="grid grid-2">
-    <!-- بطاقة الأونصة -->
+    <!-- Ounce price -->
     <section class="card">
       <h2>سعر الأونصة بالدولار</h2>
 
-      <div class="spot-toolbar">
-        <div class="priceField">
+      <div class="spot-toolbar" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+        <div class="priceField" style="flex:1 1 180px;min-width:170px">
           <label>USD/oz (إدخال يدوي)</label>
           <input id="oz" class="num" type="tel" inputmode="decimal" placeholder="مثال: 2350" value="">
         </div>
@@ -275,18 +139,17 @@
         <button class="btn ghost" id="btnCalc" title="احسب من القيمة الحالية">احسب</button>
       </div>
 
-      <div class="spot-meta">
+      <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
         <span id="meta" class="badge">—</span>
         <span class="spacer"></span>
       </div>
       <div id="err" class="error" style="display:none;margin-top:8px"></div>
     </section>
 
-    <!-- بطاقة الأسعار + الليرة -->
+    <!-- Basic per-gram prices + coin -->
     <section class="card">
       <h2>الأسعار الأساسية من دون صياغة (دولار/غرام)</h2>
 
-      <!-- يملأه JS -->
       <div class="out" id="perg">
         <div class="prices">
           <div class="label">مبيع 18K</div><div class="value">—</div>
@@ -296,7 +159,7 @@
         </div>
       </div>
 
-      <!-- شريط التواصل (بين السعرين) -->
+      <!-- contact line -->
       <div class="contact-bar" role="note" aria-label="التواصل للإعلانات">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/>
@@ -310,9 +173,7 @@
         <button id="copyAdMail" class="btn-mini gold" type="button">نسخ الإيميل</button>
       </div>
 
-      <!-- عنوان وصندوق الليرة -->
       <h2 style="margin-top:4px">ليرة ذهبية أنجليزية ٨ غ عيار ٢١</h2>
-
       <div class="out" id="coin">
         <div class="prices" id="coinPrices">
           <div class="label">ليرة — مبيع</div><div class="value">—</div>
@@ -320,24 +181,13 @@
         </div>
         <picture>
           <source type="image/webp" srcset="assets/coin_photo_1000x500.webp">
-          <img
-             class="coin-img"
-             src="assets/coin_photo_1000x500.png"
-             alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١ — الوجه والظهر"
-             width="1000" height="500"
-            loading="lazy" decoding="async">
+          <img class="coin-img" src="assets/coin_photo_1000x500.png" alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١ — الوجه والظهر" width="1000" height="500" loading="lazy" decoding="async">
         </picture>
-
-      
-
-        <div class="mini">
-          مبيع = ٨ × مبيع ٢١ /غ<br>
-          شراء = ٨ × شراء ٢١ /غ + ٨ دولار.
-        </div>
+        <div class="mini" id="coinRule">مبيع = ٨ × مبيع ٢١ /غ<br>شراء = ٨ × شراء ٢١ /غ + ٨ دولار.</div>
       </div>
     </section>
 
-    <!-- بطاقة الإجماليات -->
+    <!-- Totals -->
     <section class="card" style="grid-column:1 / -1">
       <h2>حساب الإجمالي حسب الوزن</h2>
 
@@ -404,54 +254,207 @@
       </div>
     </section>
 
-    <!-- بطاقة الصيغ -->
+    <!-- Formulas + per-shop settings -->
     <section class="card" style="grid-column:1 / -1">
-      <h2>الصيغ المستخدمة</h2>
-      <div class="out" style="direction:ltr;text-align:left">
-sell 18K =(oz−30)*32*740
-buy  18K =(oz+30)*32*750/995
-sell 21K =(oz−30)*32*865
-buy  21K =(oz+30)*32*875/995
-Coin sell = 8 × sell21k
-Coin buy  = 8 × buy21k + 8
-(شراء 18/21) +5.5 $/غ ربح محل قبل الصياغة
+      <div class="bar-head">
+        <h2>الصيغ المستخدمة</h2>
+        <button id="toggleCfg" class="btn-mini">تعديل القيم</button>
+      </div>
+
+      <div id="formulaBox" class="out" style="direction:ltr;text-align:left"></div>
+
+      <div id="cfgPanel" class="panel" style="margin-top:10px;display:none">
+        <details open>
+          <summary style="cursor:pointer">إعدادات المحل (تُحفَظ محليًا في هذا المتصفح)</summary>
+          <div class="settings-grid" style="margin-top:10px">
+            <div class="settings-row">
+              <label>التحويل: غرام/أونصة</label>
+              <input id="c_ozt" class="num" type="number" step="0.001" min="28" max="35">
+            </div>
+            <div class="settings-row">
+              <label>فرق السعر للمبيع (oz − …)</label>
+              <input id="c_spreadMinus" class="num" type="number" step="0.1" min="0" max="200">
+            </div>
+            <div class="settings-row">
+              <label>فرق السعر للشراء (oz + …)</label>
+              <input id="c_spreadPlus" class="num" type="number" step="0.1" min="0" max="200">
+            </div>
+
+            <div class="settings-row">
+              <label>18K مبيع — البهار (‰)</label>
+              <input id="c_k18s" class="num" type="number" step="1" min="600" max="999">
+            </div>
+            <div class="settings-row">
+              <label>18K مبيع — المقام (÷)</label>
+              <input id="c_k18s_den" class="num" type="number" step="1" min="600" max="1200">
+            </div>
+
+            <div class="settings-row">
+              <label>18K شراء — البهار (‰)</label>
+              <input id="c_k18b" class="num" type="number" step="1" min="600" max="999">
+            </div>
+            <div class="settings-row">
+              <label>18K شراء — المقام (÷)</label>
+              <input id="c_k18b_den" class="num" type="number" step="1" min="600" max="1200">
+            </div>
+
+            <div class="settings-row">
+              <label>21K مبيع — البهار (‰)</label>
+              <input id="c_k21s" class="num" type="number" step="1" min="700" max="999">
+            </div>
+            <div class="settings-row">
+              <label>21K مبيع — المقام (÷)</label>
+              <input id="c_k21s_den" class="num" type="number" step="1" min="700" max="1200">
+            </div>
+
+            <div class="settings-row">
+              <label>21K شراء — البهار (‰)</label>
+              <input id="c_k21b" class="num" type="number" step="1" min="700" max="999">
+            </div>
+            <div class="settings-row">
+              <label>21K شراء — المقام (÷)</label>
+              <input id="c_k21b_den" class="num" type="number" step="1" min="700" max="1200">
+            </div>
+
+            <div class="settings-row">
+              <label>وزن الليرة (غ)</label>
+              <input id="c_coinW" class="num" type="number" step="0.01" min="1" max="50">
+            </div>
+            <div class="settings-row">
+              <label>رسوم شراء الليرة (دولار)</label>
+              <input id="c_coinFee" class="num" type="number" step="0.1" min="0" max="200">
+            </div>
+            <div class="settings-row">
+              <label>هامش المحل (ربح $/غ قبل الصياغة)</label>
+              <input id="c_margin" class="num" type="number" step="0.1" min="0" max="50">
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button id="btnSaveCfg" class="btn-mini gold" type="button">حفظ</button>
+            <button id="btnResetCfg" class="btn-mini" type="button">إرجاع الافتراضي</button>
+            <button id="btnCopyCfg" class="btn-mini" type="button" title="ينسخ القيم كـ JSON">نسخ الإعدادات</button>
+          </div>
+          <div class="settings-note">الملاحظة: تُحفَظ هذه القيم على هذا الجهاز فقط (localStorage). لإلغاءها استخدم زر الإرجاع.</div>
+        </details>
       </div>
     </section>
   </main>
 
-<!-- ذيل -->
   <footer style="text-align:center;color:var(--muted);font-size:12px;padding:18px 0;">
     © <span id="y"></span> <strong>goldpricelb.store</strong> — جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني (Ali Jouni).
     <br>لا يُسمح بنسخ أو إعادة استخدام الكود/الصور بدون إذن خطّي مسبق.
   </footer>
 
-
   <script>
-  /* ==========================================================
-     JavaScript — المنطق الوظيفي
-     ========================================================== */
-
-  const OZT_TO_G = 32;
-  const STORE_MARGIN = 5.5;
+  /* =========================
+     Helpers
+     ========================= */
   const $ = id => document.getElementById(id);
   const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
-  const cleanDec = s => (s||"").replace(/[^\d.,]/g,"").replace(",",".");
+  const cleanDec = s => (s||"").replace(/[^\d.,-]/g,"").replace(",",".");
   const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
-  const clampDec = (id,min=0,max=50)=>{
-    const n = parseFloat(cleanDec($(id).value));
-    return isFinite(n) ? Math.min(max, Math.max(min, n)) : NaN;
-  };
+  const clamp = (x,min,max)=> Math.min(max, Math.max(min, x));
 
+  /* =========================
+     Per-shop config (saved)
+     ========================= */
+  const CFG_KEY = "gold_cfg_v1";
+  const DEFAULTS = Object.freeze({
+    oztToG: 32,
+    spreadMinus: 30,
+    spreadPlus: 30,
+    k18SellPpm: 740,   k18SellDen: 1000,
+    k18BuyPpm: 750,    k18BuyDen:  995,
+    k21SellPpm: 865,   k21SellDen: 1000,
+    k21BuyPpm: 875,    k21BuyDen:  995,
+    coinWeightG: 8,
+    coinBuyFee: 8,
+    storeMargin: 5.5
+  });
+  let cfg = loadCfg();
+
+  function loadCfg(){
+    try{
+      const saved = JSON.parse(localStorage.getItem(CFG_KEY)||"null");
+      if(saved && typeof saved==="object") return {...DEFAULTS, ...saved};
+    }catch{}
+    return {...DEFAULTS};
+  }
+  function saveCfg(){ try{ localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }catch{} }
+  function resetCfg(){ cfg = {...DEFAULTS}; saveCfg(); bindCfgInputs(); renderFormulas(); runAll(); }
+
+  function bindCfgInputs(){
+    $("c_ozt").value = cfg.oztToG;
+    $("c_spreadMinus").value = cfg.spreadMinus;
+    $("c_spreadPlus").value  = cfg.spreadPlus;
+
+    $("c_k18s").value = cfg.k18SellPpm;     $("c_k18s_den").value = cfg.k18SellDen;
+    $("c_k18b").value = cfg.k18BuyPpm;      $("c_k18b_den").value = cfg.k18BuyDen;
+    $("c_k21s").value = cfg.k21SellPpm;     $("c_k21s_den").value = cfg.k21SellDen;
+    $("c_k21b").value = cfg.k21BuyPpm;      $("c_k21b_den").value = cfg.k21BuyDen;
+
+    $("c_coinW").value = cfg.coinWeightG;
+    $("c_coinFee").value = cfg.coinBuyFee;
+    $("c_margin").value = cfg.storeMargin;
+  }
+
+  function readCfgFromInputs(){
+    const v = id => parseFloat(cleanDec($(id).value));
+    const nn = (x,fallback)=> (isFinite(x)?x:fallback);
+
+    cfg.oztToG      = clamp(nn(v("c_ozt"), DEFAULTS.oztToG), 28, 35);
+    cfg.spreadMinus = clamp(nn(v("c_spreadMinus"), DEFAULTS.spreadMinus), 0, 200);
+    cfg.spreadPlus  = clamp(nn(v("c_spreadPlus"),  DEFAULTS.spreadPlus),  0, 200);
+
+    cfg.k18SellPpm  = clamp(nn(v("c_k18s"), DEFAULTS.k18SellPpm),  600, 999);
+    cfg.k18SellDen  = clamp(nn(v("c_k18s_den"), DEFAULTS.k18SellDen), 600, 1200);
+    cfg.k18BuyPpm   = clamp(nn(v("c_k18b"), DEFAULTS.k18BuyPpm),   600, 999);
+    cfg.k18BuyDen   = clamp(nn(v("c_k18b_den"), DEFAULTS.k18BuyDen), 600, 1200);
+
+    cfg.k21SellPpm  = clamp(nn(v("c_k21s"), DEFAULTS.k21SellPpm),  700, 999);
+    cfg.k21SellDen  = clamp(nn(v("c_k21s_den"), DEFAULTS.k21SellDen), 700, 1200);
+    cfg.k21BuyPpm   = clamp(nn(v("c_k21b"), DEFAULTS.k21BuyPpm),   700, 999);
+    cfg.k21BuyDen   = clamp(nn(v("c_k21b_den"), DEFAULTS.k21BuyDen), 700, 1200);
+
+    cfg.coinWeightG = clamp(nn(v("c_coinW"), DEFAULTS.coinWeightG), 1, 50);
+    cfg.coinBuyFee  = clamp(nn(v("c_coinFee"), DEFAULTS.coinBuyFee), 0, 500);
+    cfg.storeMargin = clamp(nn(v("c_margin"), DEFAULTS.storeMargin), 0, 50);
+  }
+
+  function renderFormulas(){
+    const f = (pm,ppm,den)=>`(oz ${pm>0?"+":"−"} ${Math.abs(pm)})*${cfg.oztToG}*${ppm}/${den}`;
+    const lines = [
+      `sell 18K = ${f(-cfg.spreadMinus, cfg.k18SellPpm, cfg.k18SellDen)}`,
+      `buy  18K = ${f(+cfg.spreadPlus,  cfg.k18BuyPpm,  cfg.k18BuyDen)}`,
+      `sell 21K = ${f(-cfg.spreadMinus, cfg.k21SellPpm, cfg.k21SellDen)}`,
+      `buy  21K = ${f(+cfg.spreadPlus,  cfg.k21BuyPpm,  cfg.k21BuyDen)}`,
+      `Coin sell = ${cfg.coinWeightG} × sell21k`,
+      `Coin buy  = ${cfg.coinWeightG} × buy21k + ${cfg.coinBuyFee}`,
+      `(شراء 18/21) +${cfg.storeMargin} $/غ ربح محل قبل الصياغة`
+    ].join("\n");
+    $("formulaBox").textContent = lines;
+
+    $("coinRule").innerHTML =
+      `مبيع = ${cfg.coinWeightG} × مبيع ٢١ /غ<br>`+
+      `شراء = ${cfg.coinWeightG} × شراء ٢١ /غ + ${fmt(cfg.coinBuyFee)} دولار.`;
+  }
+
+  /* =========================
+     Pricing logic
+     ========================= */
   let per = { s18:NaN, b18:NaN, s21:NaN, b21:NaN };
 
   function calcPerGram(){
     const oz = fval("oz");
     if(!isFinite(oz) || oz<=0) return false;
 
-    per.s18 = (oz-30)*(OZT_TO_G)*(740/1000)/1000;
-    per.b18 = (oz+30)*(OZT_TO_G)*(750)/(995)/1000;
-    per.s21 = (oz-30)*(OZT_TO_G)*(865/1000)/1000;
-    per.b21 = (oz+30)*(OZT_TO_G)*(875/995)/1000;
+    const g = cfg.oztToG;
+
+    per.s18 = (oz - cfg.spreadMinus) * g * (cfg.k18SellPpm / cfg.k18SellDen) / 1000;
+    per.b18 = (oz + cfg.spreadPlus)  * g * (cfg.k18BuyPpm  / cfg.k18BuyDen)  / 1000;
+    per.s21 = (oz - cfg.spreadMinus) * g * (cfg.k21SellPpm / cfg.k21SellDen) / 1000;
+    per.b21 = (oz + cfg.spreadPlus)  * g * (cfg.k21BuyPpm  / cfg.k21BuyDen)  / 1000;
 
     $("perg").innerHTML = `
       <div class="prices">
@@ -462,8 +465,8 @@ Coin buy  = 8 × buy21k + 8
       </div>
     `;
 
-    const coinSell = 8*per.s21;
-    const coinBuy  = 8*per.b21 + 8;
+    const coinSell = cfg.coinWeightG * per.s21;
+    const coinBuy  = cfg.coinWeightG * per.b21 + cfg.coinBuyFee;
 
     $("coinPrices").innerHTML = `
       <div class="label">ليرة — مبيع</div><div class="value">$ ${fmt(coinSell)}</div>
@@ -479,20 +482,23 @@ Coin buy  = 8 × buy21k + 8
     const ws18=fval("w_s18");
     $("t_s18").textContent = "الإجمالي: " + (isFinite(ws18)? "$ "+(per.s18*ws18).toFixed(2) : "—");
 
-    const wb18=fval("w_b18"), a18=clampDec("add18");
-    const base18 = per.b18 + STORE_MARGIN;
+    const wb18=fval("w_b18"), a18=parseFloat(cleanDec($("add18").value));
+    const base18 = per.b18 + cfg.storeMargin;
     $("t_b18").textContent = "الإجمالي: " + (isFinite(wb18)? "$ "+((base18 + (isFinite(a18)?a18:0))*wb18).toFixed(2) : "—");
 
     const ws21=fval("w_s21");
     $("t_s21").textContent = "الإجمالي: " + (isFinite(ws21)? "$ "+(per.s21*ws21).toFixed(2) : "—");
 
-    const wb21=fval("w_b21"), a21=clampDec("add21");
-    const base21 = per.b21 + STORE_MARGIN;
+    const wb21=fval("w_b21"), a21=parseFloat(cleanDec($("add21").value));
+    const base21 = per.b21 + cfg.storeMargin;
     $("t_b21").textContent = "الإجمالي: " + (isFinite(wb21)? "$ "+((base21 + (isFinite(a21)?a21:0))*wb21).toFixed(2) : "—");
   }
 
   function runAll(){ if(calcPerGram()) updateTotals(); }
 
+  /* =========================
+     Fetch ounce price
+     ========================= */
   const GOLDAPI_FREE_ENDPOINTS = [
     "https://api.gold-api.com/price/XAU",
     "https://api.gold-api.com/price/XAU/USD",
@@ -502,20 +508,14 @@ Coin buy  = 8 × buy21k + 8
 
   function pickOuncePrice(data){
     const candidates = [
-      data && data.price,
-      data && data.usd,
-      data && data.usd_ounce,
-      data && data.price_ounce,
-      data && data.ounce,
-      data && data.oz,
-      data && data?.result?.price,
-      data && data?.XAU?.USD
+      data && data.price, data && data.usd, data && data.usd_ounce,
+      data && data.price_ounce, data && data.ounce, data && data.oz,
+      data && data?.result?.price, data && data?.XAU?.USD
     ].map(Number).filter(x => isFinite(x) && x>0);
     if (candidates.length) return candidates[0];
 
     const g24 = Number(data && (data.gram_24k || data.price_gram_24k || data.g24 || data.per_gram));
-    if (isFinite(g24) && g24>0) return g24 * OZT_TO_G;
-
+    if (isFinite(g24) && g24>0) return g24 * cfg.oztToG;
     return NaN;
   }
 
@@ -538,15 +538,16 @@ Coin buy  = 8 × buy21k + 8
         return;
       }catch(e){ last=e.message+" @ "+url; }
     }
-
     err.style.display="block";
     err.textContent="فشل الجلب من gold-api.com.\n" + (last || "");
     $("btnFetch").disabled=false;
   }
 
+  /* =========================
+     Auto/inputs wiring
+     ========================= */
   ["w_s18","w_b18","add18","w_s21","w_b21","add21"].forEach(id=>{
-    const el = $(id);
-    if(el) el.addEventListener("input", updateTotals);
+    const el = $(id); if(el) el.addEventListener("input", updateTotals);
   });
   $("oz").addEventListener("input", runAll);
   $("btnCalc").addEventListener("click", runAll);
@@ -554,35 +555,39 @@ Coin buy  = 8 × buy21k + 8
 
   let autoTimer = null;
   const AUTO_MS = 10_000;
-
   function setAuto(on){
-    const btn = $("btnFetch");
-    const meta = $("meta");
-    const auto = $("auto");
-    const btnCalc = $("btnCalc"); // [أضِف هذا السطر هنا]
-
-
+    const btn = $("btnFetch"); const meta = $("meta"); const auto = $("auto"); const btnCalc = $("btnCalc");
     if(on){
       if(autoTimer) clearInterval(autoTimer);
-      btn.disabled = true;
-      meta.textContent = "تحديث تلقائي كل 10 ثوانٍ.";
-      btnCalc.classList.add("ghost"); // الزر غير أصفر أثناء التحديث التلقائي
-      fetchSpot();
-      autoTimer = setInterval(fetchSpot, AUTO_MS);
-      auto.checked = true;
+      btn.disabled = true; meta.textContent = "تحديث تلقائي كل 10 ثوانٍ.";
+      btnCalc.classList.add("ghost"); fetchSpot();
+      autoTimer = setInterval(fetchSpot, AUTO_MS); auto.checked = true;
     }else{
       if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
-      btn.disabled = false;
-      meta.textContent = "التحديث اليدوي مفعّل.";
-      btnCalc.classList.remove("ghost"); // الزر يصير أصفر بارز عند الإيقاف
-      auto.checked = false;
+      btn.disabled = false; meta.textContent = "التحديث اليدوي مفعّل.";
+      btnCalc.classList.remove("ghost"); auto.checked = false;
     }
   }
-
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
-  window.addEventListener("load", () => { fetchSpot(); setAuto(true); });
 
-  /* ===== نسخ إيميل شريط التواصل ===== */
+  /* =========================
+     Settings UI wiring
+     ========================= */
+  $("toggleCfg").addEventListener("click", ()=>{
+    const p = $("cfgPanel"); p.style.display = (p.style.display==="none"||!p.style.display) ? "block" : "none";
+  });
+  $("btnSaveCfg").addEventListener("click", ()=>{
+    readCfgFromInputs(); saveCfg(); renderFormulas(); runAll();
+  });
+  $("btnResetCfg").addEventListener("click", resetCfg);
+  $("btnCopyCfg").addEventListener("click", async ()=>{
+    try{
+      await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
+      $("btnCopyCfg").textContent = "نُسخت!"; setTimeout(()=>$("btnCopyCfg").textContent="نسخ الإعدادات",1200);
+    }catch{}
+  });
+
+  /* copy email */
   (function(){
     const copyBtn = document.getElementById("copyAdMail");
     const emailEl = document.getElementById("adEmail");
@@ -591,31 +596,31 @@ Coin buy  = 8 × buy21k + 8
       copyBtn.addEventListener("click", async () => {
         try{
           await navigator.clipboard.writeText(emailText);
-          const old = copyBtn.textContent;
-          copyBtn.textContent = "نُسخ!";
-          setTimeout(()=> copyBtn.textContent = old, 1200);
+          const old = copyBtn.textContent; copyBtn.textContent = "نُسخ!"; setTimeout(()=> copyBtn.textContent = old, 1200);
         }catch{
           const ta = document.createElement("textarea");
           ta.value = emailText; document.body.appendChild(ta);
-          ta.select(); document.execCommand("copy");
-          document.body.removeChild(ta);
-          const old = copyBtn.textContent;
-          copyBtn.textContent = "نُسخ!";
-          setTimeout(()=> copyBtn.textContent = old, 1200);
+          ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+          const old = copyBtn.textContent; copyBtn.textContent = "نُسخ!"; setTimeout(()=> copyBtn.textContent = old, 1200);
         }
       });
     }
   })();
 
-  /* =========================================
-     PWA: Register Service Worker (ADDED)
-     - If deployed under a subpath, change '/sw.js' to '/SUBPATH/sw.js'
-     ========================================= */
+  /* PWA */
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').catch(()=>{});
     });
   }
+
+  /* boot */
+  window.addEventListener("load", () => {
+    $("y").textContent = new Date().getFullYear();
+    bindCfgInputs();
+    renderFormulas();
+    fetchSpot(); setAuto(true);
+  });
   </script>
 </body>
 </html>
