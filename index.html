@@ -108,7 +108,9 @@
   .settings-row{display:grid;gap:6px}
   .settings-note{margin-top:8px;color:var(--muted);font-size:12px}
   .bar-head{display:flex;align-items:center;gap:10px;justify-content:space-between}
-  
+  .bar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .badge.hint{border-color:rgba(212,175,55,.5)}
+
 
   </style>
 </head>
@@ -256,94 +258,97 @@
       </div>
     </section>
 
-    <!-- Formulas + per-shop settings -->
-      <div class="bar-head">
-        <h2>الصيغ المستخدمة</h2>
-        <div class="bar-actions">
-          <span class="badge hint">يمكنك تعديل طريقة الحساب بالضغط على هذا الزر</span>
-          <button id="toggleCfg" class="btn-mini gold" type="button" title="تحرير القيم">تعديل القيم</button>
+  <!-- Formulas + per-shop settings -->
+<section class="card" style="grid-column:1 / -1">
+  <div class="bar-head" style="margin-bottom:8px">
+    <h2>الصيغ المستخدمة</h2>
+    <div class="bar-actions">
+      <span class="badge hint">يمكنك تعديل طريقة الحساب بالضغط على هذا الزر</span>
+      <button id="toggleCfg" class="btn-mini gold" type="button" title="تحرير القيم">تعديل القيم</button>
+    </div>
+  </div>
+
+  <div id="formulaBox" class="out" style="direction:ltr;text-align:left"></div>
+
+  <div id="cfgPanel" class="panel" style="margin-top:10px;display:none">
+    <details open>
+      <summary style="cursor:pointer">إعدادات المحل (تُحفَظ محليًا في هذا المتصفح)</summary>
+
+      <div class="settings-grid" style="margin-top:10px">
+        <div class="settings-row">
+          <label>التحويل: غرام/أونصة</label>
+          <input id="c_ozt" class="num" type="number" step="0.001" min="28" max="35">
+        </div>
+        <div class="settings-row">
+          <label>فرق السعر للمبيع (oz − …)</label>
+          <input id="c_spreadMinus" class="num" type="number" step="0.1" min="0" max="200">
+        </div>
+        <div class="settings-row">
+          <label>فرق السعر للشراء (oz + …)</label>
+          <input id="c_spreadPlus" class="num" type="number" step="0.1" min="0" max="200">
+        </div>
+
+        <div class="settings-row">
+          <label>18K مبيع — البهار (‰)</label>
+          <input id="c_k18s" class="num" type="number" step="1" min="600" max="999">
+        </div>
+        <div class="settings-row">
+          <label>18K مبيع — المقام (÷)</label>
+          <input id="c_k18s_den" class="num" type="number" step="1" min="600" max="1200">
+        </div>
+
+        <div class="settings-row">
+          <label>18K شراء — البهار (‰)</label>
+          <input id="c_k18b" class="num" type="number" step="1" min="600" max="999">
+        </div>
+        <div class="settings-row">
+          <label>18K شراء — المقام (÷)</label>
+          <input id="c_k18b_den" class="num" type="number" step="1" min="600" max="1200">
+        </div>
+
+        <div class="settings-row">
+          <label>21K مبيع — البهار (‰)</label>
+          <input id="c_k21s" class="num" type="number" step="1" min="700" max="999">
+        </div>
+        <div class="settings-row">
+          <label>21K مبيع — المقام (÷)</label>
+          <input id="c_k21s_den" class="num" type="number" step="1" min="700" max="1200">
+        </div>
+
+        <div class="settings-row">
+          <label>21K شراء — البهار (‰)</label>
+          <input id="c_k21b" class="num" type="number" step="1" min="700" max="999">
+        </div>
+        <div class="settings-row">
+          <label>21K شراء — المقام (÷)</label>
+          <input id="c_k21b_den" class="num" type="number" step="1" min="700" max="1200">
+        </div>
+
+        <div class="settings-row">
+          <label>وزن الليرة (غ)</label>
+          <input id="c_coinW" class="num" type="number" step="0.01" min="1" max="50">
+        </div>
+        <div class="settings-row">
+          <label>رسوم شراء الليرة (دولار)</label>
+          <input id="c_coinFee" class="num" type="number" step="0.1" min="0" max="200">
+        </div>
+        <div class="settings-row">
+          <label>هامش المحل (ربح $/غ قبل الصياغة)</label>
+          <input id="c_margin" class="num" type="number" step="0.1" min="0" max="50">
         </div>
       </div>
 
-      <div id="formulaBox" class="out" style="direction:ltr;text-align:left"></div>
-
-      <div id="cfgPanel" class="panel" style="margin-top:10px;display:none">
-        <details open>
-          <summary style="cursor:pointer">إعدادات المحل (تُحفَظ محليًا في هذا المتصفح)</summary>
-          <div class="settings-grid" style="margin-top:10px">
-            <div class="settings-row">
-              <label>التحويل: غرام/أونصة</label>
-              <input id="c_ozt" class="num" type="number" step="0.001" min="28" max="35">
-            </div>
-            <div class="settings-row">
-              <label>فرق السعر للمبيع (oz − …)</label>
-              <input id="c_spreadMinus" class="num" type="number" step="0.1" min="0" max="200">
-            </div>
-            <div class="settings-row">
-              <label>فرق السعر للشراء (oz + …)</label>
-              <input id="c_spreadPlus" class="num" type="number" step="0.1" min="0" max="200">
-            </div>
-
-            <div class="settings-row">
-              <label>18K مبيع — البهار (‰)</label>
-              <input id="c_k18s" class="num" type="number" step="1" min="600" max="999">
-            </div>
-            <div class="settings-row">
-              <label>18K مبيع — المقام (÷)</label>
-              <input id="c_k18s_den" class="num" type="number" step="1" min="600" max="1200">
-            </div>
-
-            <div class="settings-row">
-              <label>18K شراء — البهار (‰)</label>
-              <input id="c_k18b" class="num" type="number" step="1" min="600" max="999">
-            </div>
-            <div class="settings-row">
-              <label>18K شراء — المقام (÷)</label>
-              <input id="c_k18b_den" class="num" type="number" step="1" min="600" max="1200">
-            </div>
-
-            <div class="settings-row">
-              <label>21K مبيع — البهار (‰)</label>
-              <input id="c_k21s" class="num" type="number" step="1" min="700" max="999">
-            </div>
-            <div class="settings-row">
-              <label>21K مبيع — المقام (÷)</label>
-              <input id="c_k21s_den" class="num" type="number" step="1" min="700" max="1200">
-            </div>
-
-            <div class="settings-row">
-              <label>21K شراء — البهار (‰)</label>
-              <input id="c_k21b" class="num" type="number" step="1" min="700" max="999">
-            </div>
-            <div class="settings-row">
-              <label>21K شراء — المقام (÷)</label>
-              <input id="c_k21b_den" class="num" type="number" step="1" min="700" max="1200">
-            </div>
-
-            <div class="settings-row">
-              <label>وزن الليرة (غ)</label>
-              <input id="c_coinW" class="num" type="number" step="0.01" min="1" max="50">
-            </div>
-            <div class="settings-row">
-              <label>رسوم شراء الليرة (دولار)</label>
-              <input id="c_coinFee" class="num" type="number" step="0.1" min="0" max="200">
-            </div>
-            <div class="settings-row">
-              <label>هامش المحل (ربح $/غ قبل الصياغة)</label>
-              <input id="c_margin" class="num" type="number" step="0.1" min="0" max="50">
-            </div>
-          </div>
-
-          <div style="display:flex;gap:8px;margin-top:10px">
-            <button id="btnSaveCfg" class="btn-mini gold" type="button">حفظ</button>
-            <button id="btnResetCfg" class="btn-mini" type="button">إرجاع الافتراضي</button>
-            <button id="btnCopyCfg" class="btn-mini" type="button" title="ينسخ القيم كـ JSON">نسخ الإعدادات</button>
-          </div>
-          <div class="settings-note">الملاحظة: تُحفَظ هذه القيم على هذا الجهاز فقط (localStorage). لإلغاءها استخدم زر الإرجاع.</div>
-        </details>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="btnSaveCfg" class="btn-mini gold" type="button">حفظ</button>
+        <button id="btnResetCfg" class="btn-mini" type="button">إرجاع الافتراضي</button>
+        <button id="btnCopyCfg" class="btn-mini" type="button" title="ينسخ القيم كـ JSON">نسخ الإعدادات</button>
       </div>
-    </section>
-  </main>
+      <div class="settings-note">الملاحظة: تُحفَظ هذه القيم على هذا الجهاز فقط (localStorage). لإلغاءها استخدم زر الإرجاع.</div>
+    </details>
+  </div>
+</section>
+</main>
+
 
   <footer style="text-align:center;color:var(--muted);font-size:12px;padding:18px 0;">
     © <span id="y"></span> <strong>goldpricelb.store</strong> — جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني (Ali Jouni).
