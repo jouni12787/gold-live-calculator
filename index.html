@@ -103,18 +103,15 @@
   .contact-bar a{color:var(--gold);text-decoration:none;border-bottom:1px dashed rgba(212,175,55,.4)}
   .contact-bar .spacer{flex:1}
 
-  /* ---------- Fixes to avoid layout stretch / keep header full width ---------- */
+  /* ---------- Fixes ---------- */
   .card,.panel,.out,.contact-bar,.prices,.totals-grid{min-width:0}
   .prices .value{min-width:0; overflow-wrap:anywhere}
   .contact-bar a{overflow-wrap:anywhere}
   #formulaBox{white-space:pre; overflow-x:auto; direction:ltr; text-align:left; -webkit-overflow-scrolling:touch}
-
-  /* Footer safe-area on iOS and always centered */
   footer{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
-  /* Prevent page scroll when modal is open */
   body.no-scroll{height:100vh; overflow:hidden}
 
-  /* ---------- Settings modal (doesn't elongate the page) ---------- */
+  /* ---------- Settings modal ---------- */
   #cfgPanel{position:fixed; inset:0; z-index:1000; display:none}
   #cfgPanel.open{display:block}
   #cfgPanel::before{content:""; position:absolute; inset:0; background:rgba(0,0,0,.55)}
@@ -125,10 +122,68 @@
     box-shadow:0 20px 50px rgba(0,0,0,.5)
   }
   #cfgPanel .cfg-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+  /* ---------- A2HS Banner ---------- */
+  #a2hsBanner{
+    position:fixed; top:0; left:0; right:0; z-index:9999;
+    transform:translateY(-110%); transition:transform .45s ease;
+    background:#3a2a16; color:#fff7e6;
+    border-bottom:1px solid rgba(212,175,55,.35);
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  #a2hsBanner.show{ transform:translateY(0) }
+  #a2hsBanner .wrap{
+    max-width:1100px; margin:0 auto; padding:10px 14px; display:flex; align-items:center; gap:10px;
+  }
+  #a2hsBanner img.icon{width:22px;height:22px;border-radius:6px;flex:0 0 22px}
+  #a2hsBanner .txt{flex:1; font-size:14px}
+  #a2hsBanner .cta{background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#2b1f10; border:0; border-radius:999px; padding:6px 12px; font-weight:800; cursor:pointer}
+  #a2hsBanner .close{background:transparent; color:#fff7e6; border:0; width:28px; height:28px; font-size:18px; line-height:28px; cursor:pointer}
+
+  /* ---------- A2HS Guide Modal ---------- */
+  #a2hsModal{position:fixed; inset:0; z-index:9998; display:none}
+  #a2hsModal.open{display:block}
+  #a2hsModal::before{content:""; position:absolute; inset:0; background:rgba(0,0,0,.6)}
+  #a2hsModal .sheet{
+    position:relative; margin:8vh auto 0; width:min(680px,92vw);
+    background:#1f150a; color:var(--ink);
+    border:1px solid rgba(212,175,55,.28); border-radius:16px; padding:14px;
+    box-shadow:0 20px 50px rgba(0,0,0,.65)
+  }
+  #a2hsModal .sheet h3{margin:0 0 8px}
+  #a2hsModal .sheet img.main{display:block; width:100%; height:auto; border-radius:10px; border:1px solid rgba(212,175,55,.22); background:#0b0b0b}
+  #a2hsModal .steps{margin-top:10px; font-size:14px; line-height:1.7}
+  #a2hsModal .steps .row{display:flex; align-items:center; gap:10px; margin:6px 0}
+  #a2hsModal .steps img.icon{width:22px; height:22px}
+  #a2hsModal .x{position:absolute; top:8px; left:10px; background:transparent; border:0; color:var(--ink); font-size:20px; cursor:pointer}
   </style>
 </head>
 
 <body>
+
+  <!-- A2HS Banner -->
+  <div id="a2hsBanner" aria-hidden="true">
+    <div class="wrap">
+      <button class="close" type="button" aria-label="إغلاق">×</button>
+      <img class="icon" src="icons/icon-192.png" alt="">
+      <div class="txt">احصل على النسخة السريعة — أضِف الموقع إلى الشاشة الرئيسية.</div>
+      <button class="cta" type="button" id="a2hsGet">الحصول</button>
+    </div>
+  </div>
+
+  <!-- A2HS Guide Modal -->
+  <div id="a2hsModal" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="a2hsTitle">
+      <button class="x" type="button" aria-label="إغلاق">×</button>
+      <h3 id="a2hsTitle">إضافة إلى الشاشة الرئيسية</h3>
+      <img class="main" src="assets/save_to_home_screen.jpg" alt="شرح إضافة إلى الشاشة الرئيسية">
+      <div class="steps">
+        <div class="row"><strong>1.</strong> اضغط <em>مشاركة</em> <img class="icon" src="assets/share.jpg" alt=""></div>
+        <div class="row"><strong>2.</strong> اختر <em>Add to Home Screen</em> ثم <em>تثبيت</em>.</div>
+      </div>
+    </div>
+  </div>
+
   <header>
     <h1>أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
     <p>حاليًا نحدّث السعر تلقائيًا كل 10 ثوانٍ. إذا أردت الإدخال يدويًا، أوقف التحديث، اكتب سعر الأونصة، ثم اضغط «احسب».</p>
@@ -284,7 +339,7 @@
     </section>
   </main>
 
-  <!-- Settings modal (detached so it won't elongate the page) -->
+  <!-- Settings modal -->
   <div id="cfgPanel" aria-hidden="true">
     <div class="cfg-sheet" role="dialog" aria-modal="true" aria-labelledby="cfgTitle">
       <div class="cfg-head">
@@ -495,7 +550,7 @@
     const candidates = [
       data && data.price, data && data.usd, data && data.usd_ounce,
       data && data.price_ounce, data && data.ounce, data && data.oz,
-      data && data?.result?.price, data && data?.XAU?.USD
+      data && data.result && data.result.price, data && data.XAU && data.XAU.USD
     ].map(Number).filter(x => isFinite(x) && x>0);
     if (candidates.length) return candidates[0];
 
@@ -605,6 +660,58 @@
         }
       });
     }
+  })();
+
+  /* ============ A2HS banner logic ============ */
+  (function(){
+    var banner = document.getElementById('a2hsBanner');
+    var getBtn = document.getElementById('a2hsGet');
+    var modal = document.getElementById('a2hsModal');
+    var deferredPrompt = null;
+
+    // capture Android A2HS event if available
+    window.addEventListener('beforeinstallprompt', function(e){
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    function isStandalone(){
+      var mql = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+      var ios = window.navigator && window.navigator.standalone === true;
+      return !!(mql || ios);
+    }
+    function showBanner(){ banner.classList.add('show'); }
+    function hideBanner(){ banner.classList.remove('show'); }
+
+    function openGuide(){ modal.classList.add('open'); document.body.classList.add('no-scroll'); }
+    function closeGuide(){ modal.classList.remove('open'); document.body.classList.remove('no-scroll'); }
+
+    // X buttons
+    banner.querySelector('.close').addEventListener('click', function(){
+      hideBanner();
+      try{ sessionStorage.setItem('a2hs_dismissed','1'); }catch(e){}
+    });
+    modal.querySelector('.x').addEventListener('click', closeGuide);
+    modal.addEventListener('click', function(e){ if(e.target === modal) closeGuide(); });
+
+    // CTA
+    getBtn.addEventListener('click', async function(){
+      if (deferredPrompt){
+        try{ deferredPrompt.prompt(); }catch(e){}
+        deferredPrompt = null;
+      } else {
+        openGuide();
+      }
+    });
+
+    // Show banner after load if not installed and not dismissed this session
+    window.addEventListener('load', function(){
+      var dismissed = '0';
+      try{ dismissed = sessionStorage.getItem('a2hs_dismissed') || '0'; }catch(e){}
+      if (!isStandalone() && dismissed !== '1'){
+        setTimeout(showBanner, 600);
+      }
+    });
   })();
 
   /* PWA */
