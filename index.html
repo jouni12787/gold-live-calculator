@@ -307,7 +307,12 @@
         </div>
 
         <div class="panel">
-          <h2>شراء 18 قيراط</h2>
+          <h2>
+    شراء 18 قيراط
+    <small style="display:block;font-size:12px;color:var(--muted);font-weight:normal">
+      (رسوم المحل مضافة قبل الصياغة — يمكن تعديلها في الأسفل)
+    </small>
+  </h2>
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
@@ -337,7 +342,12 @@
         </div>
 
         <div class="panel">
-          <h2>شراء 21 قيراط</h2>
+           <h2>
+    شراء 21 قيراط
+    <small style="display:block;font-size:12px;color:var(--muted);font-weight:normal">
+      (رسوم المحل مضافة قبل الصياغة — يمكن تعديلها في الأسفل)
+    </small>
+  </h2>
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
@@ -393,7 +403,7 @@
 
         <div class="settings-row"><label>وزن الليرة (غ)</label><input id="c_coinW" class="num" type="number" step="0.01" min="1" max="50"></div>
         <div class="settings-row"><label>رسوم شراء الليرة (دولار)</label><input id="c_coinFee" class="num" type="number" step="0.1" min="0" max="200"></div>
-        <div class="settings-row"><label>هامش المحل (ربح $/غ قبل الصياغة)</label><input id="c_margin" class="num" type="number" step="0.1" min="0" max="50"></div>
+        <div class="settings-row"><label>هامش المحل (رسوم $/غ قبل الصياغة)</label><input id="c_margin" class="num" type="number" step="0.1" min="0" max="50"></div>
       </div>
 
       <div style="display:flex;gap:8px;margin-top:10px">
@@ -514,7 +524,7 @@
       `buy  21K = ${f(+cfg.spreadPlus,  cfg.k21BuyPpm,  cfg.k21BuyDen)}`,
       `Coin sell = ${cfg.coinWeightG} × sell21k`,
       `Coin buy  = ${cfg.coinWeightG} × buy21k + ${cfg.coinBuyFee}`,
-      `(شراء 18/21) +${cfg.storeMargin} $/غ ربح محل قبل الصياغة`
+      `(شراء 18/21) +${cfg.storeMargin} $/غ رسوم محل قبل الصياغة`
     ].join("\n");
     $("formulaBox").textContent = lines;
 
@@ -542,7 +552,7 @@
     $("perg").innerHTML = `
       <div class="prices">
         <div class="label">مبيع 18K</div><div class="value">$ ${fmt(per.s18)} / غ</div>
-        <div class="label">شراء 18K</div><div class="value">$ ${fmt(per.b18)} / غ</div>
+        <div class="label"> شراء 18K</div><div class="value">$ ${fmt(per.b18)} / غ</div>
         <div class="label">مبيع 21K</div><div class="value">$ ${fmt(per.s21)} / غ</div>
         <div class="label">شراء 21K</div><div class="value">$ ${fmt(per.b21)} / غ</div>
       </div>
