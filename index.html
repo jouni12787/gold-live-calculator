@@ -43,8 +43,33 @@
     box-shadow:0 12px 30px rgba(0,0,0,.35)}
   h2{margin:0 0 6px;font-size:17px}
   label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}
-  input{width:100%; background:#171008; color:var(--ink); border:1px solid rgba(212,175,55,.28);
-    padding:12px; border-radius:12px; outline:none; caret-color: var(--ink)}
+input {
+  width:100%;
+  background:#171008;
+  color:var(--ink);
+  border:1px solid rgba(212,175,55,.45); /* brighter gold outline */
+  padding:12px;
+  border-radius:12px;
+  outline:none;
+  caret-color: var(--ink);
+  box-shadow:0 0 6px rgba(212,175,55,.25); /* subtle glow */
+  transition:all .25s ease;
+}
+input:focus {
+  border-color:var(--gold);
+  box-shadow:0 0 10px rgba(212,175,55,.55); /* stronger glow when focused */
+}
+input::placeholder {
+  color: rgba(212,175,55,.55);
+  font-style: italic;
+}
+
+input:hover {
+  border-color: var(--gold2);
+  box-shadow: 0 0 8px rgba(212,175,55,.35);
+}
+
+
   input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.25)}
   .num{direction:ltr;text-align:left}
   .row{display:grid;gap:10px;grid-template-columns:1fr 160px;align-items:end}
@@ -210,11 +235,12 @@
 
         <button class="btn ghost" id="btnCalc" title="احسب من القيمة الحالية">احسب</button>
       </div>
+    <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
+          <span id="meta" class="badge">—</span>
+          <span id="last" class="badge" aria-live="polite" title="وقت آخر تحديث">آخر تحديث: —</span>
+          <span class="spacer"></span>
+     </div>
 
-      <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
-        <span id="meta" class="badge">—</span>
-        <span class="spacer"></span>
-      </div>
       <div id="err" class="error" style="display:none;margin-top:8px"></div>
     </section>
 
@@ -269,11 +295,11 @@
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
-              <input id="w_s18" class="num" type="tel" inputmode="decimal" placeholder="">
+              <input id="w_s18" class="num" type="tel" inputmode="decimal" placeholder="أدخل الوزن هنا">
             </div>
             <div style="visibility:hidden">
               <label>صياغة</label>
-              <input disabled class="num" placeholder="">
+              <input disabled class="num" placeholder="أدخل الوزن هنا">
             </div>
           </div>
           <div id="t_s18" class="tot">الإجمالي: —</div>
@@ -284,11 +310,11 @@
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
-              <input id="w_b18" class="num" type="tel" inputmode="decimal" placeholder="">
+              <input id="w_b18" class="num" type="tel" inputmode="decimal" placeholder="أدخل الوزن هنا">
             </div>
             <div>
               <label>صياغة (0–50 $/غ)</label>
-              <input id="add18" class="num" type="tel" inputmode="decimal" step="0.01" placeholder="">
+              <input id="add18" class="num" type="tel" inputmode="decimal" step="0.01" placeholder=" أدخل الصياغة هنا">
             </div>
           </div>
           <div id="t_b18" class="tot">الإجمالي: —</div>
@@ -299,7 +325,7 @@
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
-              <input id="w_s21" class="num" type="tel" inputmode="decimal" placeholder="">
+              <input id="w_s21" class="num" type="tel" inputmode="decimal" placeholder="أدخل الوزن هنا">
             </div>
             <div style="visibility:hidden">
               <label>صياغة</label>
@@ -314,11 +340,11 @@
           <div class="row">
             <div>
               <label>الوزن (غ)</label>
-              <input id="w_b21" class="num" type="tel" inputmode="decimal" placeholder="">
+              <input id="w_b21" class="num" type="tel" inputmode="decimal" placeholder="أدخل الوزن هنا">
             </div>
             <div>
               <label>صياغة (0–50 $/غ)</label>
-              <input id="add21" class="num" type="tel" inputmode="decimal" step="0.01" placeholder="">
+              <input id="add21" class="num" type="tel" inputmode="decimal" step="0.01" placeholder="أدخل الصياغة هنا">
             </div>
           </div>
           <div id="t_b21" class="tot">الإجمالي: —</div>
@@ -394,6 +420,21 @@
   const cleanDec = s => (s||"").replace(/[^\d.,-]/g,"").replace(",",".");
   const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
   const clamp = (x,min,max)=> Math.min(max, Math.max(min, x));
+   // Format date & time for the "آخر تحديث" bubble
+function fmtDateTime(d = new Date()){
+  try{
+    return d.toLocaleString(undefined, {
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+  }catch{
+    return d.toISOString().replace('T',' ').slice(0,19);
+  }
+}
+function setLastUpdated(d = new Date()){
+  const el = $("last");
+  if (el) el.textContent = "آخر تحديث: " + fmtDateTime(d);
+}
 
   /* =========================
      Per-shop config (saved)
@@ -571,10 +612,12 @@
         const p=pickOuncePrice(d);
         if(!isFinite(p)){ last=`No ounce price in response @ ${url} → ${JSON.stringify(d).slice(0,120)}…`; continue; }
 
-        $("oz").value=p.toFixed(2);
-        runAll();
-        $("btnFetch").disabled=false;
-        return;
+        $("oz").value = p.toFixed(2);
+runAll();
+setLastUpdated(new Date()); // <-- update the "آخر تحديث" badge
+$("btnFetch").disabled = false;
+return;
+
       }catch(e){ last=e.message+" @ "+url; }
     }
     err.style.display="block";
