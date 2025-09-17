@@ -43,34 +43,27 @@
     box-shadow:0 12px 30px rgba(0,0,0,.35)}
   h2{margin:0 0 6px;font-size:17px}
   label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}
-input {
-  width:100%;
-  background:#171008;
-  color:var(--ink);
-  border:1px solid rgba(212,175,55,.45); /* brighter gold outline */
-  padding:12px;
-  border-radius:12px;
-  outline:none;
-  caret-color: var(--ink);
-  box-shadow:0 0 6px rgba(212,175,55,.25); /* subtle glow */
-  transition:all .25s ease;
-}
-input:focus {
-  border-color:var(--gold);
-  box-shadow:0 0 10px rgba(212,175,55,.55); /* stronger glow when focused */
-}
-input::placeholder {
-  color: rgba(212,175,55,.55);
-  font-style: italic;
-}
 
-input:hover {
-  border-color: var(--gold2);
-  box-shadow: 0 0 8px rgba(212,175,55,.35);
-}
+  /* Inputs: glow + placeholder */
+  input{
+    width:100%;
+    background:#171008;
+    color:var(--ink);
+    border:1px solid rgba(212,175,55,.45);
+    padding:12px;
+    border-radius:12px;
+    outline:none;
+    caret-color:var(--ink);
+    box-shadow:0 0 6px rgba(212,175,55,.25);
+    transition:all .25s ease;
+  }
+  input:focus{
+    border-color:var(--gold);
+    box-shadow:0 0 10px rgba(212,175,55,.55);
+  }
+  input::placeholder{ color:rgba(212,175,55,.55); font-style:italic }
+  input:hover{ border-color:var(--gold2); box-shadow:0 0 8px rgba(212,175,55,.35) }
 
-
-  input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.25)}
   .num{direction:ltr;text-align:left}
   .row{display:grid;gap:10px;grid-template-columns:1fr 160px;align-items:end}
   .btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;
@@ -235,11 +228,12 @@ input:hover {
 
         <button class="btn ghost" id="btnCalc" title="احسب من القيمة الحالية">احسب</button>
       </div>
-    <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
-          <span id="meta" class="badge">—</span>
-          <span id="last" class="badge" aria-live="polite" title="وقت آخر تحديث">آخر تحديث: —</span>
-          <span class="spacer"></span>
-     </div>
+
+      <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
+        <span id="meta" class="badge">—</span>
+        <span id="last" class="badge" aria-live="polite" title="وقت آخر تحديث">آخر تحديث: —</span>
+        <span class="spacer"></span>
+      </div>
 
       <div id="err" class="error" style="display:none;margin-top:8px"></div>
     </section>
@@ -277,23 +271,16 @@ input:hover {
           <div class="label">ليرة — مبيع</div><div class="value">—</div>
           <div class="label">ليرة — شراء</div><div class="value">—</div>
         </div>
-     <picture>
-      <!-- Best quality/size first -->
-      <source type="image/avif" srcset="assets/coin_photo_627x300.avif">
-      <source type="image/webp" srcset="assets/coin_photo_627x300.webp">
 
-      <!-- Fallback if AVIF/WebP unsupported -->
-    <img
-      class="coin-img"
-      src="assets/coin_photo_627x300.png"
-      alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١ — الوجه والظهر"
-      width="627" height="300"
-      loading="lazy"
-      decoding="async"
-      fetchpriority="low">
-      </picture>
-
-
+        <picture>
+          <source type="image/avif" srcset="assets/coin_photo_627x300.avif">
+          <source type="image/webp" srcset="assets/coin_photo_627x300.webp">
+          <img class="coin-img"
+               src="assets/coin_photo_627x300.png"
+               alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١ — الوجه والظهر"
+               width="627" height="300"
+               loading="lazy" decoding="async" fetchpriority="low">
+        </picture>
 
         <div class="mini" id="coinRule">مبيع = ٨ × مبيع ٢١ /غ<br>شراء = ٨ × شراء ٢١ /غ + ٨ دولار.</div>
       </div>
@@ -434,26 +421,28 @@ input:hover {
   const cleanDec = s => (s||"").replace(/[^\d.,-]/g,"").replace(",",".");
   const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
   const clamp = (x,min,max)=> Math.min(max, Math.max(min, x));
-   // Format date & time for the "آخر تحديث" bubble
-function fmtDateTime(d = new Date()){
-  try{
-    return d.toLocaleString(undefined, {
-      year:'numeric', month:'2-digit', day:'2-digit',
-      hour:'2-digit', minute:'2-digit', second:'2-digit'
-    });
-  }catch{
-    return d.toISOString().replace('T',' ').slice(0,19);
+
+  // Format date & time for the "آخر تحديث" bubble
+  function fmtDateTime(d = new Date()){
+    try{
+      return d.toLocaleString(undefined, {
+        year:'numeric', month:'2-digit', day:'2-digit',
+        hour:'2-digit', minute:'2-digit', second:'2-digit'
+      });
+    }catch{
+      return d.toISOString().replace('T',' ').slice(0,19);
+    }
   }
-}
-function setLastUpdated(d = new Date()){
-  const el = $("last");
-  if (el) el.textContent = "آخر تحديث: " + fmtDateTime(d);
-}
+  function setLastUpdated(d = new Date()){
+    const el = $("last");
+    if (el) el.textContent = "آخر تحديث: " + fmtDateTime(d);
+  }
 
   /* =========================
      Per-shop config (saved)
      ========================= */
   const CFG_KEY = "gold_cfg_v1";
+  const SPOT_KEY = "last_spot_v1";             // NEW: cache key for last price
   const DEFAULTS = Object.freeze({
     oztToG: 32,
     spreadMinus: 30,
@@ -613,30 +602,38 @@ function setLastUpdated(d = new Date()){
     return NaN;
   }
 
+  // NEW: fast parallel fetch with timeout
+  function timeoutFetch(url, ms){
+    const c = new AbortController();
+    const id = setTimeout(() => c.abort(), ms);
+    return fetch(url, { cache:"no-store", signal:c.signal })
+      .finally(() => clearTimeout(id));
+  }
+  async function getSpotFast(){
+    const tries = GOLDAPI_FREE_ENDPOINTS.map(url =>
+      timeoutFetch(url, 3500)
+        .then(r => r.ok ? r.json() : Promise.reject("HTTP " + r.status))
+        .then(pickOuncePrice)
+        .then(v => (isFinite(v) && v>0) ? v : Promise.reject("bad data"))
+    );
+    return Promise.any(tries);
+  }
+
   async function fetchSpot(){
-    $("btnFetch").disabled=true;
-    const err=$("err"); err.style.display="none"; err.textContent="";
-    let last=null;
-
-    for(const url of GOLDAPI_FREE_ENDPOINTS){
-      try{
-        const r=await fetch(url, {cache:"no-store"});
-        if(!r.ok){ last=`HTTP ${r.status} @ ${url}`; continue; }
-        const d=await r.json();
-        const p=pickOuncePrice(d);
-        if(!isFinite(p)){ last=`No ounce price in response @ ${url} → ${JSON.stringify(d).slice(0,120)}…`; continue; }
-
-        $("oz").value = p.toFixed(2);
-runAll();
-setLastUpdated(new Date()); // <-- update the "آخر تحديث" badge
-$("btnFetch").disabled = false;
-return;
-
-      }catch(e){ last=e.message+" @ "+url; }
+    $("btnFetch").disabled = true;
+    const err = $("err"); err.style.display = "none"; err.textContent = "";
+    try{
+      const p = await getSpotFast();
+      $("oz").value = p.toFixed(2);
+      runAll();
+      setLastUpdated(new Date());
+      try{ localStorage.setItem(SPOT_KEY, JSON.stringify({ p, t: Date.now() })); }catch{}
+    }catch(e){
+      err.style.display = "block";
+      err.textContent = "فشل الجلب من gold-api.com.\n" + (e && e.toString ? e.toString() : e);
+    }finally{
+      $("btnFetch").disabled = false;
     }
-    err.style.display="block";
-    err.textContent="فشل الجلب من gold-api.com.\n" + (last || "");
-    $("btnFetch").disabled=false;
   }
 
   /* =========================
@@ -656,7 +653,8 @@ return;
     if(on){
       if(autoTimer) clearInterval(autoTimer);
       btn.disabled = true; if(meta) meta.textContent = "تحديث تلقائي كل 10 ثوانٍ.";
-      btnCalc.classList.add("ghost"); fetchSpot();
+      btnCalc.classList.add("ghost");
+      fetchSpot();
       autoTimer = setInterval(fetchSpot, AUTO_MS); auto.checked = true;
     }else{
       if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
@@ -725,7 +723,6 @@ return;
     var modal = document.getElementById('a2hsModal');
     var deferredPrompt = null;
 
-    // capture Android A2HS event if available
     window.addEventListener('beforeinstallprompt', function(e){
       e.preventDefault();
       deferredPrompt = e;
@@ -742,7 +739,6 @@ return;
     function openGuide(){ modal.classList.add('open'); document.body.classList.add('no-scroll'); }
     function closeGuide(){ modal.classList.remove('open'); document.body.classList.remove('no-scroll'); }
 
-    // X buttons
     banner.querySelector('.close').addEventListener('click', function(){
       hideBanner();
       try{ sessionStorage.setItem('a2hs_dismissed','1'); }catch(e){}
@@ -750,7 +746,6 @@ return;
     modal.querySelector('.x').addEventListener('click', closeGuide);
     modal.addEventListener('click', function(e){ if(e.target === modal) closeGuide(); });
 
-    // CTA
     getBtn.addEventListener('click', async function(){
       if (deferredPrompt){
         try{ deferredPrompt.prompt(); }catch(e){}
@@ -760,7 +755,6 @@ return;
       }
     });
 
-    // Show banner after load if not installed and not dismissed this session
     window.addEventListener('load', function(){
       var dismissed = '0';
       try{ dismissed = sessionStorage.getItem('a2hs_dismissed') || '0'; }catch(e){}
@@ -782,7 +776,18 @@ return;
     $("y").textContent = new Date().getFullYear();
     bindCfgInputs();
     renderFormulas();
-    fetchSpot(); setAuto(true);
+
+    // Show cached price instantly (no waiting on network)
+    try{
+      const last = JSON.parse(localStorage.getItem(SPOT_KEY) || "null");
+      if (last && isFinite(last.p)) {
+        $("oz").value = Number(last.p).toFixed(2);
+        runAll();
+        setLastUpdated(new Date(last.t || Date.now()));
+      }
+    }catch{}
+
+    setAuto(true); // background refresh every 10s (and runs once now)
   });
   </script>
 </body>
