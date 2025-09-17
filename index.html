@@ -277,10 +277,24 @@ input:hover {
           <div class="label">ليرة — مبيع</div><div class="value">—</div>
           <div class="label">ليرة — شراء</div><div class="value">—</div>
         </div>
-        <picture>
-          <source type="image/webp" srcset="assets/coin_photo_1000x500.webp">
-          <img class="coin-img" src="assets/coin_photo_1000x500.png" alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١ — الوجه والظهر" width="1000" height="500" loading="lazy" decoding="async">
-        </picture>
+     <picture>
+      <!-- Best quality/size first -->
+      <source type="image/avif" srcset="assets/coin_photo_627x300.avif">
+      <source type="image/webp" srcset="assets/coin_photo_627x300.webp">
+
+      <!-- Fallback if AVIF/WebP unsupported -->
+    <img
+      class="coin-img"
+      src="assets/coin_photo_627x300.png"
+      alt="ليرة ذهبية إنجليزية ٨ غرام عيار ٢١ — الوجه والظهر"
+      width="627" height="300"
+      loading="lazy"
+      decoding="async"
+      fetchpriority="low">
+      </picture>
+
+
+
         <div class="mini" id="coinRule">مبيع = ٨ × مبيع ٢١ /غ<br>شراء = ٨ × شراء ٢١ /غ + ٨ دولار.</div>
       </div>
     </section>
