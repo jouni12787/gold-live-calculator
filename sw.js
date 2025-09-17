@@ -1,5 +1,5 @@
 /* PWA Service Worker */
-const CACHE = "gold-app-v3"; // 🔁 bump on every deploy
+const CACHE = "gold-app-v3.1.1"; // 🔁 bump on every deploy
 
 const ASSETS = [
   "/", "/index.html", "/manifest.json", "/favicon.svg",
