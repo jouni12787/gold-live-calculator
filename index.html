@@ -13,6 +13,10 @@
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Hint the browser early -->
+<link rel="preconnect" href="https://api.gold-api.com" crossorigin>
+<link rel="preconnect" href="https://www.gold-api.com" crossorigin>
+
 
   <style>
   :root{
@@ -174,6 +178,22 @@
   #a2hsModal .steps .row{display:flex; align-items:center; gap:10px; margin:6px 0}
   #a2hsModal .steps img.icon{width:22px; height:22px}
   #a2hsModal .x{position:absolute; top:8px; left:10px; background:transparent; border:0; color:var(--ink); font-size:20px; cursor:pointer}
+  /* --- CLS guards --- */
+/* Keep the "آخر تحديث" bubble width stable (20 mono chars) */
+#last { font-variant-numeric: tabular-nums; min-width: 18ch; text-align: start }
+
+/* Each prices row keeps its height even while numbers change */
+.prices .value, .prices .label { line-height: 1.6 }
+.prices .value { min-height: 1.6em; display: inline-block }
+
+/* Totals blocks get a fixed minimum height */
+.tot { min-height: 2.2em }
+
+/* Prefer reduced motion = fewer heavy transitions on low devices */
+@media (prefers-reduced-motion: reduce){
+  * { transition: none !important; animation: none !important }
+}
+
   </style>
 </head>
 
@@ -204,7 +224,9 @@
 
   <header>
     <h1>أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
-    <p>حاليًا نحدّث السعر تلقائيًا كل 10 ثوانٍ. إذا أردت الإدخال يدويًا، أوقف التحديث، اكتب سعر الأونصة، ثم اضغط «احسب».</p>
+   <p>حاليًا نحدّث السعر تلقائيًا كل 10 ثوانٍ. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.</p>
+
+ 
   </header>
 
   <main class="grid grid-2">
@@ -226,7 +248,6 @@
           <span class="txt">تحديث تلقائي</span>
         </label>
 
-        <button class="btn ghost" id="btnCalc" title="احسب من القيمة الحالية">احسب</button>
       </div>
 
       <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
@@ -244,11 +265,12 @@
 
       <div class="out" id="perg">
         <div class="prices">
-          <div class="label">مبيع 18K</div><div class="value">—</div>
-          <div class="label">شراء 18K</div><div class="value">—</div>
-          <div class="label">مبيع 21K</div><div class="value">—</div>
-          <div class="label">شراء 21K</div><div class="value">—</div>
-        </div>
+  <div class="label">مبيع 18K</div><div class="value">$ <span id="s18">—</span> / غ</div>
+  <div class="label">شراء 18K</div><div class="value">$ <span id="b18">—</span> / غ</div>
+  <div class="label">مبيع 21K</div><div class="value">$ <span id="s21">—</span> / غ</div>
+  <div class="label">شراء 21K</div><div class="value">$ <span id="b21">—</span> / غ</div>
+</div>
+
       </div>
 
       <!-- contact line -->
@@ -268,8 +290,8 @@
       <h2 style="margin-top:4px">ليرة ذهبية أنجليزية ٨ غ عيار ٢١</h2>
       <div class="out" id="coin">
         <div class="prices" id="coinPrices">
-          <div class="label">ليرة — مبيع</div><div class="value">—</div>
-          <div class="label">ليرة — شراء</div><div class="value">—</div>
+         <div class="label">ليرة — مبيع</div><div class="value">$ <span id="coinSell">—</span></div>
+         <div class="label">ليرة — شراء</div><div class="value">$ <span id="coinBuy">—</span></div>
         </div>
 
         <picture>
@@ -426,6 +448,13 @@
   /* =========================
      Helpers
      ========================= */
+     // Cache output spans once
+    const outRefs = {};
+    function bindOutputs(){
+  ["s18","b18","s21","b21","coinSell","coinBuy"].forEach(id => outRefs[id] = document.getElementById(id));
+    }
+    function setOut(id, val){ if(outRefs[id]) outRefs[id].textContent = fmt(val); }
+
   const $ = id => document.getElementById(id);
   const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
   const cleanDec = s => (s||"").replace(/[^\d.,-]/g,"").replace(",",".");
@@ -539,35 +568,31 @@
   let per = { s18:NaN, b18:NaN, s21:NaN, b21:NaN };
 
   function calcPerGram(){
-    const oz = fval("oz");
-    if(!isFinite(oz) || oz<=0) return false;
+  const oz = fval("oz");
+  if(!isFinite(oz) || oz<=0) return false;
 
-    const g = cfg.oztToG;
+  const g = cfg.oztToG;
 
-    per.s18 = (oz - cfg.spreadMinus) * g * (cfg.k18SellPpm / cfg.k18SellDen) / 1000;
-    per.b18 = (oz + cfg.spreadPlus)  * g * (cfg.k18BuyPpm  / cfg.k18BuyDen)  / 1000;
-    per.s21 = (oz - cfg.spreadMinus) * g * (cfg.k21SellPpm / cfg.k21SellDen) / 1000;
-    per.b21 = (oz + cfg.spreadPlus)  * g * (cfg.k21BuyPpm  / cfg.k21BuyDen)  / 1000;
+  per.s18 = (oz - cfg.spreadMinus) * g * (cfg.k18SellPpm / cfg.k18SellDen) / 1000;
+  per.b18 = (oz + cfg.spreadPlus)  * g * (cfg.k18BuyPpm  / cfg.k18BuyDen)  / 1000;
+  per.s21 = (oz - cfg.spreadMinus) * g * (cfg.k21SellPpm / cfg.k21SellDen) / 1000;
+  per.b21 = (oz + cfg.spreadPlus)  * g * (cfg.k21BuyPpm  / cfg.k21BuyDen)  / 1000;
 
-    $("perg").innerHTML = `
-      <div class="prices">
-        <div class="label">مبيع 18K</div><div class="value">$ ${fmt(per.s18)} / غ</div>
-        <div class="label"> شراء 18K</div><div class="value">$ ${fmt(per.b18)} / غ</div>
-        <div class="label">مبيع 21K</div><div class="value">$ ${fmt(per.s21)} / غ</div>
-        <div class="label">شراء 21K</div><div class="value">$ ${fmt(per.b21)} / غ</div>
-      </div>
-    `;
+  // Update text only (no innerHTML)
+  setOut("s18", per.s18);
+  setOut("b18", per.b18);
+  setOut("s21", per.s21);
+  setOut("b21", per.b21);
 
-    const coinSell = cfg.coinWeightG * per.s21;
-    const coinBuy  = cfg.coinWeightG * per.b21 + cfg.coinBuyFee;
+  const coinSell = cfg.coinWeightG * per.s21;
+  const coinBuy  = cfg.coinWeightG * per.b21 + cfg.coinBuyFee;
 
-    $("coinPrices").innerHTML = `
-      <div class="label">ليرة — مبيع</div><div class="value">$ ${fmt(coinSell)}</div>
-      <div class="label">ليرة — شراء</div><div class="value">$ ${fmt(coinBuy)}</div>
-    `;
+  setOut("coinSell", coinSell);
+  setOut("coinBuy",  coinBuy);
 
-    return true;
-  }
+  return true;
+}
+
 
   function updateTotals(){
     if(!isFinite(per.s18)) return;
@@ -653,25 +678,24 @@
     const el = $(id); if(el) el.addEventListener("input", updateTotals);
   });
   $("oz").addEventListener("input", runAll);
-  $("btnCalc").addEventListener("click", runAll);
   $("btnFetch").addEventListener("click", fetchSpot);
 
   let autoTimer = null;
   const AUTO_MS = 10_000;
-  function setAuto(on){
-    const btn = $("btnFetch"); const meta = $("meta"); const auto = $("auto"); const btnCalc = $("btnCalc");
-    if(on){
-      if(autoTimer) clearInterval(autoTimer);
-      btn.disabled = true; if(meta) meta.textContent = "تحديث تلقائي كل 10 ثوانٍ.";
-      btnCalc.classList.add("ghost");
-      fetchSpot();
-      autoTimer = setInterval(fetchSpot, AUTO_MS); auto.checked = true;
-    }else{
-      if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
-      btn.disabled = false; if(meta) meta.textContent = "التحديث اليدوي مفعّل.";
-      btnCalc.classList.remove("ghost"); auto.checked = false;
-    }
+ function setAuto(on){
+  const btn = $("btnFetch"); const meta = $("meta"); const auto = $("auto");
+  if(on){
+    if(autoTimer) clearInterval(autoTimer);
+    btn.disabled = true; if(meta) meta.textContent = "تحديث تلقائي كل 10 ثوانٍ";
+    fetchSpot();
+    autoTimer = setInterval(fetchSpot, AUTO_MS); auto.checked = true;
+  }else{
+    if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
+    btn.disabled = false; if(meta) meta.textContent = "التحديث اليدوي مفعّل";
+    auto.checked = false;
   }
+}
+
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
 
   /* =========================
@@ -784,8 +808,10 @@
   /* boot */
   window.addEventListener("load", () => {
     $("y").textContent = new Date().getFullYear();
-    bindCfgInputs();
-    renderFormulas();
+    bindOutputs();
+
+   bindCfgInputs();
+   renderFormulas();
 
     // Show cached price instantly (no waiting on network)
     try{
