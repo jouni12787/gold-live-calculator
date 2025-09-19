@@ -624,9 +624,22 @@
      ========================= */
   let per = { s18:NaN, b18:NaN, s21:NaN, b21:NaN };
 
+  function clearPerOutputs(){
+    per.s18 = per.b18 = per.s21 = per.b21 = NaN;
+    setOut("s18", NaN);
+    setOut("b18", NaN);
+    setOut("s21", NaN);
+    setOut("b21", NaN);
+    setOut("coinSell", NaN);
+    setOut("coinBuy", NaN);
+  }
+
   function calcPerGram(){
   const oz = fval("oz");
-  if(!isFinite(oz) || oz<=0) return false;
+  if(!isFinite(oz) || oz<=0){
+    clearPerOutputs();
+    return false;
+  }
 
   const g = cfg.oztToG;
 
@@ -669,7 +682,14 @@
     $("t_b21").textContent = "الإجمالي: " + (isFinite(wb21)? "$ "+((base21 + (isFinite(a21)?a21:0))*wb21).toFixed(2) : "—");
   }
 
-  function runAll(){ if(calcPerGram()) updateTotals(); }
+  function resetTotals(){
+    ["t_s18","t_b18","t_s21","t_b21"].forEach(id => {
+      const el = $(id);
+      if(el) el.textContent = "الإجمالي: —";
+    });
+  }
+
+  function runAll(){ if(calcPerGram()) updateTotals(); else resetTotals(); }
 
   /* =========================
      Fetch ounce price
