@@ -814,18 +814,18 @@
     var modal = document.getElementById('a2hsModal');
     var deferredPrompt = null;
     var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+   var bannerShown = false;
+   function safeShowBanner(){ if (!bannerShown){ bannerShown = true; showBanner(); } }
 
 
-    window.addEventListener('beforeinstallprompt', function(e){
+   window.addEventListener('beforeinstallprompt', function(e){
   e.preventDefault();
   deferredPrompt = e;
-  // Android/Desktop: show banner now (native prompt available)
-  try{
-    if (!isStandalone() && sessionStorage.getItem('a2hs_dismissed') !== '1' && !isIOS){
-      showBanner();
-    }
-  }catch{}
+  if (!isStandalone() && (sessionStorage.getItem('a2hs_dismissed') !== '1')){
+    safeShowBanner();     // Desktop/Android: show when installable
+  }
 });
+
 
 
     function isStandalone(){
@@ -833,22 +833,11 @@
       var ios = window.navigator && window.navigator.standalone === true;
       return !!(mql || ios);
     }
-function showBanner(){
-  banner.classList.add('show');
-  document.body.classList.add('has-topbar');
-}
-function hideBanner(){
-  banner.classList.remove('show');
-  document.body.classList.remove('has-topbar');
-}
+function showBanner(){ banner.classList.add('show'); banner.setAttribute('aria-hidden','false'); document.body.classList.add('has-topbar'); }
+function hideBanner(){ banner.classList.remove('show'); banner.setAttribute('aria-hidden','true'); document.body.classList.remove('has-topbar'); }
+function openGuide(){ hideBanner(); modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('no-scroll'); }
+function closeGuide(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('no-scroll'); }
 
-function openGuide(){
-  hideBanner(); // make sure the bar doesn’t overlap
-  modal.classList.add('open');
-  document.body.classList.add('no-scroll');
-}
-
-    function closeGuide(){ modal.classList.remove('open'); document.body.classList.remove('no-scroll'); }
 
     banner.querySelector('.close').addEventListener('click', function(){
       hideBanner();
@@ -857,31 +846,38 @@ function openGuide(){
     modal.querySelector('.x').addEventListener('click', closeGuide);
     modal.addEventListener('click', function(e){ if(e.target === modal) closeGuide(); });
 
-   getBtn.addEventListener('click', async function(){
-  if (deferredPrompt){                 // Android/Desktop → native prompt
-    try{
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-    }catch(e){}
-    deferredPrompt = null;
-    hideBanner();
-  } else if (isIOS){                   // iOS → show the guide
+  getBtn.addEventListener('click', async function(){
+  if (deferredPrompt){
+    try{ deferredPrompt.prompt(); await deferredPrompt.userChoice; }catch(e){}
+    deferredPrompt = null; hideBanner();
+  } else if (isIOS){
     openGuide();
+  } else {
+    alert('Windows/Brave: Click the install icon in the address bar, or Menu → Apps → Install this site.');
   }
 });
 
 
-    window.addEventListener('load', function(){
+window.addEventListener('appinstalled', function(){
+  hideBanner();
+  try{ sessionStorage.setItem('a2hs_dismissed','1'); }catch(e){}
+});
+
+
+ window.addEventListener('load', function(){
   var dismissed = '0';
   try{ dismissed = sessionStorage.getItem('a2hs_dismissed') || '0'; }catch(e){}
   if (isStandalone() || dismissed === '1') return;
 
   if (isIOS){
-    // iOS never fires beforeinstallprompt → show our guide banner
-    setTimeout(showBanner, 600);
+    setTimeout(safeShowBanner, 600); // iOS: always show guide banner
+  } else {
+    setTimeout(function(){           // Desktop/Brave fallback
+      if (!deferredPrompt) safeShowBanner();
+    }, 6000);
   }
-  // Android/Desktop: wait for beforeinstallprompt to fire (no banner yet)
 });
+
 
   })();
 
