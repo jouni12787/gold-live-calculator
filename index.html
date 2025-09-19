@@ -813,11 +813,20 @@
     var getBtn = document.getElementById('a2hsGet');
     var modal = document.getElementById('a2hsModal');
     var deferredPrompt = null;
+    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
 
     window.addEventListener('beforeinstallprompt', function(e){
-      e.preventDefault();
-      deferredPrompt = e;
-    });
+  e.preventDefault();
+  deferredPrompt = e;
+  // Android/Desktop: show banner now (native prompt available)
+  try{
+    if (!isStandalone() && sessionStorage.getItem('a2hs_dismissed') !== '1' && !isIOS){
+      showBanner();
+    }
+  }catch{}
+});
+
 
     function isStandalone(){
       var mql = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
@@ -848,22 +857,32 @@ function openGuide(){
     modal.querySelector('.x').addEventListener('click', closeGuide);
     modal.addEventListener('click', function(e){ if(e.target === modal) closeGuide(); });
 
-    getBtn.addEventListener('click', async function(){
-      if (deferredPrompt){
-        try{ deferredPrompt.prompt(); }catch(e){}
-        deferredPrompt = null;
-      } else {
-        openGuide();
-      }
-    });
+   getBtn.addEventListener('click', async function(){
+  if (deferredPrompt){                 // Android/Desktop → native prompt
+    try{
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+    }catch(e){}
+    deferredPrompt = null;
+    hideBanner();
+  } else if (isIOS){                   // iOS → show the guide
+    openGuide();
+  }
+});
+
 
     window.addEventListener('load', function(){
-      var dismissed = '0';
-      try{ dismissed = sessionStorage.getItem('a2hs_dismissed') || '0'; }catch(e){}
-      if (!isStandalone() && dismissed !== '1'){
-        setTimeout(showBanner, 600);
-      }
-    });
+  var dismissed = '0';
+  try{ dismissed = sessionStorage.getItem('a2hs_dismissed') || '0'; }catch(e){}
+  if (isStandalone() || dismissed === '1') return;
+
+  if (isIOS){
+    // iOS never fires beforeinstallprompt → show our guide banner
+    setTimeout(showBanner, 600);
+  }
+  // Android/Desktop: wait for beforeinstallprompt to fire (no banner yet)
+});
+
   })();
 
   /* PWA */
