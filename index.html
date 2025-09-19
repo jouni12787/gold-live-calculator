@@ -21,7 +21,15 @@
   <style>
   :root{
     --bg:#1c140b; --bg2:#120d07; --card:#211a0e; --ink:#fff7e6; --muted:#e8d9b3;
-    --gold:#d4af37; --gold2:#b88a1a; --radius:16px; --gap:7px;
+    --gold:#d4af37; --gold2:#b88a1a; --radius:16px; --gap:7px;  --bar-font: clamp(.98rem, .9rem + .35vw, 1.15rem);
+  --bar-pad-y: 14px;
+  --bar-pad-x: 18px;
+  --bar-gap: 12px;
+  --bar-icon: 28px;
+  --bar-close: 32px;
+  --bar-btn-py: 8px;
+  --bar-btn-px: 16px;
+
   }
   *{box-sizing:border-box}
   html,body{max-width:100%}
@@ -132,6 +140,9 @@
   #formulaBox{white-space:pre; overflow-x:auto; direction:ltr; text-align:left; -webkit-overflow-scrolling:touch}
   footer{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
   body.no-scroll{height:100vh; overflow:hidden}
+ body.has-topbar{ padding-top:68px }
+
+
 
   /* ---------- Settings modal ---------- */
   #cfgPanel{position:fixed; inset:0; z-index:1000; display:none}
@@ -145,33 +156,79 @@
   }
   #cfgPanel .cfg-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 
-  /* ---------- A2HS Banner ---------- */
-  #a2hsBanner{
-    position:fixed; top:0; left:0; right:0; z-index:9999;
-    transform:translateY(-110%); transition:transform .45s ease;
-    background:#3a2a16; color:#fff7e6;
-    border-bottom:1px solid rgba(212,175,55,.35);
-    box-shadow:0 10px 30px rgba(0,0,0,.35);
+/* ---------- A2HS Banner (BIGGER + RESPONSIVE) ---------- */
+#a2hsBanner{
+  position:fixed; top:0; left:0; right:0; z-index:9999;
+  transform:translateY(-110%); transition:transform .45s ease;
+  background:#3a2a16; color:#fff7e6;
+  border-bottom:1px solid rgba(212,175,55,.35);
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  font-size: var(--bar-font);
+}
+#a2hsBanner.show{ transform:translateY(0) }
+
+#a2hsBanner .wrap{
+  max-width:1100px; margin:0 auto;
+  padding: var(--bar-pad-y) var(--bar-pad-x);
+  display:flex; align-items:center; gap: var(--bar-gap);
+}
+
+#a2hsBanner img.icon{
+  width: var(--bar-icon); height: var(--bar-icon);
+  border-radius:6px; flex:0 0 var(--bar-icon);
+}
+
+#a2hsBanner .txt{
+  flex:1; line-height:1.35;
+}
+
+#a2hsBanner .cta{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#2b1f10; border:0; border-radius:999px;
+  padding: var(--bar-btn-py) var(--bar-btn-px);
+  font-weight:800; cursor:pointer; font-size:1em;
+}
+
+#a2hsBanner .close{
+  background:transparent; color:#fff7e6; border:0;
+  width: var(--bar-close); height: var(--bar-close);
+  font-size: calc(var(--bar-close) * 0.56);
+  line-height: var(--bar-close);
+  cursor:pointer; flex:0 0 var(--bar-close);
+}
+
+/* Small phones: tiny bump */
+@media (max-width: 380px){
+  :root{
+    --bar-font: clamp(1rem, .95rem + .6vw, 1.2rem);
+    --bar-pad-y: 16px;
   }
-  #a2hsBanner.show{ transform:translateY(0) }
-  #a2hsBanner .wrap{
-    max-width:1100px; margin:0 auto; padding:10px 14px; display:flex; align-items:center; gap:10px;
-  }
-  #a2hsBanner img.icon{width:22px;height:22px;border-radius:6px;flex:0 0 22px}
-  #a2hsBanner .txt{flex:1; font-size:14px}
-  #a2hsBanner .cta{background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#2b1f10; border:0; border-radius:999px; padding:6px 12px; font-weight:800; cursor:pointer}
-  #a2hsBanner .close{background:transparent; color:#fff7e6; border:0; width:28px; height:28px; font-size:18px; line-height:28px; cursor:pointer}
+}
+
 
   /* ---------- A2HS Guide Modal ---------- */
-  #a2hsModal{position:fixed; inset:0; z-index:9998; display:none}
-  #a2hsModal.open{display:block}
+  /* center the modal */
+#a2hsModal{
+  position:fixed; inset:0; z-index:10001;
+  display:none;
+  align-items:center;            /* vertical centering */
+  justify-content:center;        /* horizontal centering */
+  padding:24px 12px;             /* safe breathing room on small screens */
+}
+#a2hsModal.open{ display:flex }   /* show + keep flex centering */
+
   #a2hsModal::before{content:""; position:absolute; inset:0; background:rgba(0,0,0,.6)}
   #a2hsModal .sheet{
-    position:relative; margin:8vh auto 0; width:min(680px,92vw);
-    background:#1f150a; color:var(--ink);
-    border:1px solid rgba(212,175,55,.28); border-radius:16px; padding:14px;
-    box-shadow:0 20px 50px rgba(0,0,0,.65)
-  }
+  position:relative;
+  margin:0;                         /* no push from the top */
+  width:min(680px,92vw);
+  max-height:calc(100vh - 48px);    /* fit viewport height minus the overlay padding */
+  overflow:auto;                    /* scroll if content is taller */
+  background:#1f150a; color:var(--ink);
+  border:1px solid rgba(212,175,55,.28); border-radius:16px; padding:14px;
+  box-shadow:0 20px 50px rgba(0,0,0,.65);
+}
+
   #a2hsModal .sheet h3{margin:0 0 8px}
   #a2hsModal .sheet img.main{display:block; width:100%; height:auto; border-radius:10px; border:1px solid rgba(212,175,55,.22); background:#0b0b0b}
   #a2hsModal .steps{margin-top:10px; font-size:14px; line-height:1.7}
@@ -767,10 +824,21 @@
       var ios = window.navigator && window.navigator.standalone === true;
       return !!(mql || ios);
     }
-    function showBanner(){ banner.classList.add('show'); }
-    function hideBanner(){ banner.classList.remove('show'); }
+function showBanner(){
+  banner.classList.add('show');
+  document.body.classList.add('has-topbar');
+}
+function hideBanner(){
+  banner.classList.remove('show');
+  document.body.classList.remove('has-topbar');
+}
 
-    function openGuide(){ modal.classList.add('open'); document.body.classList.add('no-scroll'); }
+function openGuide(){
+  hideBanner(); // make sure the bar doesn’t overlap
+  modal.classList.add('open');
+  document.body.classList.add('no-scroll');
+}
+
     function closeGuide(){ modal.classList.remove('open'); document.body.classList.remove('no-scroll'); }
 
     banner.querySelector('.close').addEventListener('click', function(){
