@@ -1,5 +1,5 @@
 /* PWA Service Worker */
-const CACHE = "gold-app-v3.1.1"; // 🔁 bump on every deploy
+const CACHE = "gold-app-v3.2.0"; // 🔁 bump on every deploy
 
 const ASSETS = [
   "/", "/index.html", "/manifest.json", "/favicon.svg",
@@ -51,5 +51,20 @@ self.addEventListener("fetch", (e) => {
         return res;
       })
     )
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientsArr) => {
+      for (const client of clientsArr){
+        if("focus" in client) return client.focus();
+      }
+      const targetUrl = event.notification && event.notification.data && event.notification.data.url;
+      if(self.clients.openWindow){
+        return self.clients.openWindow(targetUrl || "/");
+      }
+    })
   );
 });

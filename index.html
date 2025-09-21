@@ -172,7 +172,49 @@
   body.no-scroll{height:100vh; overflow:hidden}
   body.has-topbar{ padding-top:68px }
 
+  #toast{
+    position:fixed;
+    left:50%; bottom:24px;
+    transform:translate(-50%, 30px);
+    background:color-mix(in oklab, var(--card) 94%, transparent);
+    color:var(--ink);
+    border:1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+    padding:12px 18px;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+    max-width:min(90vw,440px);
+    z-index:1200;
+    font-size:14px;
+    white-space:pre-line;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+
   /* ---------- Settings modal ---------- */
+  .settings-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:12px;
+  }
+  .settings-row{display:flex;flex-direction:column;gap:6px}
+  .settings-row--toggle{flex-direction:row;align-items:center;gap:14px}
+  .settings-row--toggle label[data-i18n]{margin:0}
+  .settings-row--toggle .mini{margin:0;color:var(--muted);font-size:12px}
+  .settings-row--toggle .switch{margin-inline-start:auto}
+  .settings-grid select{
+    width:100%;
+    background:color-mix(in oklab, var(--bg) 80%, #0000);
+    color:var(--ink);
+    border:1px solid color-mix(in oklab, var(--gold) 40%, transparent);
+    padding:12px 36px 12px 12px;
+    border-radius:12px;
+    font-size:14px;
+    appearance:none;
+  }
+  .settings-grid .select-wrap::after{inset-inline-end:12px}
+  .settings-grid input::placeholder{opacity:.7}
   #cfgPanel{position:fixed; inset:0; z-index:1000; display:none}
   #cfgPanel.open{display:block}
   #cfgPanel::before{content:""; position:absolute; inset:0; background:rgba(0,0,0,.55)}
@@ -471,6 +513,31 @@
         <div class="settings-row"><label data-i18n="c_spreadMinus">فرق السعر للمبيع (oz − …)</label><input id="c_spreadMinus" class="num" type="number" step="0.1" min="0" max="200"></div>
         <div class="settings-row"><label data-i18n="c_spreadPlus">فرق السعر للشراء (oz + …)</label><input id="c_spreadPlus" class="num" type="number" step="0.1" min="0" max="200"></div>
 
+        <div class="settings-row settings-row--toggle">
+          <div>
+            <label for="c_alertsEnabled" data-i18n="c_alertsEnabled">تنبيهات الأسعار</label>
+            <div class="mini" data-i18n="c_alertsHint">سننبهك عندما يتخطى السعر الحدود التي تحددها.</div>
+          </div>
+          <label class="switch">
+            <input id="c_alertsEnabled" type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <label for="c_alertMetric" data-i18n="c_alertMetric">السعر المراقب</label>
+          <div class="select-wrap">
+            <select id="c_alertMetric" class="select">
+              <option value="oz" data-i18n="alert_metric_oz">سعر الأونصة (دولار)</option>
+              <option value="sell21" data-i18n="alert_metric_sell21">مبيع 21 قيراط ($/غ)</option>
+              <option value="buy21" data-i18n="alert_metric_buy21">شراء 21 قيراط ($/غ)</option>
+              <option value="sell18" data-i18n="alert_metric_sell18">مبيع 18 قيراط ($/غ)</option>
+              <option value="buy18" data-i18n="alert_metric_buy18">شراء 18 قيراط ($/غ)</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row"><label for="c_alertAbove" data-i18n="c_alertAbove">نبّهني عند الارتفاع فوق ($)</label><input id="c_alertAbove" class="num" type="number" step="0.01" min="0" inputmode="decimal"></div>
+        <div class="settings-row"><label for="c_alertBelow" data-i18n="c_alertBelow">نبّهني عند الهبوط تحت ($)</label><input id="c_alertBelow" class="num" type="number" step="0.01" min="0" inputmode="decimal"></div>
+
         <div class="settings-row"><label data-i18n="c_k18s">18K مبيع — البهار (%)</label><input id="c_k18s" class="num" type="number" step="1" min="600" max="999"></div>
         <div class="settings-row"><label data-i18n="c_k18s_den">18K مبيع — المقام (÷)</label><input id="c_k18s_den" class="num" type="number" step="1" min="600" max="1200"></div>
 
@@ -504,6 +571,8 @@
     <span data-i18n="footer">© <span id="y"></span> <strong>goldpricelb.store</strong> — جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني (Ali Jouni).</span>
   </footer>
 
+  <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
   <script>
   /* =========================
      Helpers
@@ -518,6 +587,20 @@
 
   const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
   const clamp = (x,min,max)=> Math.min(max, Math.max(min, x));
+
+  let toastTimer = null;
+  function showToast(message){
+    const toast = $("toast");
+    if(!toast || !message) return;
+    toast.textContent = message;
+    toast.dir = document.documentElement.dir || "rtl";
+    toast.lang = document.documentElement.lang || "ar";
+    toast.classList.add("show");
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>{
+      toast.classList.remove("show");
+    }, 4200);
+  }
 
   // ========= i18n =========
   const DICT = {
@@ -552,7 +635,7 @@
       sell21_title:"مبيع 21 قيراط", buy21_title:"شراء 21 قيراط",
       note_making:"(رسوم المحل مضافة قبل الصياغة — يمكن تعديلها في الأسفل)",
       weight:"الوزن (غ)", making:"صياغة", making_full:"صياغة (0–50 $/غ)",
-      ph_weight:"أدخل الوزن هنا", ph_making:"أدخل الصياغة εδώ", /* typo Arabic/Greek avoided by keeping Arabic */ ph_making:"أدخل الصياغة هنا",
+      ph_weight:"أدخل الوزن هنا", ph_making:"أدخل الصياغة هنا",
       total_prefix:"الإجمالي: —",
 
       formulas_title:"الصيغ المستخدمة",
@@ -569,6 +652,23 @@
       c_k21s:"21K مبيع — البهار (%)", c_k21s_den:"21K مبيع — المقام (÷)",
       c_k21b:"21K شراء — البهار (%)",  c_k21b_den:"21K شراء — المقام (÷)",
       c_coinW:"وزن الليرة (غ)", c_coinFee:"رسوم شراء الليرة (دولار)", c_margin:"هامش المحل (رسوم $/غ قبل الصياغة)",
+      c_alertsEnabled:"تنبيهات الأسعار",
+      c_alertsHint:"سننبهك عندما يتخطى السعر الحدود التي تحددها.",
+      c_alertMetric:"السعر المراقب",
+      c_alertAbove:"نبّهني عند الارتفاع فوق ($)",
+      c_alertBelow:"نبّهني عند الهبوط تحت ($)",
+      alert_metric_oz:"سعر الأونصة (دولار)",
+      alert_metric_sell18:"مبيع 18 قيراط ($/غ)",
+      alert_metric_buy18:"شراء 18 قيراط ($/غ)",
+      alert_metric_sell21:"مبيع 21 قيراط ($/غ)",
+      alert_metric_buy21:"شراء 21 قيراط ($/غ)",
+      alert_title:"تنبيه أسعار الذهب",
+      alert_msg_above:"{metric} أصبح $ {value} (فوق حد التنبيه $ {threshold})",
+      alert_msg_below:"{metric} أصبح $ {value} (تحت حد التنبيه $ {threshold})",
+      alert_permission_denied:"تم حظر إشعارات المتصفح. سنعرض التنبيهات داخل الصفحة فقط.",
+      alert_permission_unsupported:"هذا المتصفح لا يدعم الإشعارات. سنعرض التنبيهات داخل الصفحة فقط.",
+      alert_enabled_toast:"تم تفعيل تنبيهات الأسعار.",
+      alert_disabled_toast:"تم إيقاف تنبيهات الأسعار.",
       save:"حفظ", reset:"إرجاع الافتراضي", copy_settings:"نسخ الإعدادات",
       settings_note:"الملاحظة: تُحفَظ هذه القيم على هذا الجهاز فقط (localStorage). لإلغاءها استخدم زر الإرجاع.",
 
@@ -633,6 +733,23 @@
       c_k21s:"21K Sell — parts per thousand (%)", c_k21s_den:"21K Sell — denominator (÷)",
       c_k21b:"21K Buy — parts per thousand (%)",  c_k21b_den:"21K Buy — denominator (÷)",
       c_coinW:"Coin weight (g)", c_coinFee:"Coin buy fee ($)", c_margin:"Store margin ($/g before making)",
+      c_alertsEnabled:"Price alerts",
+      c_alertsHint:"We'll notify you when the selected price crosses your thresholds.",
+      c_alertMetric:"Price to watch",
+      c_alertAbove:"Alert me when price rises above ($)",
+      c_alertBelow:"Alert me when price drops below ($)",
+      alert_metric_oz:"Ounce price (USD)",
+      alert_metric_sell18:"18K Sell price ($/g)",
+      alert_metric_buy18:"18K Buy price ($/g)",
+      alert_metric_sell21:"21K Sell price ($/g)",
+      alert_metric_buy21:"21K Buy price ($/g)",
+      alert_title:"Gold price alert",
+      alert_msg_above:"{metric} is now $ {value} (above your $ {threshold} alert)",
+      alert_msg_below:"{metric} is now $ {value} (below your $ {threshold} alert)",
+      alert_permission_denied:"Browser notifications are blocked. We'll show in-page alerts instead.",
+      alert_permission_unsupported:"Notifications are not supported in this browser. We'll show in-page alerts instead.",
+      alert_enabled_toast:"Price alerts enabled.",
+      alert_disabled_toast:"Price alerts disabled.",
       save:"Save", reset:"Reset to default", copy_settings:"Copy settings",
       settings_note:"Note: these values are saved on this device only (localStorage). Use Reset to clear.",
 
@@ -717,9 +834,26 @@
     k21BuyPpm: 875,    k21BuyDen:  995,
     coinWeightG: 8,
     coinBuyFee: 8,
-    storeMargin: 5.5
+    storeMargin: 5.5,
+    alertsEnabled: false,
+    alertMetric: "oz",
+    alertAbove: null,
+    alertBelow: null
   });
   let cfg = loadCfg();
+
+  const ALERT_META_KEY = "gold_alert_meta_v1";
+  const ALERT_MIN_GAP_MS = 120_000;
+  const ALERT_NOTIFICATION_TAG = "gold-price-alert";
+  const ALERT_METRIC_LABEL_KEYS = Object.freeze({
+    oz: "alert_metric_oz",
+    sell18: "alert_metric_sell18",
+    buy18: "alert_metric_buy18",
+    sell21: "alert_metric_sell21",
+    buy21: "alert_metric_buy21"
+  });
+  let lastAlertAt = loadAlertTimestamp();
+  let prevAlertValue = null;
 
   function loadCfg(){
     try{
@@ -729,7 +863,29 @@
     return {...DEFAULTS};
   }
   function saveCfg(){ try{ localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }catch{} }
-  function resetCfg(){ cfg = {...DEFAULTS}; saveCfg(); bindCfgInputs(); renderFormulas(); runAll(); }
+  function loadAlertTimestamp(){
+    try{
+      const raw = localStorage.getItem(ALERT_META_KEY);
+      if(!raw) return 0;
+      const num = parseInt(raw, 10);
+      return Number.isFinite(num) ? num : 0;
+    }catch{}
+    return 0;
+  }
+  function storeAlertTimestamp(ts){
+    lastAlertAt = ts;
+    try{ localStorage.setItem(ALERT_META_KEY, String(ts)); }catch{}
+  }
+  function resetCfg(){
+    cfg = {...DEFAULTS};
+    saveCfg();
+    bindCfgInputs();
+    renderFormulas();
+    resetAlertTracking();
+    storeAlertTimestamp(0);
+    runAll();
+    updateAlertBaseline(fval("oz"));
+  }
 
   function bindCfgInputs(){
     $("c_ozt").value = cfg.oztToG;
@@ -744,6 +900,17 @@
     $("c_coinW").value = cfg.coinWeightG;
     $("c_coinFee").value = cfg.coinBuyFee;
     $("c_margin").value = cfg.storeMargin;
+
+    const alertsToggle = $("c_alertsEnabled");
+    if(alertsToggle) alertsToggle.checked = !!cfg.alertsEnabled;
+    const metricSel = $("c_alertMetric");
+    if(metricSel){
+      metricSel.value = (cfg.alertMetric && ALERT_METRIC_LABEL_KEYS[cfg.alertMetric]) ? cfg.alertMetric : "oz";
+    }
+    const above = $("c_alertAbove");
+    if(above) above.value = cfg.alertAbove ?? "";
+    const below = $("c_alertBelow");
+    if(below) below.value = cfg.alertBelow ?? "";
   }
 
   function readCfgFromInputs(){
@@ -767,6 +934,23 @@
     cfg.coinWeightG = clamp(nn(v("c_coinW"), DEFAULTS.coinWeightG), 1, 50);
     cfg.coinBuyFee  = clamp(nn(v("c_coinFee"), DEFAULTS.coinBuyFee), 0, 500);
     cfg.storeMargin = clamp(nn(v("c_margin"), DEFAULTS.storeMargin), 0, 50);
+
+    cfg.alertsEnabled = !!($("c_alertsEnabled") && $("c_alertsEnabled").checked);
+    const metricSel = $("c_alertMetric");
+    const metricVal = metricSel ? metricSel.value : "oz";
+    cfg.alertMetric = ALERT_METRIC_LABEL_KEYS[metricVal] ? metricVal : "oz";
+    cfg.alertAbove = parseAlertInput("c_alertAbove");
+    cfg.alertBelow = parseAlertInput("c_alertBelow");
+  }
+
+  function parseAlertInput(id){
+    const el = $(id);
+    if(!el) return null;
+    const raw = cleanDec(el.value);
+    if(!raw) return null;
+    const val = parseFloat(raw);
+    if(!isFinite(val) || val < 0) return null;
+    return val;
   }
 
   function renderFormulas(){
@@ -863,6 +1047,148 @@
     if(status === "ok"){ cancelPerReset(); updateTotals(); }
     else if(allowPartial){ schedulePerReset(); }
     else { cancelPerReset(); resetTotals(); }
+
+    if(allowPartial){
+      if(status === "ok") updateAlertBaseline(fval("oz"));
+      else resetAlertTracking();
+    }
+  }
+
+  /* =========================
+     Alerts logic
+     ========================= */
+  function resolveAlertMetric(){
+    return (cfg.alertMetric && ALERT_METRIC_LABEL_KEYS[cfg.alertMetric]) ? cfg.alertMetric : "oz";
+  }
+
+  function isValidThreshold(val){
+    return typeof val === "number" && isFinite(val);
+  }
+
+  function getAlertMetricLabel(metric){
+    const key = ALERT_METRIC_LABEL_KEYS[metric] || ALERT_METRIC_LABEL_KEYS.oz;
+    return t(key);
+  }
+
+  function computeAlertValue(metric, latestOz){
+    switch(metric){
+      case "sell18": return per.s18;
+      case "buy18": return per.b18;
+      case "sell21": return per.s21;
+      case "buy21": return per.b21;
+      default:{
+        if(isFinite(latestOz)) return latestOz;
+        const ozVal = fval("oz");
+        return isFinite(ozVal) ? ozVal : NaN;
+      }
+    }
+  }
+
+  function resetAlertTracking(){ prevAlertValue = null; }
+
+  function updateAlertBaseline(latestOz){
+    const metric = resolveAlertMetric();
+    const value = computeAlertValue(metric, latestOz);
+    prevAlertValue = isFinite(value) ? value : null;
+  }
+
+  async function ensureNotificationPermission(){
+    if(!("Notification" in window)){
+      showToast(t("alert_permission_unsupported"));
+      return false;
+    }
+    if(Notification.permission === "granted") return true;
+    try{
+      const result = await Notification.requestPermission();
+      if(result === "granted") return true;
+    }catch{}
+    showToast(t("alert_permission_denied"));
+    return false;
+  }
+
+  async function sendAlertNotification(body){
+    try{
+      const title = t("alert_title");
+      const options = {
+        body,
+        tag: ALERT_NOTIFICATION_TAG,
+        renotify: true,
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-192.png",
+        data: { url: location.origin + location.pathname }
+      };
+
+      if('serviceWorker' in navigator){
+        const reg = await navigator.serviceWorker.getRegistration();
+        if(reg && typeof reg.showNotification === "function"){
+          await reg.showNotification(title, options);
+          return true;
+        }
+      }
+
+      if("Notification" in window && Notification.permission === "granted"){
+        new Notification(title, options);
+        return true;
+      }
+    }catch{}
+    return false;
+  }
+
+  async function handleAlerts(latestOz){
+    const metric = resolveAlertMetric();
+    const currentValue = computeAlertValue(metric, latestOz);
+
+    if(!isFinite(currentValue)){
+      prevAlertValue = null;
+      return;
+    }
+
+    if(!cfg.alertsEnabled){
+      prevAlertValue = currentValue;
+      return;
+    }
+
+    if(prevAlertValue === null){
+      prevAlertValue = currentValue;
+      return;
+    }
+
+    const triggered = [];
+    const label = getAlertMetricLabel(metric);
+
+    if(isValidThreshold(cfg.alertAbove) && prevAlertValue < cfg.alertAbove && currentValue >= cfg.alertAbove){
+      triggered.push(
+        t("alert_msg_above")
+          .replace("{metric}", label)
+          .replace("{value}", fmt(currentValue))
+          .replace("{threshold}", fmt(cfg.alertAbove))
+      );
+    }
+
+    if(isValidThreshold(cfg.alertBelow) && prevAlertValue > cfg.alertBelow && currentValue <= cfg.alertBelow){
+      triggered.push(
+        t("alert_msg_below")
+          .replace("{metric}", label)
+          .replace("{value}", fmt(currentValue))
+          .replace("{threshold}", fmt(cfg.alertBelow))
+      );
+    }
+
+    prevAlertValue = currentValue;
+    if(!triggered.length) return;
+
+    const now = Date.now();
+    if(lastAlertAt && (now - lastAlertAt) < ALERT_MIN_GAP_MS) return;
+
+    const body = triggered.join("\n");
+    let delivered = false;
+    if("Notification" in window && Notification.permission === "granted"){
+      delivered = await sendAlertNotification(body);
+    }
+    if(!delivered){
+      showToast(body);
+    }
+    storeAlertTimestamp(now);
   }
 
   /* =========================
@@ -993,6 +1319,7 @@
       runAll();
       setLastUpdated(new Date());
       try{ localStorage.setItem(SPOT_KEY, JSON.stringify({ p, t: Date.now() })); }catch{}
+      try{ await handleAlerts(p); }catch{}
     }catch(e){
       const key = interpretFetchError(e);
       if(key === "fetch_err_rate"){
@@ -1054,7 +1381,14 @@
   cfgModal.addEventListener("click", (e)=>{ if (e.target === cfgModal || e.target.hasAttribute("data-close")){ cfgModal.classList.remove("open"); document.body.classList.remove("no-scroll"); }});
   document.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && cfgModal.classList.contains("open")){ cfgModal.classList.remove("open"); document.body.classList.remove("no-scroll"); }});
 
-  $("btnSaveCfg").addEventListener("click", ()=>{ readCfgFromInputs(); saveCfg(); renderFormulas(); runAll(); });
+  $("btnSaveCfg").addEventListener("click", ()=>{
+    readCfgFromInputs();
+    saveCfg();
+    renderFormulas();
+    resetAlertTracking();
+    runAll();
+    updateAlertBaseline(fval("oz"));
+  });
   $("btnResetCfg").addEventListener("click", resetCfg);
   $("btnCopyCfg").addEventListener("click", async ()=>{
     try{
@@ -1085,6 +1419,24 @@
       });
     }
   })();
+
+  const alertsToggleEl = $("c_alertsEnabled");
+  if(alertsToggleEl){
+    alertsToggleEl.addEventListener("change", async (e)=>{
+      const enabled = !!e.target.checked;
+      cfg.alertsEnabled = enabled;
+      saveCfg();
+      resetAlertTracking();
+      updateAlertBaseline(fval("oz"));
+      storeAlertTimestamp(0);
+      if(enabled){
+        const granted = await ensureNotificationPermission();
+        if(granted) showToast(t("alert_enabled_toast"));
+      }else{
+        showToast(t("alert_disabled_toast"));
+      }
+    });
+  }
 
   /* ============ A2HS banner logic ============ */
   (function(){
@@ -1162,7 +1514,7 @@
   langSel.addEventListener("change", onLangChange);
 
   /* boot */
-  window.addEventListener("load", () => {
+  window.addEventListener("load", async () => {
     $("y").textContent = new Date().getFullYear();
 
     // Restore theme/lang, but default to Arabic + Classic Dark
@@ -1181,14 +1533,30 @@
     bindCfgInputs();
     renderFormulas();
 
+    let baselineOz = fval("oz");
     try{
       const last = JSON.parse(localStorage.getItem(SPOT_KEY) || "null");
       if (last && isFinite(last.p)) {
         $("oz").value = Number(last.p).toFixed(2);
         runAll();
         setLastUpdated(new Date(last.t || Date.now()));
+        baselineOz = Number(last.p);
       }
     }catch{}
+
+    updateAlertBaseline(baselineOz);
+
+    if(cfg.alertsEnabled){
+      if("Notification" in window){
+        if(Notification.permission === "default"){
+          await ensureNotificationPermission();
+        }else if(Notification.permission === "denied"){
+          showToast(t("alert_permission_denied"));
+        }
+      }else{
+        showToast(t("alert_permission_unsupported"));
+      }
+    }
 
     setAuto(true);
   });
