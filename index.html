@@ -291,7 +291,7 @@
           </select>
         </div>
       </div>
-      <p data-i18n="hdr_hint">حاليًا نحدّث السعر تلقائيًا كل 10 ثوانٍ. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.</p>
+      <p data-i18n="hdr_hint">حاليًا نحدّث السعر تلقائيًا. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.</p>
     </div>
   </header>
 
@@ -308,7 +308,7 @@
 
         <button id="btnFetch" class="btn" data-i18n="btn_refresh">تحديث • Refresh</button>
 
-        <label class="switch" aria-label="تحديث تلقائي" title="تحديث تلقائي كل 10 ثوانٍ" data-i18n-title="auto_title" data-i18n-aria="auto_title">
+        <label class="switch" aria-label="تحديث تلقائي" title="تحديث تلقائي" data-i18n-title="auto_title" data-i18n-aria="auto_title">
           <input id="auto" type="checkbox" checked>
           <span class="slider" aria-hidden="true"></span>
           <span class="txt" data-i18n="auto_txt">تحديث تلقائي</span>
@@ -479,6 +479,7 @@
 
       <div class="settings-grid" style="margin-top:10px">
         <div class="settings-row"><label data-i18n="c_ozt">التحويل: غرام/أونصة</label><input id="c_ozt" class="num" type="number" step="0.001" min="28" max="35"></div>
+        <div class="settings-row"><label data-i18n="c_autoRefresh">فاصل التحديث التلقائي (ثانية)</label><input id="c_autoRefresh" class="num" type="number" step="1" min="5" max="300"></div>
         <div class="settings-row"><label data-i18n="c_spreadMinus">فرق السعر للمبيع (oz − …)</label><input id="c_spreadMinus" class="num" type="number" step="0.1" min="0" max="200"></div>
         <div class="settings-row"><label data-i18n="c_spreadPlus">فرق السعر للشراء (oz + …)</label><input id="c_spreadPlus" class="num" type="number" step="0.1" min="0" max="200"></div>
 
@@ -535,16 +536,16 @@
     ar: {
       page_title:"أسعار الذهب — 18 و 21 قيراط (دولار/غرام)",
       hdr_title:"أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)",
-      hdr_hint:"حاليًا نحدّث السعر تلقائيًا كل 10 ثوانٍ. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.",
+      hdr_hint:"حاليًا نحدّث السعر تلقائيًا كل {label}. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.",
       h_ounce:"سعر الأونصة بالدولار",
       usd_oz_label:"USD/oz (إدخال يدوي)",
       oz_placeholder:"مثال: 2350",
       btn_refresh:"تحديث • Refresh",
-      auto_title:"تحديث تلقائي كل 10 ثوانٍ",
+      auto_title:"تحديث تلقائي كل {label}",
       auto_txt:"تحديث تلقائي",
       last_title:"وقت آخر تحديث",
       last_prefix:"آخر تحديث: ",
-      auto_meta_refresh:"تحديث تلقائي كل 10 ثوانٍ",
+      auto_meta_refresh:"تحديث تلقائي كل {label}",
       auto_meta_manual:"التحديث اليدوي مفعّل",
       sparkline_label:"منحنى السعر (آخر 50 تحديثًا)",
       sparkline_hint:"آخر {n} أسعار. أحدث قيمة: {p} دولار/أونصة.",
@@ -576,6 +577,7 @@
       cfg_title:"إعدادات المحل (تُحفَظ محليًا في هذا المتصفح)",
       close:"إغلاق",
       c_ozt:"التحويل: غرام/أونصة",
+      c_autoRefresh:"فاصل التحديث التلقائي (ثانية)",
       c_spreadMinus:"فرق السعر للمبيع (oz − …)",
       c_spreadPlus:"فرق السعر للشراء (oz + …)",
       c_k18s:"18K مبيع — البهار (%)", c_k18s_den:"18K مبيع — المقام (÷)",
@@ -602,16 +604,16 @@
     en: {
       page_title:"Gold Prices — 18K & 21K (USD/gram)",
       hdr_title:"Gold Prices — 18K & 21K (USD/gram)",
-      hdr_hint:"We auto-refresh every 10s. To enter manually, turn off auto-refresh, then type the ounce price.",
+      hdr_hint:"We auto-refresh every {label}. To enter manually, turn off auto-refresh, then type the ounce price.",
       h_ounce:"Ounce Price (USD)",
       usd_oz_label:"USD/oz (manual input)",
       oz_placeholder:"e.g. 2350",
       btn_refresh:"Refresh",
-      auto_title:"Auto refresh every 10 seconds",
+      auto_title:"Auto refresh every {label}",
       auto_txt:"Auto refresh",
       last_title:"Last update time",
       last_prefix:"Last update: ",
-      auto_meta_refresh:"Auto refresh every 10s",
+      auto_meta_refresh:"Auto refresh every {label}",
       auto_meta_manual:"Manual update enabled",
       sparkline_label:"Price trend (last 50 updates)",
       sparkline_hint:"Last {n} prices. Latest: {p} USD/oz.",
@@ -643,6 +645,7 @@
       cfg_title:"Shop settings (saved locally in this browser)",
       close:"Close",
       c_ozt:"Conversion: gram/ounce",
+      c_autoRefresh:"Auto refresh interval (seconds)",
       c_spreadMinus:"Sell spread (oz − …)",
       c_spreadPlus:"Buy spread (oz + …)",
       c_k18s:"18K Sell — parts per thousand (%)", c_k18s_den:"18K Sell — denominator (÷)",
@@ -671,7 +674,18 @@
   const LANG_KEY="gold_lang"; const THEME_KEY="gold_theme";
   let CUR_LANG = (localStorage.getItem(LANG_KEY)||document.documentElement.lang||"ar");
 
-  function t(k){ const d=DICT[CUR_LANG]||DICT.ar; return d[k] ?? k; }
+  function t(k, vars){
+    const d = DICT[CUR_LANG] || DICT.ar;
+    let str = d[k];
+    if(str == null) str = k;
+    if(vars && typeof vars === "object"){
+      for(const [key, value] of Object.entries(vars)){
+        const pattern = new RegExp(`\\{${key}\\}`, "g");
+        str = str.replace(pattern, value);
+      }
+    }
+    return str;
+  }
 
   // Apply i18n to text nodes/attrs/placeholders
   function applyI18n(){
@@ -696,12 +710,70 @@
 
     document.title = t("page_title");
 
-    const meta = $("meta");
-    if(meta) meta.textContent = $("auto").checked ? t("auto_meta_refresh") : t("auto_meta_manual");
-
     setLastUpdated();
     renderFormulas();
     renderSparkline();
+    renderAutoTexts();
+  }
+
+  function clampAutoSeconds(sec){
+    const num = Number(sec);
+    if(!isFinite(num)) return DEFAULTS.autoRefreshSec;
+    return clamp(Math.round(num), AUTO_SEC_MIN, AUTO_SEC_MAX);
+  }
+
+  function getAutoSeconds(){
+    return clampAutoSeconds(cfg.autoRefreshSec);
+  }
+
+  function formatSecondsLocalized(secs){
+    const n = Number(secs);
+    if(!isFinite(n) || n <= 0) return secs;
+    if(CUR_LANG === "ar"){
+      if(n === 1) return "ثانية واحدة";
+      if(n === 2) return "ثانيتين";
+      if(n >= 3 && n <= 10) return `${n} ثوانٍ`;
+      return `${n} ثانية`;
+    }
+    return n === 1 ? "1 second" : `${n} seconds`;
+  }
+
+  function renderAutoTexts(){
+    const auto = $("auto");
+    const label = formatSecondsLocalized(getAutoSeconds());
+    const hintEl = document.querySelector("[data-i18n='hdr_hint']");
+    if(hintEl) hintEl.textContent = t("hdr_hint", { label });
+    const autoSwitch = document.querySelector("[data-i18n-title='auto_title']");
+    if(autoSwitch){
+      const title = t("auto_title", { label });
+      autoSwitch.title = title;
+      autoSwitch.setAttribute("aria-label", title);
+    }
+    const meta = $("meta");
+    if(meta){
+      if(auto && auto.checked){
+        meta.textContent = t("auto_meta_refresh", { label });
+      }else{
+        meta.textContent = t("auto_meta_manual");
+      }
+    }
+  }
+
+  function updateAutoIntervalFromCfg({ restartTimer = true } = {}){
+    cfg.autoRefreshSec = clampAutoSeconds(cfg.autoRefreshSec);
+    autoIntervalMs = cfg.autoRefreshSec * 1000;
+    renderAutoTexts();
+    if(restartTimer){
+      const autoEl = $("auto");
+      const autoActive = autoEl && autoEl.checked;
+      if(autoTimer){
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+      if(autoActive){
+        autoTimer = setInterval(() => fetchSpot({ source:"auto" }), autoIntervalMs);
+      }
+    }
   }
 
   // ========= Dates =========
@@ -728,6 +800,7 @@
   const PRICE_HISTORY_KEY = "price_history_v1";
   const DEFAULTS = Object.freeze({
     oztToG: 32,
+    autoRefreshSec: 10,
     spreadMinus: 30,
     spreadPlus: 30,
     k18SellPpm: 740,   k18SellDen: 1000,
@@ -738,7 +811,12 @@
     coinBuyFee: 8,
     storeMargin: 5.5
   });
+  const AUTO_SEC_MIN = 5;
+  const AUTO_SEC_MAX = 300;
   let cfg = loadCfg();
+  cfg.autoRefreshSec = clampAutoSeconds(cfg.autoRefreshSec);
+  let autoTimer = null;
+  let autoIntervalMs = cfg.autoRefreshSec * 1000;
 
   function loadCfg(){
     try{
@@ -748,10 +826,19 @@
     return {...DEFAULTS};
   }
   function saveCfg(){ try{ localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }catch{} }
-  function resetCfg(){ cfg = {...DEFAULTS}; saveCfg(); bindCfgInputs(); renderFormulas(); runAll(); }
+  function resetCfg(){
+    cfg = {...DEFAULTS};
+    cfg.autoRefreshSec = clampAutoSeconds(cfg.autoRefreshSec);
+    saveCfg();
+    bindCfgInputs();
+    renderFormulas();
+    updateAutoIntervalFromCfg();
+    runAll();
+  }
 
   function bindCfgInputs(){
     $("c_ozt").value = cfg.oztToG;
+    $("c_autoRefresh").value = cfg.autoRefreshSec;
     $("c_spreadMinus").value = cfg.spreadMinus;
     $("c_spreadPlus").value  = cfg.spreadPlus;
 
@@ -770,6 +857,7 @@
     const nn = (x,fallback)=> (isFinite(x)?x:fallback);
 
     cfg.oztToG      = clamp(nn(v("c_ozt"), DEFAULTS.oztToG), 28, 35);
+    cfg.autoRefreshSec = clampAutoSeconds(nn(v("c_autoRefresh"), DEFAULTS.autoRefreshSec));
     cfg.spreadMinus = clamp(nn(v("c_spreadMinus"), DEFAULTS.spreadMinus), 0, 200);
     cfg.spreadPlus  = clamp(nn(v("c_spreadPlus"),  DEFAULTS.spreadPlus),  0, 200);
 
@@ -956,7 +1044,6 @@
   const RATE_LIMIT_STRIKE_THRESHOLD = 3;
   const RATE_LIMIT_MIN_COOLDOWN_MS = 60_000;
   const RATE_LIMIT_MAX_COOLDOWN_MS = 300_000;
-  let autoTimer = null;
   let nextRateLimitCooldownMs = RATE_LIMIT_MIN_COOLDOWN_MS;
   let cooldownUntil = 0;
   let rateLimitStrikeCount = 0;
@@ -982,7 +1069,7 @@
     const msRemaining = Math.max(0, cooldownUntil - Date.now());
     const secs = Math.max(1, Math.ceil(msRemaining / 1000));
     errEl.style.display = "block";
-    errEl.textContent = t("fetch_err_rate").replace("{s}", secs);
+    errEl.textContent = t("fetch_err_rate", { s: secs });
   }
 
   function applyRateLimitCooldown(errEl){
@@ -1169,28 +1256,26 @@
   $("oz").addEventListener("input", runAll);
   $("btnFetch").addEventListener("click", () => fetchSpot({ source:"manual" }));
 
-  const AUTO_MS = 10_000;
   function setAuto(on){
-    const btn = $("btnFetch"); const meta = $("meta"); const auto = $("auto");
+    const btn = $("btnFetch"); const auto = $("auto");
     if(on){
       if(inRateLimitCooldown()){
         if(auto) auto.checked = false;
         showRateLimitMessage($("err"));
-        if(meta) meta.textContent = t("auto_meta_manual");
+        renderAutoTexts();
         return;
       }
       if(autoTimer) clearInterval(autoTimer);
       if(btn) btn.disabled = true;
-      if(meta) meta.textContent = t("auto_meta_refresh");
       fetchSpot({ source:"auto" });
-      autoTimer = setInterval(() => fetchSpot({ source:"auto" }), AUTO_MS);
+      autoTimer = setInterval(() => fetchSpot({ source:"auto" }), autoIntervalMs);
       if(auto) auto.checked = true;
     }else{
       if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
       if(btn) btn.disabled = false;
-      if(meta) meta.textContent = t("auto_meta_manual");
       if(auto) auto.checked = false;
     }
+    renderAutoTexts();
   }
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
   window.addEventListener("resize", renderSparkline);
@@ -1203,7 +1288,13 @@
   cfgModal.addEventListener("click", (e)=>{ if (e.target === cfgModal || e.target.hasAttribute("data-close")){ cfgModal.classList.remove("open"); document.body.classList.remove("no-scroll"); }});
   document.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && cfgModal.classList.contains("open")){ cfgModal.classList.remove("open"); document.body.classList.remove("no-scroll"); }});
 
-  $("btnSaveCfg").addEventListener("click", ()=>{ readCfgFromInputs(); saveCfg(); renderFormulas(); runAll(); });
+  $("btnSaveCfg").addEventListener("click", ()=>{
+    readCfgFromInputs();
+    saveCfg();
+    renderFormulas();
+    updateAutoIntervalFromCfg();
+    runAll();
+  });
   $("btnResetCfg").addEventListener("click", resetCfg);
   $("btnCopyCfg").addEventListener("click", async ()=>{
     try{
