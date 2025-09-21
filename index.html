@@ -188,6 +188,24 @@
   }
   #cfgPanel .cfg-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 
+  .settings-grid{display:grid;gap:12px}
+  .settings-row{display:flex;flex-direction:column;gap:6px}
+  .settings-row.settings-toggle{flex-direction:row;align-items:center;justify-content:space-between}
+  .settings-row.settings-toggle .switch{margin-inline-start:auto}
+  .settings-row.settings-toggle .mini{display:block;margin-top:4px;max-width:260px}
+
+  #toast{
+    position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));
+    transform:translate(-50%,120%);
+    background:color-mix(in oklab, var(--card) 92%, transparent);
+    border:1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+    color:var(--ink);
+    padding:10px 16px;border-radius:12px;box-shadow:0 14px 28px rgba(0,0,0,.35);
+    transition:transform .35s ease, opacity .35s ease;opacity:0;z-index:2000;
+    max-width:min(92vw,420px);text-align:center;font-size:13px
+  }
+  #toast.show{transform:translate(-50%,0);opacity:1}
+
   /* ---------- A2HS Banner ---------- */
   #a2hsBanner{
     position:fixed; top:0; left:0; right:0; z-index:9999;
@@ -480,6 +498,21 @@
       <div class="settings-grid" style="margin-top:10px">
         <div class="settings-row"><label data-i18n="c_ozt">التحويل: غرام/أونصة</label><input id="c_ozt" class="num" type="number" step="0.001" min="28" max="35"></div>
         <div class="settings-row"><label data-i18n="c_autoRefresh">فاصل التحديث التلقائي (ثانية)</label><input id="c_autoRefresh" class="num" type="number" step="1" min="5" max="300"></div>
+        <div class="settings-row settings-toggle">
+          <div>
+            <label id="alertsLabel" for="c_alertsEnabled" data-i18n="c_alertsEnabled">تفعيل التنبيهات (إشعارات)</label>
+            <span class="mini" data-i18n="c_alertsHint">يتم إرسال تنبيه عند تجاوز الحدود. ستحتاج للسماح بالإشعارات.</span>
+          </div>
+          <label class="switch" aria-labelledby="alertsLabel" data-i18n-title="c_alertsEnabled">
+            <input id="c_alertsEnabled" type="checkbox">
+            <span class="slider" aria-hidden="true"></span>
+            <span class="txt" data-i18n="alerts_switch_on">تشغيل</span>
+          </label>
+        </div>
+        <div class="settings-row"><label for="c_alertAboveOz" data-i18n="c_alertAboveOz">تنبيه عند تجاوز سعر الأونصة هذا الرقم ($)</label><input id="c_alertAboveOz" class="num" type="number" step="0.01" min="0"></div>
+        <div class="settings-row"><label for="c_alertBelowOz" data-i18n="c_alertBelowOz">تنبيه عند هبوط سعر الأونصة تحت هذا الرقم ($)</label><input id="c_alertBelowOz" class="num" type="number" step="0.01" min="0"></div>
+        <div class="settings-row"><label for="c_alertAboveGram" data-i18n="c_alertAboveGram">تنبيه عند تجاوز سعر الغرام (24K) هذا الرقم ($)</label><input id="c_alertAboveGram" class="num" type="number" step="0.01" min="0"></div>
+        <div class="settings-row"><label for="c_alertBelowGram" data-i18n="c_alertBelowGram">تنبيه عند هبوط سعر الغرام (24K) تحت هذا الرقم ($)</label><input id="c_alertBelowGram" class="num" type="number" step="0.01" min="0"></div>
         <div class="settings-row"><label data-i18n="c_spreadMinus">فرق السعر للمبيع (oz − …)</label><input id="c_spreadMinus" class="num" type="number" step="0.1" min="0" max="200"></div>
         <div class="settings-row"><label data-i18n="c_spreadPlus">فرق السعر للشراء (oz + …)</label><input id="c_spreadPlus" class="num" type="number" step="0.1" min="0" max="200"></div>
 
@@ -512,6 +545,8 @@
     </div>
   </div>
 
+  <div id="toast" role="status" aria-live="polite"></div>
+
   <footer style="text-align:center;color:var(--muted);font-size:12px;padding:18px 0;">
     <span data-i18n="footer">© <span id="y"></span> <strong>goldpricelb.store</strong> — جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني (Ali Jouni).</span>
   </footer>
@@ -527,6 +562,16 @@
   const $ = id => document.getElementById(id);
   const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
   const cleanDec = s => (s||"").replace(/[^\d.,-]/g,"").replace(",",".");
+
+  let toastTimer = null;
+  function showToast(msg){
+    const el = $("toast");
+    if(!el || !msg) return;
+    el.textContent = msg;
+    el.classList.add("show");
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>{ el.classList.remove("show"); toastTimer = null; }, 4000);
+  }
 
   const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
   const clamp = (x,min,max)=> Math.min(max, Math.max(min, x));
@@ -578,6 +623,13 @@
       close:"إغلاق",
       c_ozt:"التحويل: غرام/أونصة",
       c_autoRefresh:"فاصل التحديث التلقائي (ثانية)",
+      c_alertsEnabled:"تفعيل التنبيهات (إشعارات)",
+      c_alertsHint:"يُرسل تنبيه عند تجاوز الحدود المحددة. ستحتاج للسماح بالإشعارات.",
+      alerts_switch_on:"تشغيل",
+      c_alertAboveOz:"تنبيه عند تجاوز سعر الأونصة هذا الرقم ($)",
+      c_alertBelowOz:"تنبيه عند هبوط سعر الأونصة تحت هذا الرقم ($)",
+      c_alertAboveGram:"تنبيه عند تجاوز سعر الغرام (24K) هذا الرقم ($)",
+      c_alertBelowGram:"تنبيه عند هبوط سعر الغرام (24K) تحت هذا الرقم ($)",
       c_spreadMinus:"فرق السعر للمبيع (oz − …)",
       c_spreadPlus:"فرق السعر للشراء (oz + …)",
       c_k18s:"18K مبيع — البهار (%)", c_k18s_den:"18K مبيع — المقام (÷)",
@@ -592,6 +644,14 @@
 
       fetch_err_prefix:"فشل الجلب من gold-api.com.\n",
       fetch_err_rate:"تم الوصول إلى حدّ الطلبات من gold-api.com. سيتم إيقاف التحديث التلقائي لمدة {s} ثانية.",
+      alert_title:"تنبيه سعر الذهب",
+      alert_body_above_oz:"وصل سعر الأونصة إلى $ {price}/أونصة (فوق $ {threshold}/أونصة).",
+      alert_body_below_oz:"هبط سعر الأونصة إلى $ {price}/أونصة (تحت $ {threshold}/أونصة).",
+      alert_body_above_gram:"وصل سعر الغرام (24K) إلى $ {price}/غرام (فوق $ {threshold}/غرام).",
+      alert_body_below_gram:"هبط سعر الغرام (24K) إلى $ {price}/غرام (تحت $ {threshold}/غرام).",
+      alert_toast_blocked:"الإشعارات معطّلة: {body}",
+      alert_toast_generic:"تنبيه السعر: {body}",
+      alert_toast_unsupported:"المتصفح لا يدعم الإشعارات: {body}",
       a2hs_text:"احصل على النسخة السريعة — أضِف الموقع إلى الشاشة الرئيسية.",
       a2hs_get:"الحصول",
       a2hs_title:"إضافة إلى الشاشة الرئيسية",
@@ -646,6 +706,13 @@
       close:"Close",
       c_ozt:"Conversion: gram/ounce",
       c_autoRefresh:"Auto refresh interval (seconds)",
+      c_alertsEnabled:"Enable alerts (notifications)",
+      c_alertsHint:"We'll alert you when the price crosses a threshold. Notification permission is required.",
+      alerts_switch_on:"On",
+      c_alertAboveOz:"Alert when ounce price rises above ($)",
+      c_alertBelowOz:"Alert when ounce price falls below ($)",
+      c_alertAboveGram:"Alert when gram price (24K) rises above ($)",
+      c_alertBelowGram:"Alert when gram price (24K) falls below ($)",
       c_spreadMinus:"Sell spread (oz − …)",
       c_spreadPlus:"Buy spread (oz + …)",
       c_k18s:"18K Sell — parts per thousand (%)", c_k18s_den:"18K Sell — denominator (÷)",
@@ -660,6 +727,14 @@
 
       fetch_err_prefix:"Failed to fetch from gold-api.com.\n",
       fetch_err_rate:"Rate limit reached on gold-api.com. Auto refresh paused for {s} seconds.",
+      alert_title:"Gold price alert",
+      alert_body_above_oz:"Gold ounce hit $ {price}/oz (above $ {threshold}/oz).",
+      alert_body_below_oz:"Gold ounce dropped to $ {price}/oz (below $ {threshold}/oz).",
+      alert_body_above_gram:"24K gram reached $ {price}/g (above $ {threshold}/g).",
+      alert_body_below_gram:"24K gram fell to $ {price}/g (below $ {threshold}/g).",
+      alert_toast_blocked:"Notifications blocked: {body}",
+      alert_toast_generic:"Price alert: {body}",
+      alert_toast_unsupported:"Notifications unsupported: {body}",
       a2hs_text:"Get the fast version — add this site to your Home screen.",
       a2hs_get:"Get",
       a2hs_title:"Add to Home Screen",
@@ -803,6 +878,11 @@
     autoRefreshSec: 10,
     spreadMinus: 30,
     spreadPlus: 30,
+    alertsEnabled: false,
+    alertAboveOz: null,
+    alertBelowOz: null,
+    alertAboveGram: null,
+    alertBelowGram: null,
     k18SellPpm: 740,   k18SellDen: 1000,
     k18BuyPpm: 750,    k18BuyDen:  995,
     k21SellPpm: 865,   k21SellDen: 1000,
@@ -817,6 +897,9 @@
   cfg.autoRefreshSec = clampAutoSeconds(cfg.autoRefreshSec);
   let autoTimer = null;
   let autoIntervalMs = cfg.autoRefreshSec * 1000;
+  const ALERT_META_KEY = "gold_alert_meta_v1";
+  const ALERT_COOLDOWN_MS = 120_000;
+  let alertMeta = loadAlertMeta();
 
   function loadCfg(){
     try{
@@ -830,15 +913,42 @@
     cfg = {...DEFAULTS};
     cfg.autoRefreshSec = clampAutoSeconds(cfg.autoRefreshSec);
     saveCfg();
+    alertMeta = { lastAlertAt: 0 };
+    saveAlertMeta();
     bindCfgInputs();
     renderFormulas();
     updateAutoIntervalFromCfg();
     runAll();
   }
 
+  function loadAlertMeta(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(ALERT_META_KEY) || "null");
+      if(raw && typeof raw === "object"){
+        const lastAlertAt = Number(raw.lastAlertAt);
+        return { lastAlertAt: isFinite(lastAlertAt) ? lastAlertAt : 0 };
+      }
+    }catch{}
+    return { lastAlertAt: 0 };
+  }
+  function saveAlertMeta(){
+    try{ localStorage.setItem(ALERT_META_KEY, JSON.stringify(alertMeta)); }catch{}
+  }
+  function updateLastAlertAt(ts){
+    alertMeta.lastAlertAt = ts;
+    saveAlertMeta();
+  }
+
   function bindCfgInputs(){
     $("c_ozt").value = cfg.oztToG;
     $("c_autoRefresh").value = cfg.autoRefreshSec;
+    const alertToggle = $("c_alertsEnabled");
+    if(alertToggle) alertToggle.checked = !!cfg.alertsEnabled;
+    const setThreshold = (id, val)=>{ const el = $(id); if(el) el.value = (val != null && val !== "") ? val : ""; };
+    setThreshold("c_alertAboveOz",   cfg.alertAboveOz);
+    setThreshold("c_alertBelowOz",   cfg.alertBelowOz);
+    setThreshold("c_alertAboveGram", cfg.alertAboveGram);
+    setThreshold("c_alertBelowGram", cfg.alertBelowGram);
     $("c_spreadMinus").value = cfg.spreadMinus;
     $("c_spreadPlus").value  = cfg.spreadPlus;
 
@@ -855,6 +965,19 @@
   function readCfgFromInputs(){
     const v = id => parseFloat(cleanDec($(id).value));
     const nn = (x,fallback)=> (isFinite(x)?x:fallback);
+    const parseThreshold = id => {
+      const el = $(id);
+      if(!el) return null;
+      const val = parseFloat(cleanDec(el.value));
+      return (isFinite(val) && val > 0) ? val : null;
+    };
+
+    const alertToggle = $("c_alertsEnabled");
+    cfg.alertsEnabled = !!(alertToggle && alertToggle.checked);
+    cfg.alertAboveOz   = parseThreshold("c_alertAboveOz");
+    cfg.alertBelowOz   = parseThreshold("c_alertBelowOz");
+    cfg.alertAboveGram = parseThreshold("c_alertAboveGram");
+    cfg.alertBelowGram = parseThreshold("c_alertBelowGram");
 
     cfg.oztToG      = clamp(nn(v("c_ozt"), DEFAULTS.oztToG), 28, 35);
     cfg.autoRefreshSec = clampAutoSeconds(nn(v("c_autoRefresh"), DEFAULTS.autoRefreshSec));
@@ -1112,6 +1235,16 @@
     }
     savePriceHistory();
   }
+  function getLatestRecordedPrice(){
+    const last = priceHistory.length ? priceHistory[priceHistory.length - 1] : null;
+    if(last && isFinite(last.p)) return Number(last.p);
+    try{
+      const stored = JSON.parse(localStorage.getItem(SPOT_KEY) || "null");
+      const val = Number(stored && stored.p);
+      if(isFinite(val)) return val;
+    }catch{}
+    return NaN;
+  }
 
   function renderSparkline(){
     const canvas = $("priceSparkline");
@@ -1206,6 +1339,107 @@
     }
   }
 
+  async function ensureAlertPermission(){
+    if(!cfg.alertsEnabled) return "disabled";
+    if(typeof Notification === "undefined") return "unsupported";
+    if(Notification.permission === "granted" || Notification.permission === "denied"){
+      return Notification.permission;
+    }
+    try{
+      return await Notification.requestPermission();
+    }catch{
+      return Notification.permission;
+    }
+  }
+
+  function hasAlertThresholds(){
+    return [cfg.alertAboveOz, cfg.alertBelowOz, cfg.alertAboveGram, cfg.alertBelowGram]
+      .some(val => typeof val === "number" && isFinite(val));
+  }
+
+  function crossed(prev, current, threshold, direction){
+    if(!isFinite(prev) || !isFinite(current) || !isFinite(threshold)) return false;
+    if(direction === "above") return prev < threshold && current >= threshold;
+    return prev > threshold && current <= threshold;
+  }
+
+  async function sendAlertNotification(title, body){
+    if(typeof Notification === "undefined" || Notification.permission !== "granted") return false;
+    const options = {
+      body,
+      icon:"/icons/icon-192.png",
+      badge:"/icons/icon-192.png",
+      tag:"gold-price-alert",
+      renotify:true,
+      data:{ url: location.href }
+    };
+    try{
+      if(navigator.serviceWorker && navigator.serviceWorker.ready){
+        const reg = await navigator.serviceWorker.ready;
+        if(reg && reg.showNotification){
+          await reg.showNotification(title, options);
+          return true;
+        }
+      }
+    }catch{}
+    try{
+      new Notification(title, options);
+      return true;
+    }catch{}
+    return false;
+  }
+
+  async function maybeTriggerAlerts(prevOz, currentOz, timestamp = Date.now()){
+    if(!cfg.alertsEnabled || !hasAlertThresholds()) return;
+    if(!isFinite(prevOz) || !isFinite(currentOz)) return;
+
+    const lastAt = Number(alertMeta && alertMeta.lastAlertAt) || 0;
+    if(timestamp - lastAt < ALERT_COOLDOWN_MS) return;
+
+    const g = cfg.oztToG || DEFAULTS.oztToG;
+    const prevGram = prevOz / g;
+    const currGram = currentOz / g;
+
+    const events = [];
+    if(crossed(prevOz, currentOz, cfg.alertAboveOz, "above")){
+      events.push({ key:"alert_body_above_oz", price: currentOz, threshold: cfg.alertAboveOz });
+    }
+    if(!events.length && crossed(prevOz, currentOz, cfg.alertBelowOz, "below")){
+      events.push({ key:"alert_body_below_oz", price: currentOz, threshold: cfg.alertBelowOz });
+    }
+    if(!events.length && crossed(prevGram, currGram, cfg.alertAboveGram, "above")){
+      events.push({ key:"alert_body_above_gram", price: currGram, threshold: cfg.alertAboveGram });
+    }
+    if(!events.length && crossed(prevGram, currGram, cfg.alertBelowGram, "below")){
+      events.push({ key:"alert_body_below_gram", price: currGram, threshold: cfg.alertBelowGram });
+    }
+    if(!events.length) return;
+
+    const event = events[0];
+    const title = t("alert_title");
+    const body = t(event.key, {
+      price: fmt(event.price),
+      threshold: fmt(event.threshold)
+    });
+
+    let delivered = false;
+    if(typeof Notification !== "undefined" && Notification.permission === "granted"){
+      delivered = await sendAlertNotification(title, body);
+    }
+
+    if(!delivered){
+      const permission = (typeof Notification === "undefined") ? "unsupported" : Notification.permission;
+      const fallbackKey =
+        permission === "denied" ? "alert_toast_blocked" :
+        (permission === "unsupported" ? "alert_toast_unsupported" : "alert_toast_generic");
+      const fallbackMsg = t(fallbackKey, { body });
+      showToast(fallbackMsg || body);
+      delivered = true;
+    }
+
+    if(delivered) updateLastAlertAt(timestamp);
+  }
+
   async function fetchSpot({ source = "manual" } = {}){
     const btn = $("btnFetch");
     const err = $("err");
@@ -1221,11 +1455,13 @@
     try{
       const p = await getSpotFast();
       const now = Date.now();
+      const prev = getLatestRecordedPrice();
       recordPricePoint(p, now);
       renderSparkline();
       resetRateLimitState();
       $("oz").value = p.toFixed(2);
       runAll();
+      await maybeTriggerAlerts(prev, p, now);
       setLastUpdated(new Date(now));
       try{ localStorage.setItem(SPOT_KEY, JSON.stringify({ p, t: now })); }catch{}
     }catch(e){
@@ -1288,12 +1524,16 @@
   cfgModal.addEventListener("click", (e)=>{ if (e.target === cfgModal || e.target.hasAttribute("data-close")){ cfgModal.classList.remove("open"); document.body.classList.remove("no-scroll"); }});
   document.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && cfgModal.classList.contains("open")){ cfgModal.classList.remove("open"); document.body.classList.remove("no-scroll"); }});
 
-  $("btnSaveCfg").addEventListener("click", ()=>{
+  $("btnSaveCfg").addEventListener("click", async ()=>{
+    const wasEnabled = !!cfg.alertsEnabled;
     readCfgFromInputs();
     saveCfg();
     renderFormulas();
     updateAutoIntervalFromCfg();
     runAll();
+    if(cfg.alertsEnabled && (!wasEnabled || (typeof Notification !== "undefined" && Notification.permission === "default"))){
+      await ensureAlertPermission();
+    }
   });
   $("btnResetCfg").addEventListener("click", resetCfg);
   $("btnCopyCfg").addEventListener("click", async ()=>{
@@ -1406,6 +1646,14 @@
   window.addEventListener("load", () => {
     $("y").textContent = new Date().getFullYear();
 
+    const toastEl = $("toast");
+    if(toastEl){
+      toastEl.addEventListener("click", ()=>{
+        toastEl.classList.remove("show");
+        if(toastTimer){ clearTimeout(toastTimer); toastTimer = null; }
+      });
+    }
+
     // Restore theme/lang, but default to Arabic + Classic Dark
     try{
       const savedTheme = localStorage.getItem(THEME_KEY);
@@ -1420,6 +1668,7 @@
 
     bindOutputs();
     bindCfgInputs();
+    if(cfg.alertsEnabled) ensureAlertPermission();
     renderFormulas();
 
     try{
