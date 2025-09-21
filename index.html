@@ -304,11 +304,22 @@
 
         <button id="btnFetch" class="btn" data-i18n="btn_refresh">تحديث • Refresh</button>
 
-        <label class="switch" aria-label="تحديث تلقائي" title="تحديث تلقائي كل 10 ثوانٍ" data-i18n-title="auto_title" data-i18n-aria="auto_title">
-          <input id="auto" type="checkbox" checked>
-          <span class="slider" aria-hidden="true"></span>
-          <span class="txt" data-i18n="auto_txt">تحديث تلقائي</span>
-        </label>
+        <div class="auto-controls" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <label for="autoInterval" data-i18n="auto_interval_label" style="font-size:12px;font-weight:600">فاصل التحديث</label>
+          <div class="select-wrap">
+            <select id="autoInterval" class="select" title="فاصل التحديث" aria-label="فاصل التحديث" data-i18n-title="auto_interval_label" data-i18n-aria="auto_interval_label">
+              <option value="5000" data-i18n="auto_interval_5s">كل 5 ثوانٍ</option>
+              <option value="10000" data-i18n="auto_interval_10s" selected>كل 10 ثوانٍ</option>
+              <option value="30000" data-i18n="auto_interval_30s">كل 30 ثانية</option>
+              <option value="60000" data-i18n="auto_interval_60s">كل 60 ثانية</option>
+            </select>
+          </div>
+          <label class="switch" aria-label="تحديث تلقائي" title="تحديث تلقائي كل 10 ثوانٍ" data-i18n-title="auto_title" data-i18n-aria="auto_title">
+            <input id="auto" type="checkbox" checked>
+            <span class="slider" aria-hidden="true"></span>
+            <span class="txt" data-i18n="auto_txt">تحديث تلقائي</span>
+          </label>
+        </div>
       </div>
 
       <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
@@ -519,22 +530,38 @@
   const fval = id => { const v = parseFloat(cleanDec($(id).value)); return isFinite(v)? v : NaN; };
   const clamp = (x,min,max)=> Math.min(max, Math.max(min, x));
 
+  const AUTO_INTERVAL_KEY = "auto_interval_ms";
+  const AUTO_INTERVAL_OPTIONS = [5_000, 10_000, 30_000, 60_000];
+  const AUTO_INTERVAL_DEFAULT = 10_000;
+  let autoIntervalMs = AUTO_INTERVAL_DEFAULT;
+  (function initAutoInterval(){
+    try{
+      const saved = Number(localStorage.getItem(AUTO_INTERVAL_KEY));
+      if(AUTO_INTERVAL_OPTIONS.includes(saved)) autoIntervalMs = saved;
+    }catch{}
+  })();
+
   // ========= i18n =========
   const DICT = {
     ar: {
       page_title:"أسعار الذهب — 18 و 21 قيراط (دولار/غرام)",
       hdr_title:"أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)",
-      hdr_hint:"حاليًا نحدّث السعر تلقائيًا كل 10 ثوانٍ. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.",
+      hdr_hint:"نحدّث السعر تلقائيًا كل {s} ثانية. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.",
       h_ounce:"سعر الأونصة بالدولار",
       usd_oz_label:"USD/oz (إدخال يدوي)",
       oz_placeholder:"مثال: 2350",
       btn_refresh:"تحديث • Refresh",
-      auto_title:"تحديث تلقائي كل 10 ثوانٍ",
+      auto_title:"تحديث تلقائي كل {s} ثانية",
       auto_txt:"تحديث تلقائي",
       last_title:"وقت آخر تحديث",
       last_prefix:"آخر تحديث: ",
-      auto_meta_refresh:"تحديث تلقائي كل 10 ثوانٍ",
+      auto_meta_refresh:"التحديث التلقائي كل {s} ثانية",
       auto_meta_manual:"التحديث اليدوي مفعّل",
+      auto_interval_label:"فاصل التحديث",
+      auto_interval_5s:"كل 5 ثوانٍ",
+      auto_interval_10s:"كل 10 ثوانٍ",
+      auto_interval_30s:"كل 30 ثانية",
+      auto_interval_60s:"كل 60 ثانية",
 
       h_basic:"الأسعار الأساسية من دون صياغة (دولار/غرام)",
       sell18:"مبيع 18K", buy18:"شراء 18K", sell21:"مبيع 21K", buy21:"شراء 21K", per_g:"/ غ",
@@ -588,17 +615,22 @@
     en: {
       page_title:"Gold Prices — 18K & 21K (USD/gram)",
       hdr_title:"Gold Prices — 18K & 21K (USD/gram)",
-      hdr_hint:"We auto-refresh every 10s. To enter manually, turn off auto-refresh, then type the ounce price.",
+      hdr_hint:"We auto-refresh every {s} seconds. To enter manually, turn off auto-refresh, then type the ounce price.",
       h_ounce:"Ounce Price (USD)",
       usd_oz_label:"USD/oz (manual input)",
       oz_placeholder:"e.g. 2350",
       btn_refresh:"Refresh",
-      auto_title:"Auto refresh every 10 seconds",
+      auto_title:"Auto refresh every {s} seconds",
       auto_txt:"Auto refresh",
       last_title:"Last update time",
       last_prefix:"Last update: ",
-      auto_meta_refresh:"Auto refresh every 10s",
+      auto_meta_refresh:"Auto refresh every {s} seconds",
       auto_meta_manual:"Manual update enabled",
+      auto_interval_label:"Auto interval",
+      auto_interval_5s:"Every 5 seconds",
+      auto_interval_10s:"Every 10 seconds",
+      auto_interval_30s:"Every 30 seconds",
+      auto_interval_60s:"Every 60 seconds",
 
       h_basic:"Base prices without making (USD/gram)",
       sell18:"Sell 18K", buy18:"Buy 18K", sell21:"Sell 21K", buy21:"Buy 21K", per_g:"/ g",
@@ -656,6 +688,43 @@
 
   function t(k){ const d=DICT[CUR_LANG]||DICT.ar; return d[k] ?? k; }
 
+  function updateAutoIntervalTexts(){
+    const secs = Math.max(1, Math.round(autoIntervalMs / 1000));
+    const secsStr = String(secs);
+
+    const hint = document.querySelector('[data-i18n="hdr_hint"]');
+    if(hint){
+      hint.textContent = t("hdr_hint").replace("{s}", secsStr);
+    }
+
+    const switchLabel = document.querySelector('.switch[data-i18n-title="auto_title"]');
+    if(switchLabel){
+      const title = t("auto_title").replace("{s}", secsStr);
+      switchLabel.setAttribute("title", title);
+      switchLabel.setAttribute("aria-label", title);
+    }
+
+    const intervalLabel = document.querySelector('label[for="autoInterval"][data-i18n="auto_interval_label"]');
+    if(intervalLabel){
+      intervalLabel.textContent = t("auto_interval_label");
+    }
+
+    const autoSel = $("autoInterval");
+    if(autoSel){
+      if(autoSel.value !== String(autoIntervalMs)) autoSel.value = String(autoIntervalMs);
+      autoSel.setAttribute("title", t("auto_interval_label"));
+      autoSel.setAttribute("aria-label", t("auto_interval_label"));
+    }
+
+    const auto = $("auto");
+    const meta = $("meta");
+    if(meta){
+      const manual = t("auto_meta_manual");
+      const refresh = t("auto_meta_refresh").replace("{s}", secsStr);
+      meta.textContent = (auto && auto.checked) ? refresh : manual;
+    }
+  }
+
   // Apply i18n to text nodes/attrs/placeholders
   function applyI18n(){
     document.documentElement.lang = CUR_LANG;
@@ -679,8 +748,7 @@
 
     document.title = t("page_title");
 
-    const meta = $("meta");
-    if(meta) meta.textContent = $("auto").checked ? t("auto_meta_refresh") : t("auto_meta_manual");
+    updateAutoIntervalTexts();
 
     setLastUpdated();
     renderFormulas();
@@ -1021,30 +1089,51 @@
   $("oz").addEventListener("input", runAll);
   $("btnFetch").addEventListener("click", () => fetchSpot({ source:"manual" }));
 
-  const AUTO_MS = 10_000;
   function setAuto(on){
-    const btn = $("btnFetch"); const meta = $("meta"); const auto = $("auto");
+    const btn = $("btnFetch");
+    const auto = $("auto");
     if(on){
+      if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
       if(inRateLimitCooldown()){
         if(auto) auto.checked = false;
         showRateLimitMessage($("err"));
-        if(meta) meta.textContent = t("auto_meta_manual");
+        if(btn) btn.disabled = false;
+        updateAutoIntervalTexts();
         return;
       }
-      if(autoTimer) clearInterval(autoTimer);
       if(btn) btn.disabled = true;
-      if(meta) meta.textContent = t("auto_meta_refresh");
       fetchSpot({ source:"auto" });
-      autoTimer = setInterval(() => fetchSpot({ source:"auto" }), AUTO_MS);
+      autoTimer = setInterval(() => fetchSpot({ source:"auto" }), autoIntervalMs);
       if(auto) auto.checked = true;
     }else{
       if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
       if(btn) btn.disabled = false;
-      if(meta) meta.textContent = t("auto_meta_manual");
       if(auto) auto.checked = false;
     }
+    updateAutoIntervalTexts();
   }
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
+
+  const autoIntervalSel = $("autoInterval");
+  if(autoIntervalSel){
+    if(!AUTO_INTERVAL_OPTIONS.includes(autoIntervalMs)) autoIntervalMs = AUTO_INTERVAL_DEFAULT;
+    autoIntervalSel.value = String(autoIntervalMs);
+    autoIntervalSel.addEventListener("change", () => {
+      const next = Number(autoIntervalSel.value);
+      if(!AUTO_INTERVAL_OPTIONS.includes(next)){
+        autoIntervalSel.value = String(autoIntervalMs);
+        return;
+      }
+      if(next === autoIntervalMs) return;
+      autoIntervalMs = next;
+      try{ localStorage.setItem(AUTO_INTERVAL_KEY, String(autoIntervalMs)); }catch{}
+      updateAutoIntervalTexts();
+      const autoCheckbox = $("auto");
+      if(autoCheckbox && autoCheckbox.checked){
+        setAuto(true);
+      }
+    });
+  }
 
   /* =========================
      Settings UI wiring (modal)
