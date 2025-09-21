@@ -114,6 +114,10 @@
   .btn-mini.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--accent-ink);border:0}
   .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:color-mix(in oklab, var(--bg) 82%, transparent);
     border:1px solid color-mix(in oklab, var(--gold) 25%, transparent);color:var(--muted);font-size:12px}
+  .sparkline-wrap{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .sparkline-box{flex:1 1 220px;min-height:60px;padding:6px 8px;border-radius:12px;background:color-mix(in oklab, var(--bg) 82%, transparent);
+    border:1px solid color-mix(in oklab, var(--gold) 22%, transparent)}
+  .sparkline-box canvas{width:100%;height:48px;display:block}
   .out{font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;background:color-mix(in oklab, var(--bg) 82%, transparent);
     border:1px solid color-mix(in oklab, var(--gold) 22%, transparent);padding:12px;border-radius:12px}
   .error{background:#3a120c;border:1px solid rgba(255,150,120,.6);color:#ffe1db;padding:10px;border-radius:10px;font-size:12px}
@@ -315,6 +319,13 @@
         <span id="meta" class="badge">—</span>
         <span id="last" class="badge" aria-live="polite" title="وقت آخر تحديث" data-i18n-title="last_title">آخر تحديث: —</span>
         <span class="spacer"></span>
+      </div>
+
+      <div class="sparkline-wrap">
+        <span class="badge" data-i18n="sparkline_label">منحنى السعر (آخر 50 تحديثًا)</span>
+        <div class="sparkline-box">
+          <canvas id="priceSparkline" height="48" role="img" data-i18n-title="sparkline_empty" title="—"></canvas>
+        </div>
       </div>
 
       <div id="err" class="error" style="display:none;margin-top:8px"></div>
@@ -535,6 +546,9 @@
       last_prefix:"آخر تحديث: ",
       auto_meta_refresh:"تحديث تلقائي كل 10 ثوانٍ",
       auto_meta_manual:"التحديث اليدوي مفعّل",
+      sparkline_label:"منحنى السعر (آخر 50 تحديثًا)",
+      sparkline_hint:"آخر {n} أسعار. أحدث قيمة: {p} دولار/أونصة.",
+      sparkline_empty:"لم يتم جمع بيانات بعد.",
 
       h_basic:"الأسعار الأساسية من دون صياغة (دولار/غرام)",
       sell18:"مبيع 18K", buy18:"شراء 18K", sell21:"مبيع 21K", buy21:"شراء 21K", per_g:"/ غ",
@@ -599,6 +613,9 @@
       last_prefix:"Last update: ",
       auto_meta_refresh:"Auto refresh every 10s",
       auto_meta_manual:"Manual update enabled",
+      sparkline_label:"Price trend (last 50 updates)",
+      sparkline_hint:"Last {n} prices. Latest: {p} USD/oz.",
+      sparkline_empty:"No recent data yet.",
 
       h_basic:"Base prices without making (USD/gram)",
       sell18:"Sell 18K", buy18:"Buy 18K", sell21:"Sell 21K", buy21:"Buy 21K", per_g:"/ g",
@@ -684,6 +701,7 @@
 
     setLastUpdated();
     renderFormulas();
+    renderSparkline();
   }
 
   // ========= Dates =========
@@ -707,6 +725,7 @@
      ========================= */
   const CFG_KEY = "gold_cfg_v1";
   const SPOT_KEY = "last_spot_v1";
+  const PRICE_HISTORY_KEY = "price_history_v1";
   const DEFAULTS = Object.freeze({
     oztToG: 32,
     spreadMinus: 30,
@@ -941,6 +960,8 @@
   let nextRateLimitCooldownMs = RATE_LIMIT_MIN_COOLDOWN_MS;
   let cooldownUntil = 0;
   let rateLimitStrikeCount = 0;
+  const PRICE_HISTORY_LIMIT = 50;
+  let priceHistory = loadPriceHistory();
 
   function inRateLimitCooldown(){
     return cooldownUntil && Date.now() < cooldownUntil;
@@ -974,6 +995,130 @@
     rateLimitStrikeCount = 0;
   }
 
+  function loadPriceHistory(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(PRICE_HISTORY_KEY) || "[]");
+      if(Array.isArray(raw)){
+        const cleaned = raw
+          .map(item => ({ t:Number(item && item.t), p:Number(item && item.p) }))
+          .filter(item => isFinite(item.t) && isFinite(item.p))
+          .sort((a,b) => a.t - b.t);
+        if(cleaned.length > PRICE_HISTORY_LIMIT) return cleaned.slice(-PRICE_HISTORY_LIMIT);
+        return cleaned;
+      }
+    }catch{}
+    return [];
+  }
+
+  function savePriceHistory(){
+    try{ localStorage.setItem(PRICE_HISTORY_KEY, JSON.stringify(priceHistory)); }catch{}
+  }
+
+  function recordPricePoint(price, timestamp = Date.now()){
+    const pNum = Number(price);
+    if(!isFinite(pNum)) return;
+    const time = Number(timestamp);
+    const entry = { t: isFinite(time) ? time : Date.now(), p: pNum };
+    priceHistory.push(entry);
+    if(priceHistory.length > PRICE_HISTORY_LIMIT){
+      priceHistory.splice(0, priceHistory.length - PRICE_HISTORY_LIMIT);
+    }
+    savePriceHistory();
+  }
+
+  function renderSparkline(){
+    const canvas = $("priceSparkline");
+    if(!canvas) return;
+
+    const valid = priceHistory.filter(pt => pt && isFinite(pt.p));
+    const labelBase = t("sparkline_label");
+    if(!valid.length){
+      const emptyText = t("sparkline_empty");
+      canvas.title = emptyText;
+      canvas.setAttribute("aria-label", labelBase + ": " + emptyText);
+    }else{
+      const latest = valid[valid.length - 1];
+      const infoText = t("sparkline_hint")
+        .replace("{n}", valid.length)
+        .replace("{p}", fmt(latest.p));
+      canvas.title = infoText;
+      canvas.setAttribute("aria-label", labelBase + ": " + infoText);
+    }
+
+    const ctx = canvas.getContext("2d");
+    if(!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const cssWidth = rect.width || canvas.clientWidth;
+    const cssHeight = rect.height || canvas.clientHeight || parseFloat(canvas.getAttribute("height")||"0") || 48;
+    if(cssWidth <= 0 || cssHeight <= 0){
+      ctx.clearRect(0, 0, canvas.width || 0, canvas.height || 0);
+      return;
+    }
+
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.max(1, Math.round(cssWidth * dpr));
+    const height = Math.max(1, Math.round(cssHeight * dpr));
+    if(canvas.width !== width || canvas.height !== height){
+      canvas.width = width;
+      canvas.height = height;
+    }
+    ctx.clearRect(0, 0, width, height);
+
+    if(!valid.length){
+      return;
+    }
+
+    const min = Math.min(...valid.map(pt => pt.p));
+    const max = Math.max(...valid.map(pt => pt.p));
+    const range = max - min || 1;
+
+    const padX = 6 * dpr;
+    const padY = 6 * dpr;
+    const innerW = Math.max(1, width - padX * 2);
+    const innerH = Math.max(1, height - padY * 2);
+
+    const coords = valid.map((pt, idx) => {
+      const x = (valid.length === 1)
+        ? padX + innerW / 2
+        : padX + (innerW * idx) / (valid.length - 1);
+      const norm = (pt.p - min) / range;
+      const y = padY + innerH - (innerH * norm);
+      return { x, y };
+    });
+
+    const styles = getComputedStyle(document.documentElement);
+    const strokeColor = styles.getPropertyValue("--gold").trim() || "#d4af37";
+
+    if(coords.length > 1){
+      ctx.beginPath();
+      ctx.moveTo(coords[0].x, coords[0].y);
+      for(let i=1;i<coords.length;i++) ctx.lineTo(coords[i].x, coords[i].y);
+      ctx.lineTo(coords[coords.length-1].x, height - padY);
+      ctx.lineTo(coords[0].x, height - padY);
+      ctx.closePath();
+      ctx.save();
+      ctx.fillStyle = strokeColor;
+      ctx.globalAlpha = 0.18;
+      ctx.fill();
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.moveTo(coords[0].x, coords[0].y);
+      for(let i=1;i<coords.length;i++) ctx.lineTo(coords[i].x, coords[i].y);
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.lineWidth = Math.max(1.5 * dpr, 1);
+      ctx.strokeStyle = strokeColor;
+      ctx.stroke();
+    }else{
+      ctx.beginPath();
+      ctx.arc(coords[0].x, coords[0].y, Math.max(2.5 * dpr, 2), 0, Math.PI * 2);
+      ctx.fillStyle = strokeColor;
+      ctx.fill();
+    }
+  }
+
   async function fetchSpot({ source = "manual" } = {}){
     const btn = $("btnFetch");
     const err = $("err");
@@ -988,11 +1133,14 @@
 
     try{
       const p = await getSpotFast();
+      const now = Date.now();
+      recordPricePoint(p, now);
+      renderSparkline();
       resetRateLimitState();
       $("oz").value = p.toFixed(2);
       runAll();
-      setLastUpdated(new Date());
-      try{ localStorage.setItem(SPOT_KEY, JSON.stringify({ p, t: Date.now() })); }catch{}
+      setLastUpdated(new Date(now));
+      try{ localStorage.setItem(SPOT_KEY, JSON.stringify({ p, t: now })); }catch{}
     }catch(e){
       const key = interpretFetchError(e);
       if(key === "fetch_err_rate"){
@@ -1045,6 +1193,7 @@
     }
   }
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
+  window.addEventListener("resize", renderSparkline);
 
   /* =========================
      Settings UI wiring (modal)
@@ -1150,6 +1299,7 @@
     const th = themeSel.value || "dark";
     document.documentElement.setAttribute("data-theme", th);
     try{ localStorage.setItem(THEME_KEY, th); }catch{}
+    renderSparkline();
   }
 
   function onLangChange(){
