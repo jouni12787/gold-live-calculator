@@ -575,6 +575,7 @@
       footer:"© <span id='y'></span> <strong>goldpricelb.store</strong> — جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني (Ali Jouni).",
 
       fetch_err_prefix:"فشل الجلب من gold-api.com.\n",
+      fetch_err_rate:"تم الوصول إلى حدّ الطلبات من gold-api.com. سيتم إيقاف التحديث التلقائي لمدة {s} ثانية.",
       a2hs_text:"احصل على النسخة السريعة — أضِف الموقع إلى الشاشة الرئيسية.",
       a2hs_get:"الحصول",
       a2hs_title:"إضافة إلى الشاشة الرئيسية",
@@ -638,6 +639,7 @@
       footer:"© <span id='y'></span> <strong>goldpricelb.store</strong> — All rights reserved — Designed by Ali Jouni.",
 
       fetch_err_prefix:"Failed to fetch from gold-api.com.\n",
+      fetch_err_rate:"Rate limit reached on gold-api.com. Auto refresh paused for {s} seconds.",
       a2hs_text:"Get the fast version — add this site to your Home screen.",
       a2hs_get:"Get",
       a2hs_title:"Add to Home Screen",
@@ -901,20 +903,112 @@
     return Promise.any(tries);
   }
 
-  async function fetchSpot(){
-    $("btnFetch").disabled = true;
-    const err = $("err"); err.style.display = "none"; err.textContent = "";
+  function stringifyError(err){
+    if(err instanceof AggregateError){
+      return (err.errors || []).map(stringifyError).filter(Boolean).join("; ") || "AggregateError";
+    }
+    if(err && typeof err === "object"){
+      if(typeof err.message === "string" && err.message) return err.message;
+      if(typeof err.status === "number") return "HTTP " + err.status;
+    }
+    if(typeof err === "string") return err;
+    try{ return String(err); }catch{ return "Unknown error"; }
+  }
+
+  function interpretFetchError(err){
+    if(err instanceof AggregateError){
+      for(const inner of err.errors || []){
+        const key = interpretFetchError(inner);
+        if(key === "fetch_err_rate") return "fetch_err_rate";
+      }
+      if(err.errors && err.errors.length) return interpretFetchError(err.errors[0]);
+      return "fetch_err_generic";
+    }
+    if(err && typeof err === "object"){
+      if(typeof err.status === "number" && err.status === 429) return "fetch_err_rate";
+      if(typeof err.message === "string" && (/\b429\b/.test(err.message) || /rate/i.test(err.message))) return "fetch_err_rate";
+      if(typeof err.code === "string" && /429/.test(err.code)) return "fetch_err_rate";
+    }
+    const msg = stringifyError(err);
+    if(/\b429\b/.test(msg) || /rate limit/i.test(msg) || /Too Many Requests/i.test(msg)) return "fetch_err_rate";
+    return "fetch_err_generic";
+  }
+
+  const RATE_LIMIT_STRIKE_THRESHOLD = 3;
+  const RATE_LIMIT_MIN_COOLDOWN_MS = 60_000;
+  const RATE_LIMIT_MAX_COOLDOWN_MS = 300_000;
+  let autoTimer = null;
+  let nextRateLimitCooldownMs = RATE_LIMIT_MIN_COOLDOWN_MS;
+  let cooldownUntil = 0;
+  let rateLimitStrikeCount = 0;
+
+  function inRateLimitCooldown(){
+    return cooldownUntil && Date.now() < cooldownUntil;
+  }
+
+  function resetRateLimitStrikeTracking(){
+    rateLimitStrikeCount = 0;
+    nextRateLimitCooldownMs = RATE_LIMIT_MIN_COOLDOWN_MS;
+  }
+
+  function resetRateLimitState(){
+    resetRateLimitStrikeTracking();
+    cooldownUntil = 0;
+  }
+
+  function showRateLimitMessage(errEl){
+    if(!errEl) return;
+    const msRemaining = Math.max(0, cooldownUntil - Date.now());
+    const secs = Math.max(1, Math.ceil(msRemaining / 1000));
+    errEl.style.display = "block";
+    errEl.textContent = t("fetch_err_rate").replace("{s}", secs);
+  }
+
+  function applyRateLimitCooldown(errEl){
+    const now = Date.now();
+    cooldownUntil = now + nextRateLimitCooldownMs;
+    showRateLimitMessage(errEl);
+    nextRateLimitCooldownMs = Math.min(RATE_LIMIT_MAX_COOLDOWN_MS, Math.round(nextRateLimitCooldownMs * 1.5));
+    const auto = $("auto");
+    if(auto && auto.checked) setAuto(false);
+    rateLimitStrikeCount = 0;
+  }
+
+  async function fetchSpot({ source = "manual" } = {}){
+    const btn = $("btnFetch");
+    const err = $("err");
+
+    if(inRateLimitCooldown()){
+      if(source === "manual") showRateLimitMessage(err);
+      return;
+    }
+
+    if(btn) btn.disabled = true;
+    if(err){ err.style.display = "none"; err.textContent = ""; }
+
     try{
       const p = await getSpotFast();
+      resetRateLimitState();
       $("oz").value = p.toFixed(2);
       runAll();
       setLastUpdated(new Date());
       try{ localStorage.setItem(SPOT_KEY, JSON.stringify({ p, t: Date.now() })); }catch{}
     }catch(e){
-      err.style.display = "block";
-      err.textContent = t("fetch_err_prefix") + (e && e.toString ? e.toString() : e);
+      const key = interpretFetchError(e);
+      if(key === "fetch_err_rate"){
+        rateLimitStrikeCount += 1;
+        if(rateLimitStrikeCount >= RATE_LIMIT_STRIKE_THRESHOLD){
+          applyRateLimitCooldown(err);
+        }
+      }else{
+        resetRateLimitStrikeTracking();
+        if(err){
+          err.style.display = "block";
+          err.textContent = t("fetch_err_prefix") + stringifyError(e);
+        }
+      }
     }finally{
-      $("btnFetch").disabled = false;
+      if(btn) btn.disabled = false;
     }
   }
 
@@ -925,21 +1019,29 @@
     const el = $(id); if(el) el.addEventListener("input", updateTotals);
   });
   $("oz").addEventListener("input", runAll);
-  $("btnFetch").addEventListener("click", fetchSpot);
+  $("btnFetch").addEventListener("click", () => fetchSpot({ source:"manual" }));
 
-  let autoTimer = null;
   const AUTO_MS = 10_000;
   function setAuto(on){
     const btn = $("btnFetch"); const meta = $("meta"); const auto = $("auto");
     if(on){
+      if(inRateLimitCooldown()){
+        if(auto) auto.checked = false;
+        showRateLimitMessage($("err"));
+        if(meta) meta.textContent = t("auto_meta_manual");
+        return;
+      }
       if(autoTimer) clearInterval(autoTimer);
-      btn.disabled = true; if(meta) meta.textContent = t("auto_meta_refresh");
-      fetchSpot();
-      autoTimer = setInterval(fetchSpot, AUTO_MS); auto.checked = true;
+      if(btn) btn.disabled = true;
+      if(meta) meta.textContent = t("auto_meta_refresh");
+      fetchSpot({ source:"auto" });
+      autoTimer = setInterval(() => fetchSpot({ source:"auto" }), AUTO_MS);
+      if(auto) auto.checked = true;
     }else{
       if(autoTimer){ clearInterval(autoTimer); autoTimer = null; }
-      btn.disabled = false; if(meta) meta.textContent = t("auto_meta_manual");
-      auto.checked = false;
+      if(btn) btn.disabled = false;
+      if(meta) meta.textContent = t("auto_meta_manual");
+      if(auto) auto.checked = false;
     }
   }
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
