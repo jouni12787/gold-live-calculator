@@ -624,8 +624,12 @@
      ========================= */
   let per = { s18:NaN, b18:NaN, s21:NaN, b21:NaN };
 
-  function clearPerOutputs(){
+  function markPerInvalid(){
     per.s18 = per.b18 = per.s21 = per.b21 = NaN;
+  }
+
+  function clearPerOutputs(){
+    markPerInvalid();
     setOut("s18", NaN);
     setOut("b18", NaN);
     setOut("s21", NaN);
@@ -634,34 +638,59 @@
     setOut("coinBuy", NaN);
   }
 
-  function calcPerGram(){
-  const oz = fval("oz");
-  if(!isFinite(oz) || oz<=0){
-    clearPerOutputs();
-    return false;
+  let perResetTimer = null;
+  const PARTIAL_RESET_DELAY = 260;
+
+  function schedulePerReset(){
+    cancelPerReset();
+    perResetTimer = setTimeout(()=>{
+      clearPerOutputs();
+      resetTotals();
+      perResetTimer = null;
+    }, PARTIAL_RESET_DELAY);
   }
 
-  const g = cfg.oztToG;
+  function cancelPerReset(){
+    if(perResetTimer){
+      clearTimeout(perResetTimer);
+      perResetTimer = null;
+    }
+  }
 
-  per.s18 = (oz - cfg.spreadMinus) * g * (cfg.k18SellPpm / cfg.k18SellDen) / 1000;
-  per.b18 = (oz + cfg.spreadPlus)  * g * (cfg.k18BuyPpm  / cfg.k18BuyDen)  / 1000;
-  per.s21 = (oz - cfg.spreadMinus) * g * (cfg.k21SellPpm / cfg.k21SellDen) / 1000;
-  per.b21 = (oz + cfg.spreadPlus)  * g * (cfg.k21BuyPpm  / cfg.k21BuyDen)  / 1000;
+  function calcPerGram({allowPartial=false}={}){
+    const raw = $("oz").value;
+    if(!raw || !raw.trim()){
+      if(allowPartial) markPerInvalid(); else clearPerOutputs();
+      return "empty";
+    }
 
-  // Update text only (no innerHTML)
-  setOut("s18", per.s18);
-  setOut("b18", per.b18);
-  setOut("s21", per.s21);
-  setOut("b21", per.b21);
+    const oz = fval("oz");
+    if(!isFinite(oz) || oz<=0){
+      if(allowPartial) markPerInvalid(); else clearPerOutputs();
+      return "invalid";
+    }
 
-  const coinSell = cfg.coinWeightG * per.s21;
-  const coinBuy  = cfg.coinWeightG * per.b21 + cfg.coinBuyFee;
+    const g = cfg.oztToG;
 
-  setOut("coinSell", coinSell);
-  setOut("coinBuy",  coinBuy);
+    per.s18 = (oz - cfg.spreadMinus) * g * (cfg.k18SellPpm / cfg.k18SellDen) / 1000;
+    per.b18 = (oz + cfg.spreadPlus)  * g * (cfg.k18BuyPpm  / cfg.k18BuyDen)  / 1000;
+    per.s21 = (oz - cfg.spreadMinus) * g * (cfg.k21SellPpm / cfg.k21SellDen) / 1000;
+    per.b21 = (oz + cfg.spreadPlus)  * g * (cfg.k21BuyPpm  / cfg.k21BuyDen)  / 1000;
 
-  return true;
-}
+    // Update text only (no innerHTML)
+    setOut("s18", per.s18);
+    setOut("b18", per.b18);
+    setOut("s21", per.s21);
+    setOut("b21", per.b21);
+
+    const coinSell = cfg.coinWeightG * per.s21;
+    const coinBuy  = cfg.coinWeightG * per.b21 + cfg.coinBuyFee;
+
+    setOut("coinSell", coinSell);
+    setOut("coinBuy",  coinBuy);
+
+    return "ok";
+  }
 
 
   function updateTotals(){
@@ -689,7 +718,20 @@
     });
   }
 
-  function runAll(){ if(calcPerGram()) updateTotals(); else resetTotals(); }
+  function runAll(ev){
+    const allowPartial = !!(ev && ev.type === "input");
+    const status = calcPerGram({ allowPartial });
+
+    if(status === "ok"){
+      cancelPerReset();
+      updateTotals();
+    }else if(allowPartial){
+      schedulePerReset();
+    }else{
+      cancelPerReset();
+      resetTotals();
+    }
+  }
 
   /* =========================
      Fetch ounce price
