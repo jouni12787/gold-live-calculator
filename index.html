@@ -1388,6 +1388,7 @@
     resetAlertTracking();
     runAll();
     updateAlertBaseline(fval("oz"));
+    storeAlertTimestamp(0);
   });
   $("btnResetCfg").addEventListener("click", resetCfg);
   $("btnCopyCfg").addEventListener("click", async ()=>{
