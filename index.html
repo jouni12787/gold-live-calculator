@@ -114,6 +114,14 @@
   .btn-mini.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--accent-ink);border:0}
   .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:color-mix(in oklab, var(--bg) 82%, transparent);
     border:1px solid color-mix(in oklab, var(--gold) 25%, transparent);color:var(--muted);font-size:12px}
+  .badge.delta{display:inline-flex;align-items:center;gap:6px;direction:ltr;text-align:left;justify-content:center;
+    font-weight:700;min-width:11ch;letter-spacing:.1px}
+  .badge.delta.positive{color:#33d69f;border-color:color-mix(in oklab,#33d69f 42%, transparent);
+    background:color-mix(in oklab,#33d69f 18%, transparent)}
+  .badge.delta.negative{color:#ff8d7a;border-color:color-mix(in oklab,#ff8d7a 42%, transparent);
+    background:color-mix(in oklab,#ff8d7a 18%, transparent)}
+  .badge.delta.flat{color:var(--muted);border-color:color-mix(in oklab, var(--gold) 25%, transparent);
+    background:color-mix(in oklab, var(--bg) 86%, transparent)}
   .sparkline-wrap{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
   .sparkline-box{flex:1 1 220px;min-height:60px;padding:6px 8px;border-radius:12px;background:color-mix(in oklab, var(--bg) 82%, transparent);
     border:1px solid color-mix(in oklab, var(--gold) 22%, transparent)}
@@ -335,6 +343,7 @@
 
       <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
         <span id="meta" class="badge">—</span>
+        <span id="delta" class="badge delta" aria-live="polite" data-i18n-title="delta_title">—</span>
         <span id="last" class="badge" aria-live="polite" title="وقت آخر تحديث" data-i18n-title="last_title">آخر تحديث: —</span>
         <span class="spacer"></span>
       </div>
@@ -561,6 +570,9 @@
 
   const $ = id => document.getElementById(id);
   const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
+  const fmtFixed = n => isFinite(n)
+    ? n.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})
+    : "—";
   const cleanDec = s => (s||"").replace(/[^\d.,-]/g,"").replace(",",".");
 
   let toastTimer = null;
@@ -592,6 +604,11 @@
       last_prefix:"آخر تحديث: ",
       auto_meta_refresh:"تحديث تلقائي كل {label}",
       auto_meta_manual:"التحديث اليدوي مفعّل",
+      delta_title:"التغير منذ آخر تحديث",
+      delta_up:"ارتفع السعر بمقدار $ {amount} منذ آخر تحديث.",
+      delta_down:"انخفض السعر بمقدار $ {amount} منذ آخر تحديث.",
+      delta_flat:"لا تغيّر في السعر منذ آخر تحديث.",
+      delta_no_data:"بانتظار قراءة سابقة لعرض التغيّر.",
       sparkline_label:"منحنى السعر (آخر 50 تحديثًا)",
       sparkline_hint:"آخر {n} أسعار. أحدث قيمة: {p} دولار/أونصة.",
       sparkline_empty:"لم يتم جمع بيانات بعد.",
@@ -675,6 +692,11 @@
       last_prefix:"Last update: ",
       auto_meta_refresh:"Auto refresh every {label}",
       auto_meta_manual:"Manual update enabled",
+      delta_title:"Change since last update",
+      delta_up:"Price up $ {amount} since the last update.",
+      delta_down:"Price down $ {amount} since the last update.",
+      delta_flat:"No change since the last update.",
+      delta_no_data:"Waiting for another reading to show change.",
       sparkline_label:"Price trend (last 50 updates)",
       sparkline_hint:"Last {n} prices. Latest: {p} USD/oz.",
       sparkline_empty:"No recent data yet.",
@@ -789,6 +811,7 @@
     renderFormulas();
     renderSparkline();
     renderAutoTexts();
+    renderPriceDelta();
   }
 
   function clampAutoSeconds(sec){
@@ -1171,6 +1194,7 @@
   let cooldownUntil = 0;
   let rateLimitStrikeCount = 0;
   const PRICE_HISTORY_LIMIT = 50;
+  const PRICE_DELTA_EPS = 0.05;
   let priceHistory = loadPriceHistory();
 
   function inRateLimitCooldown(){
@@ -1234,6 +1258,7 @@
       priceHistory.splice(0, priceHistory.length - PRICE_HISTORY_LIMIT);
     }
     savePriceHistory();
+    renderPriceDelta();
   }
   function getLatestRecordedPrice(){
     const last = priceHistory.length ? priceHistory[priceHistory.length - 1] : null;
@@ -1244,6 +1269,53 @@
       if(isFinite(val)) return val;
     }catch{}
     return NaN;
+  }
+
+  function renderPriceDelta(){
+    const deltaEl = $("delta");
+    if(!deltaEl) return;
+
+    deltaEl.title = t("delta_title");
+    const valid = priceHistory.filter(pt => pt && isFinite(pt.p));
+    if(valid.length < 2){
+      deltaEl.textContent = "—";
+      deltaEl.classList.remove("positive","negative","flat");
+      deltaEl.setAttribute("aria-label", t("delta_no_data"));
+      return;
+    }
+
+    const latest = Number(valid[valid.length - 1].p);
+    const prev = Number(valid[valid.length - 2].p);
+    if(!isFinite(latest) || !isFinite(prev)){
+      deltaEl.textContent = "—";
+      deltaEl.classList.remove("positive","negative","flat");
+      deltaEl.setAttribute("aria-label", t("delta_no_data"));
+      return;
+    }
+
+    const diff = latest - prev;
+    const absDiff = Math.abs(diff);
+    const displayDiff = absDiff < PRICE_DELTA_EPS ? 0 : absDiff;
+
+    deltaEl.classList.remove("positive","negative","flat");
+    if(displayDiff === 0){
+      const amount = fmtFixed(0);
+      deltaEl.textContent = `↔ $${amount}`;
+      deltaEl.classList.add("flat");
+      deltaEl.setAttribute("aria-label", t("delta_flat"));
+      return;
+    }
+
+    const amount = fmtFixed(displayDiff);
+    if(diff > 0){
+      deltaEl.textContent = `▲ +$${amount}`;
+      deltaEl.classList.add("positive");
+      deltaEl.setAttribute("aria-label", t("delta_up", { amount }));
+    }else{
+      deltaEl.textContent = `▼ −$${amount}`;
+      deltaEl.classList.add("negative");
+      deltaEl.setAttribute("aria-label", t("delta_down", { amount }));
+    }
   }
 
   function renderSparkline(){
