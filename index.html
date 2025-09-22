@@ -122,10 +122,31 @@
     background:color-mix(in oklab,#ff8d7a 18%, transparent)}
   .badge.delta.flat{color:var(--muted);border-color:color-mix(in oklab, var(--gold) 25%, transparent);
     background:color-mix(in oklab, var(--bg) 86%, transparent)}
-  .sparkline-wrap{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
-  .sparkline-box{flex:1 1 220px;min-height:60px;padding:6px 8px;border-radius:12px;background:color-mix(in oklab, var(--bg) 82%, transparent);
+  .history-section{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+  .history-toggle-bar{display:flex;justify-content:flex-end;margin-top:12px}
+  .history-toggle-bar .btn-mini{font-weight:600}
+  .history-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
+  .history-badge{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .history-label-sep{opacity:.45}
+  .history-range{font-weight:700}
+  .history-tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .history-tab{border:1px solid color-mix(in oklab, var(--gold) 30%, transparent);background:color-mix(in oklab, var(--bg) 82%, transparent);
+    color:var(--ink);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:12px;transition:.2s}
+  .history-tab:focus{outline:none;box-shadow:var(--outline)}
+  .history-tab.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--accent-ink);border-color:transparent;
+    box-shadow:0 6px 16px color-mix(in oklab, var(--gold) 28%, transparent)}
+  .history-chart{padding:12px 14px;border-radius:12px;background:color-mix(in oklab, var(--bg) 82%, transparent);
     border:1px solid color-mix(in oklab, var(--gold) 22%, transparent)}
-  .sparkline-box canvas{width:100%;height:48px;display:block}
+  .history-chart canvas{width:100%;height:120px;display:block}
+  .history-empty{font-size:12px;color:var(--muted);}
+  .history-stats{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+  .history-stat{padding:10px 12px;border-radius:12px;background:color-mix(in oklab, var(--bg) 88%, transparent);
+    border:1px solid color-mix(in oklab, var(--gold) 18%, transparent);font-size:12px}
+  .history-stat strong{display:block;margin-top:4px;font-size:16px;font-weight:700;direction:ltr;text-align:left}
+  .history-change{font-weight:700}
+  .history-change.positive{color:#33d69f}
+  .history-change.negative{color:#ff8d7a}
+  .history-change.flat{color:var(--muted)}
   .out{font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;background:color-mix(in oklab, var(--bg) 82%, transparent);
     border:1px solid color-mix(in oklab, var(--gold) 22%, transparent);padding:12px;border-radius:12px}
   .error{background:#3a120c;border:1px solid rgba(255,150,120,.6);color:#ffe1db;padding:10px;border-radius:10px;font-size:12px}
@@ -348,10 +369,54 @@
         <span class="spacer"></span>
       </div>
 
-      <div class="sparkline-wrap">
-        <span class="badge" data-i18n="sparkline_label">منحنى السعر (آخر 50 تحديثًا)</span>
-        <div class="sparkline-box">
-          <canvas id="priceSparkline" height="48" role="img" data-i18n-title="sparkline_empty" title="—"></canvas>
+      <div class="history-toggle-bar">
+        <button id="historyToggle" class="btn-mini" type="button" aria-expanded="false" aria-controls="historySection">
+          عرض سجل السعر
+        </button>
+      </div>
+      <div class="history-section" id="historySection" hidden>
+        <div class="history-header">
+          <span class="badge history-badge" id="historyLabel">
+            <span data-i18n="history_label_base">منحنى السعر</span>
+            <span class="history-label-sep">•</span>
+            <span class="history-range" id="historyRangeText">—</span>
+          </span>
+          <div class="history-tabs" role="group" data-i18n-aria="history_tabs_label">
+            <button type="button" class="history-tab" data-history-range="1h" data-i18n="history_tab_1h" aria-pressed="false">١س</button>
+            <button type="button" class="history-tab" data-history-range="6h" data-i18n="history_tab_6h" aria-pressed="false">٦س</button>
+            <button type="button" class="history-tab" data-history-range="24h" data-i18n="history_tab_24h" aria-pressed="false">٢٤س</button>
+            <button type="button" class="history-tab" data-history-range="all" data-i18n="history_tab_all" aria-pressed="false">الكل</button>
+          </div>
+        </div>
+        <div class="history-chart">
+          <canvas id="priceSparkline" height="120" role="img" title="—"></canvas>
+        </div>
+        <div id="historyEmpty" class="history-empty" hidden>—</div>
+        <div class="history-stats" id="historyStats">
+          <div class="history-stat">
+            <span class="history-stat-label" data-i18n="history_stat_high">أعلى</span>
+            <strong id="historyHigh">—</strong>
+          </div>
+          <div class="history-stat">
+            <span class="history-stat-label" data-i18n="history_stat_low">أدنى</span>
+            <strong id="historyLow">—</strong>
+          </div>
+          <div class="history-stat">
+            <span class="history-stat-label" data-i18n="history_stat_avg">متوسط</span>
+            <strong id="historyAvg">—</strong>
+          </div>
+          <div class="history-stat">
+            <span class="history-stat-label" data-i18n="history_stat_change">التغير</span>
+            <strong id="historyChange" class="history-change">—</strong>
+          </div>
+          <div class="history-stat">
+            <span class="history-stat-label" data-i18n="history_stat_samples">القراءات</span>
+            <strong id="historySamples">—</strong>
+          </div>
+          <div class="history-stat">
+            <span class="history-stat-label" data-i18n="history_stat_updated">آخر قراءة</span>
+            <strong id="historyLastTime">—</strong>
+          </div>
         </div>
       </div>
 
@@ -569,10 +634,16 @@
   function setOut(id, val){ if(outRefs[id]) outRefs[id].textContent = fmt(val); }
 
   const $ = id => document.getElementById(id);
+  const historySectionEl = $("historySection");
+  const historyToggleBtn = $("historyToggle");
   const fmt = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : "—";
   const fmtFixed = n => isFinite(n)
     ? n.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})
     : "—";
+  const fmtPercent = n => isFinite(n)
+    ? n.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})
+    : "—";
+  const fmtMoney = n => isFinite(n) ? `$ ${fmt(n)}` : "—";
   const cleanDec = s => (s||"").replace(/[^\d.,-]/g,"").replace(",",".");
 
   let toastTimer = null;
@@ -609,9 +680,29 @@
       delta_down:"انخفض السعر بمقدار $ {amount} منذ آخر تحديث.",
       delta_flat:"لا تغيّر في السعر منذ آخر تحديث.",
       delta_no_data:"بانتظار قراءة سابقة لعرض التغيّر.",
-      sparkline_label:"منحنى السعر (آخر 50 تحديثًا)",
-      sparkline_hint:"آخر {n} أسعار. أحدث قيمة: {p} دولار/أونصة.",
-      sparkline_empty:"لم يتم جمع بيانات بعد.",
+      history_label_base:"منحنى السعر",
+      history_tabs_label:"نطاق عرض سجل السعر",
+      history_tab_1h:"١س",
+      history_tab_6h:"٦س",
+      history_tab_24h:"٢٤س",
+      history_tab_all:"الكل",
+      history_range_1h:"آخر ساعة",
+      history_range_6h:"آخر ٦ ساعات",
+      history_range_24h:"آخر ٢٤ ساعة",
+      history_range_all:"كل القراءات",
+      history_hint:"عدد القراءات: {n} • أحدث قيمة: {p} دولار/أونصة.",
+      history_empty:"لا بيانات ضمن {range}.",
+      history_stat_high:"أعلى",
+      history_stat_low:"أدنى",
+      history_stat_avg:"متوسط",
+      history_stat_change:"التغير",
+      history_stat_samples:"القراءات",
+      history_stat_updated:"آخر قراءة",
+      history_change_positive:"↑ +$ {amount} ({pct}٪)",
+      history_change_negative:"↓ −$ {amount} ({pct}٪)",
+      history_change_flat:"↔ $0 (0٪)",
+      history_toggle_show:"عرض سجل السعر",
+      history_toggle_hide:"إخفاء سجل السعر",
 
       h_basic:"الأسعار الأساسية من دون صياغة (دولار/غرام)",
       sell18:"مبيع 18K", buy18:"شراء 18K", sell21:"مبيع 21K", buy21:"شراء 21K", per_g:"/ غ",
@@ -697,9 +788,29 @@
       delta_down:"Price down $ {amount} since the last update.",
       delta_flat:"No change since the last update.",
       delta_no_data:"Waiting for another reading to show change.",
-      sparkline_label:"Price trend (last 50 updates)",
-      sparkline_hint:"Last {n} prices. Latest: {p} USD/oz.",
-      sparkline_empty:"No recent data yet.",
+      history_label_base:"Price history",
+      history_tabs_label:"Select price history range",
+      history_tab_1h:"1h",
+      history_tab_6h:"6h",
+      history_tab_24h:"24h",
+      history_tab_all:"All",
+      history_range_1h:"Last hour",
+      history_range_6h:"Last 6 hours",
+      history_range_24h:"Last 24 hours",
+      history_range_all:"All saved readings",
+      history_hint:"Samples: {n} • Latest: {p} USD/oz.",
+      history_empty:"No data inside {range} yet.",
+      history_stat_high:"High",
+      history_stat_low:"Low",
+      history_stat_avg:"Average",
+      history_stat_change:"Change",
+      history_stat_samples:"Samples",
+      history_stat_updated:"Last reading",
+      history_change_positive:"↑ +$ {amount} ({pct}%)",
+      history_change_negative:"↓ −$ {amount} ({pct}%)",
+      history_change_flat:"↔ $0 (0%)",
+      history_toggle_show:"Show price history",
+      history_toggle_hide:"Hide price history",
 
       h_basic:"Base prices without making (USD/gram)",
       sell18:"Sell 18K", buy18:"Buy 18K", sell21:"Sell 21K", buy21:"Buy 21K", per_g:"/ g",
@@ -784,6 +895,25 @@
     return str;
   }
 
+  function updateHistoryToggleLabel(){
+    if(!historyToggleBtn) return;
+    const key = historyVisible ? "history_toggle_hide" : "history_toggle_show";
+    const label = t(key);
+    historyToggleBtn.textContent = label;
+    historyToggleBtn.setAttribute("aria-label", label);
+    historyToggleBtn.setAttribute("aria-pressed", historyVisible ? "true" : "false");
+    historyToggleBtn.setAttribute("aria-expanded", historyVisible ? "true" : "false");
+  }
+
+  function applyHistoryVisibility(){
+    if(historySectionEl){
+      historySectionEl.hidden = !historyVisible;
+      historySectionEl.setAttribute("aria-hidden", historyVisible ? "false" : "true");
+    }
+    updateHistoryToggleLabel();
+    if(historyVisible) renderSparkline();
+  }
+
   // Apply i18n to text nodes/attrs/placeholders
   function applyI18n(){
     document.documentElement.lang = CUR_LANG;
@@ -809,9 +939,10 @@
 
     setLastUpdated();
     renderFormulas();
-    renderSparkline();
+    renderHistorySection();
     renderAutoTexts();
     renderPriceDelta();
+    updateHistoryToggleLabel();
   }
 
   function clampAutoSeconds(sec){
@@ -896,6 +1027,7 @@
   const CFG_KEY = "gold_cfg_v1";
   const SPOT_KEY = "last_spot_v1";
   const PRICE_HISTORY_KEY = "price_history_v1";
+  const HISTORY_VISIBILITY_KEY = "price_history_visible_v1";
   const DEFAULTS = Object.freeze({
     oztToG: 32,
     autoRefreshSec: 10,
@@ -1193,7 +1325,26 @@
   let nextRateLimitCooldownMs = RATE_LIMIT_MIN_COOLDOWN_MS;
   let cooldownUntil = 0;
   let rateLimitStrikeCount = 0;
-  const PRICE_HISTORY_LIMIT = 50;
+  const PRICE_HISTORY_LIMIT = 20_000;
+  const HISTORY_CHART_MAX_POINTS = 600;
+  const HISTORY_WINDOW_KEY = "price_history_window_v1";
+  const HISTORY_DEFAULT_ID = "24h";
+  const HISTORY_WINDOWS = Object.freeze([
+    { id:"1h",  durationMs: 1 * 60 * 60 * 1000,  labelKey:"history_range_1h" },
+    { id:"6h",  durationMs: 6 * 60 * 60 * 1000,  labelKey:"history_range_6h" },
+    { id:"24h", durationMs: 24 * 60 * 60 * 1000, labelKey:"history_range_24h" },
+    { id:"all", durationMs: Infinity,            labelKey:"history_range_all" }
+  ]);
+  let historyWindowId = HISTORY_DEFAULT_ID;
+  let historyVisible = false;
+  try{
+    const savedWindow = localStorage.getItem(HISTORY_WINDOW_KEY);
+    if(savedWindow && HISTORY_WINDOWS.some(win => win.id === savedWindow)){
+      historyWindowId = savedWindow;
+    }
+    const savedVisibility = localStorage.getItem(HISTORY_VISIBILITY_KEY);
+    if(savedVisibility === "1") historyVisible = true;
+  }catch{}
   const PRICE_DELTA_EPS = 0.05;
   let priceHistory = loadPriceHistory();
 
@@ -1248,6 +1399,158 @@
     try{ localStorage.setItem(PRICE_HISTORY_KEY, JSON.stringify(priceHistory)); }catch{}
   }
 
+  function getHistoryWindowById(id){
+    return HISTORY_WINDOWS.find(win => win.id === id) || HISTORY_WINDOWS.find(win => win.id === HISTORY_DEFAULT_ID) || HISTORY_WINDOWS[0];
+  }
+
+  function getActiveHistoryWindow(){
+    return getHistoryWindowById(historyWindowId);
+  }
+
+  function getHistoryRangeLabel(){
+    const win = getActiveHistoryWindow();
+    return win ? t(win.labelKey) : "";
+  }
+
+  function getWindowedHistoryPoints(){
+    const win = getActiveHistoryWindow();
+    const duration = win ? win.durationMs : Infinity;
+    const now = Date.now();
+    return priceHistory
+      .map(pt => {
+        const time = Number(pt && pt.t);
+        const price = Number(pt && pt.p);
+        if(!isFinite(time) || !isFinite(price)) return null;
+        if(duration !== Infinity && (now - time) > duration) return null;
+        return { t: time, p: price };
+      })
+      .filter(Boolean);
+  }
+
+  function downsampleHistory(points){
+    if(!Array.isArray(points) || points.length <= HISTORY_CHART_MAX_POINTS) return points || [];
+    const step = Math.ceil(points.length / HISTORY_CHART_MAX_POINTS);
+    const sampled = [];
+    for(let i=0;i<points.length;i+=step){
+      const pt = points[i];
+      if(pt) sampled.push(pt);
+    }
+    const last = points[points.length - 1];
+    if(last && !sampled.some(pt => pt.t === last.t && pt.p === last.p)) sampled.push(last);
+    const minPt = points.reduce((min, pt) => (pt.p < min.p ? pt : min), points[0]);
+    const maxPt = points.reduce((max, pt) => (pt.p > max.p ? pt : max), points[0]);
+    const ensure = pt => {
+      if(pt && !sampled.some(item => item.t === pt.t && item.p === pt.p)) sampled.push(pt);
+    };
+    ensure(minPt);
+    ensure(maxPt);
+    sampled.sort((a,b) => a.t - b.t);
+    return sampled;
+  }
+
+  function renderHistoryLabel(){
+    const el = $("historyRangeText");
+    if(el) el.textContent = getHistoryRangeLabel() || "—";
+  }
+
+  function renderHistoryTabs(){
+    const activeId = getActiveHistoryWindow().id;
+    document.querySelectorAll(".history-tab").forEach(btn => {
+      const id = btn.getAttribute("data-history-range");
+      const isActive = id === activeId;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  }
+
+  function renderHistoryStats(points = null){
+    const highEl = $("historyHigh");
+    const lowEl = $("historyLow");
+    const avgEl = $("historyAvg");
+    const changeEl = $("historyChange");
+    const samplesEl = $("historySamples");
+    const lastEl = $("historyLastTime");
+    const emptyEl = $("historyEmpty");
+    const data = Array.isArray(points) ? points : getWindowedHistoryPoints();
+    const rangeLabel = getHistoryRangeLabel();
+
+    if(emptyEl){
+      if(!data.length){
+        emptyEl.hidden = false;
+        emptyEl.textContent = t("history_empty", { range: rangeLabel || "" });
+      }else{
+        emptyEl.hidden = true;
+        emptyEl.textContent = "";
+      }
+    }
+
+    if(!data.length){
+      if(highEl) highEl.textContent = "—";
+      if(lowEl) lowEl.textContent = "—";
+      if(avgEl) avgEl.textContent = "—";
+      if(samplesEl) samplesEl.textContent = "—";
+      if(lastEl) lastEl.textContent = "—";
+      if(changeEl){
+        changeEl.textContent = "—";
+        changeEl.classList.remove("positive","negative","flat");
+      }
+      return;
+    }
+
+    const prices = data.map(pt => pt.p);
+    const high = Math.max(...prices);
+    const low = Math.min(...prices);
+    const avg = prices.reduce((sum, val) => sum + val, 0) / data.length;
+    const first = data[0];
+    const last = data[data.length - 1];
+    const diff = last.p - first.p;
+    const diffAbs = Math.abs(diff);
+    const pct = (isFinite(first.p) && first.p !== 0) ? (diff / first.p) * 100 : NaN;
+
+    if(highEl) highEl.textContent = fmtMoney(high);
+    if(lowEl) lowEl.textContent = fmtMoney(low);
+    if(avgEl) avgEl.textContent = fmtMoney(avg);
+    if(samplesEl) samplesEl.textContent = data.length.toLocaleString();
+    if(lastEl) lastEl.textContent = fmtDateTime(new Date(last.t));
+
+    if(changeEl){
+      changeEl.classList.remove("positive","negative","flat");
+      if(!isFinite(diff) || diffAbs < PRICE_DELTA_EPS){
+        changeEl.textContent = t("history_change_flat");
+        changeEl.classList.add("flat");
+      }else if(diff > 0){
+        changeEl.textContent = t("history_change_positive", {
+          amount: fmtFixed(diffAbs),
+          pct: fmtPercent(Math.abs(pct))
+        });
+        changeEl.classList.add("positive");
+      }else{
+        changeEl.textContent = t("history_change_negative", {
+          amount: fmtFixed(diffAbs),
+          pct: fmtPercent(Math.abs(pct))
+        });
+        changeEl.classList.add("negative");
+      }
+    }
+  }
+
+  function renderHistorySection(){
+    const points = getWindowedHistoryPoints();
+    renderHistoryLabel();
+    renderHistoryTabs();
+    renderHistoryStats(points);
+    renderSparkline(points);
+  }
+
+  function setHistoryWindow(id){
+    if(!id) return;
+    const win = getHistoryWindowById(id);
+    if(!win || win.id === historyWindowId) return;
+    historyWindowId = win.id;
+    try{ localStorage.setItem(HISTORY_WINDOW_KEY, historyWindowId); }catch{}
+    renderHistorySection();
+  }
+
   function recordPricePoint(price, timestamp = Date.now()){
     const pNum = Number(price);
     if(!isFinite(pNum)) return;
@@ -1258,6 +1561,7 @@
       priceHistory.splice(0, priceHistory.length - PRICE_HISTORY_LIMIT);
     }
     savePriceHistory();
+    renderHistorySection();
     renderPriceDelta();
   }
   function getLatestRecordedPrice(){
@@ -1318,31 +1622,22 @@
     }
   }
 
-  function renderSparkline(){
+  function renderSparkline(points = null){
     const canvas = $("priceSparkline");
     if(!canvas) return;
+    if(historySectionEl && historySectionEl.hidden) return;
 
-    const valid = priceHistory.filter(pt => pt && isFinite(pt.p));
-    const labelBase = t("sparkline_label");
-    if(!valid.length){
-      const emptyText = t("sparkline_empty");
-      canvas.title = emptyText;
-      canvas.setAttribute("aria-label", labelBase + ": " + emptyText);
-    }else{
-      const latest = valid[valid.length - 1];
-      const infoText = t("sparkline_hint")
-        .replace("{n}", valid.length)
-        .replace("{p}", fmt(latest.p));
-      canvas.title = infoText;
-      canvas.setAttribute("aria-label", labelBase + ": " + infoText);
-    }
+    const data = Array.isArray(points) ? points : getWindowedHistoryPoints();
+    const rangeLabel = getHistoryRangeLabel();
+    const labelBase = t("history_label_base");
+    const labelPrefix = rangeLabel ? `${labelBase} • ${rangeLabel}` : labelBase;
 
     const ctx = canvas.getContext("2d");
     if(!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
     const cssWidth = rect.width || canvas.clientWidth;
-    const cssHeight = rect.height || canvas.clientHeight || parseFloat(canvas.getAttribute("height")||"0") || 48;
+    const cssHeight = rect.height || canvas.clientHeight || parseFloat(canvas.getAttribute("height")||"0") || 120;
     if(cssWidth <= 0 || cssHeight <= 0){
       ctx.clearRect(0, 0, canvas.width || 0, canvas.height || 0);
       return;
@@ -1357,23 +1652,39 @@
     }
     ctx.clearRect(0, 0, width, height);
 
-    if(!valid.length){
+    if(!data.length){
+      const emptyText = t("history_empty", { range: rangeLabel || "" });
+      canvas.title = emptyText;
+      canvas.setAttribute("aria-label", `${labelPrefix}. ${emptyText}`);
       return;
     }
 
-    const min = Math.min(...valid.map(pt => pt.p));
-    const max = Math.max(...valid.map(pt => pt.p));
+    const latest = data[data.length - 1];
+    const infoText = t("history_hint", {
+      n: data.length.toLocaleString(),
+      p: fmt(latest.p)
+    });
+    canvas.title = rangeLabel ? `${rangeLabel} — ${infoText}` : infoText;
+    canvas.setAttribute("aria-label", `${labelPrefix}. ${infoText}`);
+
+    const chartPoints = downsampleHistory(data);
+    const min = Math.min(...data.map(pt => pt.p));
+    const max = Math.max(...data.map(pt => pt.p));
     const range = max - min || 1;
 
-    const padX = 6 * dpr;
-    const padY = 6 * dpr;
+    const padX = 8 * dpr;
+    const padY = 8 * dpr;
     const innerW = Math.max(1, width - padX * 2);
     const innerH = Math.max(1, height - padY * 2);
 
-    const coords = valid.map((pt, idx) => {
-      const x = (valid.length === 1)
+    const firstT = chartPoints[0].t;
+    const lastT = chartPoints[chartPoints.length - 1].t;
+    const timeRange = lastT - firstT || 1;
+
+    const coords = chartPoints.map(pt => {
+      const x = (chartPoints.length === 1)
         ? padX + innerW / 2
-        : padX + (innerW * idx) / (valid.length - 1);
+        : padX + ((pt.t - firstT) / timeRange) * innerW;
       const norm = (pt.p - min) / range;
       const y = padY + innerH - (innerH * norm);
       return { x, y };
@@ -1529,7 +1840,6 @@
       const now = Date.now();
       const prev = getLatestRecordedPrice();
       recordPricePoint(p, now);
-      renderSparkline();
       resetRateLimitState();
       $("oz").value = p.toFixed(2);
       runAll();
@@ -1563,6 +1873,16 @@
   });
   $("oz").addEventListener("input", runAll);
   $("btnFetch").addEventListener("click", () => fetchSpot({ source:"manual" }));
+  document.querySelectorAll(".history-tab").forEach(btn => {
+    btn.addEventListener("click", () => setHistoryWindow(btn.getAttribute("data-history-range")));
+  });
+  if(historyToggleBtn){
+    historyToggleBtn.addEventListener("click", () => {
+      historyVisible = !historyVisible;
+      try{ localStorage.setItem(HISTORY_VISIBILITY_KEY, historyVisible ? "1" : "0"); }catch{}
+      applyHistoryVisibility();
+    });
+  }
 
   function setAuto(on){
     const btn = $("btnFetch"); const auto = $("auto");
@@ -1586,7 +1906,7 @@
     renderAutoTexts();
   }
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
-  window.addEventListener("resize", renderSparkline);
+  window.addEventListener("resize", () => renderSparkline());
 
   /* =========================
      Settings UI wiring (modal)
@@ -1737,6 +2057,7 @@
 
     applyTheme();
     applyI18n();
+    applyHistoryVisibility();
 
     bindOutputs();
     bindCfgInputs();
