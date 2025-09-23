@@ -165,8 +165,6 @@
   .switch input:checked + .slider::after{transform:translate(20px,-50%)}
   .switch .txt{font-size:12px;color:var(--muted)}
 
-  body.details-hidden [data-details]{display:none !important}
-
   /* prices grid */
   .prices{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;align-items:center;white-space:normal;font-family:inherit}
   .prices > div{padding:4px 0;border-bottom:1px dashed color-mix(in oklab, var(--gold) 18%, transparent)}
@@ -360,12 +358,6 @@
           <span class="slider" aria-hidden="true"></span>
           <span class="txt" data-i18n="auto_txt">تحديث تلقائي</span>
         </label>
-
-        <label class="switch" aria-label="عرض التفاصيل" title="عرض التفاصيل" data-i18n-title="details_title" data-i18n-aria="details_title">
-          <input id="details" type="checkbox" checked>
-          <span class="slider" aria-hidden="true"></span>
-          <span class="txt" data-i18n="details_txt">عرض التفاصيل</span>
-        </label>
       </div>
 
       <div class="spot-meta" style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
@@ -375,7 +367,7 @@
         <span class="spacer"></span>
       </div>
 
-      <div class="history-section" data-details>
+      <div class="history-section">
         <div class="history-header">
           <span class="badge history-badge" id="historyLabel">
             <span data-i18n="history_label_base">منحنى السعر</span>
@@ -392,8 +384,8 @@
         <div class="history-chart">
           <canvas id="priceSparkline" height="120" role="img" title="—"></canvas>
         </div>
-        <div id="historyEmpty" class="history-empty" data-details hidden>—</div>
-        <div class="history-stats" id="historyStats" data-details>
+        <div id="historyEmpty" class="history-empty" hidden>—</div>
+        <div class="history-stats" id="historyStats">
           <div class="history-stat">
             <span class="history-stat-label" data-i18n="history_stat_high">أعلى</span>
             <strong id="historyHigh">—</strong>
@@ -425,7 +417,7 @@
     </section>
 
     <!-- Basic per-gram prices + coin -->
-    <section class="card" data-details>
+    <section class="card">
       <h2 data-i18n="h_basic">الأسعار الأساسية من دون صياغة (دولار/غرام)</h2>
 
       <div class="out" id="perg">
@@ -473,7 +465,7 @@
     </section>
 
     <!-- Totals -->
-    <section class="card" style="grid-column:1 / -1" data-details>
+    <section class="card" style="grid-column:1 / -1">
       <h2 data-i18n="totals_title">حساب الإجمالي حسب الوزن</h2>
 
       <div class="totals-grid" style="margin-top:8px">
@@ -550,7 +542,7 @@
     </section>
 
     <!-- Formulas + a button that opens a modal -->
-    <section class="card" style="grid-column:1 / -1" data-details>
+    <section class="card" style="grid-column:1 / -1">
       <div class="bar-head" style="margin-bottom:8px">
         <h2 data-i18n="formulas_title">الصيغ المستخدمة</h2>
         <div class="bar-actions">
@@ -672,8 +664,6 @@
       auto_txt:"تحديث تلقائي",
       last_title:"وقت آخر تحديث",
       last_prefix:"آخر تحديث: ",
-      details_title:"عرض أو إخفاء التفاصيل",
-      details_txt:"عرض التفاصيل",
       auto_meta_refresh:"تحديث تلقائي كل {label}",
       auto_meta_manual:"التحديث اليدوي مفعّل",
       delta_title:"التغير منذ آخر تحديث",
@@ -780,8 +770,6 @@
       auto_txt:"Auto refresh",
       last_title:"Last update time",
       last_prefix:"Last update: ",
-      details_title:"Show or hide detailed sections",
-      details_txt:"Show details",
       auto_meta_refresh:"Auto refresh every {label}",
       auto_meta_manual:"Manual update enabled",
       delta_title:"Change since last update",
@@ -878,33 +866,8 @@
     }
   };
 
-  const LANG_KEY="gold_lang"; const THEME_KEY="gold_theme"; const DETAILS_KEY="gold_details_visible";
+  const LANG_KEY="gold_lang"; const THEME_KEY="gold_theme";
   let CUR_LANG = (localStorage.getItem(LANG_KEY)||document.documentElement.lang||"ar");
-  let priceHistoryReady = false;
-
-  function readDetailsPreference(){
-    try{
-      const saved = localStorage.getItem(DETAILS_KEY);
-      if(saved === "0") return false;
-      if(saved === "1") return true;
-    }catch{}
-    return true;
-  }
-
-  function applyDetailsVisibility(on, { save = true } = {}){
-    const visible = !!on;
-    document.body.classList.toggle("details-hidden", !visible);
-    const toggle = document.getElementById("details");
-    if(toggle) toggle.checked = visible;
-    if(save){
-      try{ localStorage.setItem(DETAILS_KEY, visible ? "1" : "0"); }catch{}
-    }
-    if(visible && priceHistoryReady && typeof renderSparkline === "function"){
-      renderSparkline();
-    }
-  }
-
-  applyDetailsVisibility(readDetailsPreference(), { save: false });
 
   function t(k, vars){
     const d = DICT[CUR_LANG] || DICT.ar;
@@ -1347,7 +1310,6 @@
   }catch{}
   const PRICE_DELTA_EPS = 0.05;
   let priceHistory = loadPriceHistory();
-  priceHistoryReady = true;
 
   function inRateLimitCooldown(){
     return cooldownUntil && Date.now() < cooldownUntil;
@@ -1899,10 +1861,6 @@
     renderAutoTexts();
   }
   $("auto").addEventListener("change", e => setAuto(e.target.checked));
-  const detailsToggle = $("details");
-  if(detailsToggle){
-    detailsToggle.addEventListener("change", e => applyDetailsVisibility(e.target.checked));
-  }
   window.addEventListener("resize", () => renderSparkline());
 
   /* =========================
