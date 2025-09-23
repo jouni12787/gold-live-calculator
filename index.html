@@ -378,7 +378,7 @@
             <button type="button" class="history-tab" data-history-range="1h" data-i18n="history_tab_1h" aria-pressed="false">١س</button>
             <button type="button" class="history-tab" data-history-range="6h" data-i18n="history_tab_6h" aria-pressed="false">٦س</button>
             <button type="button" class="history-tab" data-history-range="24h" data-i18n="history_tab_24h" aria-pressed="false">٢٤س</button>
-            <button type="button" class="history-tab" data-history-range="all" data-i18n="history_tab_all" aria-pressed="false">الكل</button>
+            <button type="button" class="history-tab" data-history-range="7d" data-i18n="history_tab_7d" aria-pressed="false">٧أ</button>
           </div>
         </div>
         <div class="history-chart">
@@ -676,13 +676,14 @@
       history_tab_1h:"١س",
       history_tab_6h:"٦س",
       history_tab_24h:"٢٤س",
-      history_tab_all:"الكل",
+      history_tab_7d:"٧أ",
       history_range_1h:"آخر ساعة",
       history_range_6h:"آخر ٦ ساعات",
       history_range_24h:"آخر ٢٤ ساعة",
-      history_range_all:"كل القراءات",
+      history_range_7d:"آخر ٧ أيام",
       history_hint:"عدد القراءات: {n} • أحدث قيمة: {p} دولار/أونصة.",
       history_empty:"لا بيانات ضمن {range}.",
+      history_preload_fail:"تعذّر تحميل سجل الأسعار الأخير. سيتم تحديثه عند وصول قراءات جديدة.",
       history_stat_high:"أعلى",
       history_stat_low:"أدنى",
       history_stat_avg:"متوسط",
@@ -782,13 +783,14 @@
       history_tab_1h:"1h",
       history_tab_6h:"6h",
       history_tab_24h:"24h",
-      history_tab_all:"All",
+      history_tab_7d:"7d",
       history_range_1h:"Last hour",
       history_range_6h:"Last 6 hours",
       history_range_24h:"Last 24 hours",
-      history_range_all:"All saved readings",
+      history_range_7d:"Last 7 days",
       history_hint:"Samples: {n} • Latest: {p} USD/oz.",
       history_empty:"No data inside {range} yet.",
+      history_preload_fail:"Couldn't preload price history. It will refresh when new readings arrive.",
       history_stat_high:"High",
       history_stat_low:"Low",
       history_stat_avg:"Average",
@@ -1225,6 +1227,44 @@
     "https://www.gold-api.com/price/XAU",
     "https://www.gold-api.com/price/XAU/USD"
   ];
+  const GOLDAPI_HISTORY_ENDPOINTS = Object.freeze([
+    "https://api.gold-api.com/history/XAU/USD?period=7d",
+    "https://www.gold-api.com/history/XAU/USD?period=7d",
+    "https://api.gold-api.com/history/XAU/USD?period=1d",
+    "https://www.gold-api.com/history/XAU/USD?period=1d"
+  ]);
+  const GOLDAPI_API_KEY = (() => {
+    try{
+      if(typeof window !== "undefined" && window.GOLDAPI_API_KEY){
+        const key = String(window.GOLDAPI_API_KEY).trim();
+        if(key) return key;
+      }
+    }catch{}
+    try{
+      const meta = document.querySelector('meta[name="goldapi-key"]');
+      if(meta && meta.content){
+        const key = meta.content.trim();
+        if(key) return key;
+      }
+    }catch{}
+    try{
+      const stored = localStorage.getItem("goldapi_api_key");
+      if(stored){
+        const key = stored.trim();
+        if(key) return key;
+      }
+    }catch{}
+    return "";
+  })();
+
+  function isGoldApiUrl(url){
+    try{
+      const u = new URL(url, location.origin);
+      return /(^|\.)gold-api\.com$/i.test(u.hostname);
+    }catch{
+      return false;
+    }
+  }
 
   function pickOuncePrice(data){
     const candidates = [
@@ -1239,10 +1279,23 @@
     return NaN;
   }
 
-  function timeoutFetch(url, ms){
+  function timeoutFetch(url, ms, options = {}){
     const c = new AbortController();
     const id = setTimeout(() => c.abort(), ms);
-    return fetch(url, { cache:"no-store", signal:c.signal }).finally(() => clearTimeout(id));
+    const opts = Object.assign({ cache:"no-store", signal:c.signal }, options || {});
+    let headers = opts.headers;
+    if(headers){
+      headers = headers instanceof Headers ? new Headers(headers) : new Headers(Object(headers));
+    }else{
+      headers = new Headers();
+    }
+    if(GOLDAPI_API_KEY && isGoldApiUrl(url) && !headers.has("x-access-token")){
+      headers.set("x-access-token", GOLDAPI_API_KEY);
+    }
+    if(Array.from(headers.keys()).length){
+      opts.headers = headers;
+    }
+    return fetch(url, opts).finally(() => clearTimeout(id));
   }
   async function getSpotFast(){
     const tries = GOLDAPI_FREE_ENDPOINTS.map(url =>
@@ -1252,6 +1305,135 @@
         .then(v => (isFinite(v) && v>0) ? v : Promise.reject("bad data"))
     );
     return Promise.any(tries);
+  }
+
+  function normalizeHistoryTimestamp(val){
+    if(val == null) return NaN;
+    if(val instanceof Date) return val.getTime();
+    if(typeof val === "number"){
+      if(!isFinite(val)) return NaN;
+      if(val >= 1e15) return Math.round(val / 1000);
+      if(val >= 1e12) return Math.round(val);
+      if(val >= 1e9) return Math.round(val * 1000);
+      const parsed = Date.parse(String(val));
+      return Number.isNaN(parsed) ? NaN : parsed;
+    }
+    if(typeof val === "string"){
+      const trimmed = val.trim();
+      if(!trimmed) return NaN;
+      const asNum = Number(trimmed);
+      if(isFinite(asNum)) return normalizeHistoryTimestamp(asNum);
+      const isoLike = trimmed.includes(" ") ? trimmed.replace(" ", "T") : trimmed;
+      const parsed = Date.parse(isoLike);
+      if(!Number.isNaN(parsed)) return parsed;
+    }
+    return NaN;
+  }
+
+  function normalizeHistoryPoint(raw){
+    if(!raw) return null;
+    if(Array.isArray(raw)){
+      if(raw.length >= 2) return normalizeHistoryPoint({ t: raw[0], p: raw[1] });
+      return null;
+    }
+    if(typeof raw !== "object") return null;
+
+    const timeCandidates = [];
+    const timeKeys = ["t","time","timestamp","ts","date","datetime","time_unix","unix","created_at","updated_at","at"];
+    for(const key of timeKeys){
+      if(key in raw) timeCandidates.push(raw[key]);
+    }
+    if("key" in raw) timeCandidates.push(raw.key);
+    if(typeof raw.date === "string" && typeof raw.time === "string"){
+      timeCandidates.push(`${raw.date} ${raw.time}`);
+    }
+
+    let timeMs = NaN;
+    for(const candidate of timeCandidates){
+      const ts = normalizeHistoryTimestamp(candidate);
+      if(isFinite(ts)){ timeMs = ts; break; }
+    }
+    if(!isFinite(timeMs)) return null;
+
+    let price = pickOuncePrice(raw);
+    if(!isFinite(price)){
+      const priceKeys = ["p","price","usd","value","close","rate","price_close","price_ounce","price_oz","usd_ounce","last","ask","bid"];
+      for(const key of priceKeys){
+        if(key in raw){
+          const num = Number(raw[key]);
+          if(isFinite(num)){ price = num; break; }
+        }
+      }
+    }
+    if(!isFinite(price)){
+      const numericVals = Object.values(raw).filter(v => typeof v === "number" && isFinite(v));
+      if(numericVals.length === 1) price = numericVals[0];
+    }
+    if(!isFinite(price)) return null;
+
+    return { t: Math.round(timeMs), p: price };
+  }
+
+  function normalizeHistoryResponse(payload){
+    if(payload == null) return [];
+    let rows = [];
+    if(Array.isArray(payload)) rows = payload;
+    else if(typeof payload === "object"){
+      const keys = ["data","prices","history","result","records","values","items","entries"];
+      for(const key of keys){
+        const val = payload[key];
+        if(Array.isArray(val) && val.length){ rows = val; break; }
+      }
+      if(!rows.length){
+        rows = Object.entries(payload).map(([key, value]) => {
+          if(value && typeof value === "object" && !Array.isArray(value)) return Object.assign({ key }, value);
+          if(typeof value === "number" || typeof value === "string") return { key, value };
+          return null;
+        }).filter(Boolean);
+      }
+    }
+
+    const points = [];
+    const pushPoint = item => {
+      if(!item) return;
+      if(Array.isArray(item)){
+        item.forEach(pushPoint);
+        return;
+      }
+      if(typeof item === "object"){
+        const normalized = normalizeHistoryPoint(item);
+        if(normalized){
+          points.push(normalized);
+          return;
+        }
+        for(const val of Object.values(item)){
+          if(Array.isArray(val) || (val && typeof val === "object")) pushPoint(val);
+        }
+        return;
+      }
+      const normalized = normalizeHistoryPoint({ value: item });
+      if(normalized) points.push(normalized);
+    };
+    pushPoint(rows);
+
+    points.sort((a,b) => a.t - b.t);
+    const deduped = [];
+    for(const pt of points){
+      const last = deduped[deduped.length - 1];
+      if(last && last.t === pt.t){ deduped[deduped.length - 1] = pt; }
+      else deduped.push(pt);
+    }
+    return deduped;
+  }
+
+  async function fetchHistoricalPrices(){
+    const tries = GOLDAPI_HISTORY_ENDPOINTS.map(url =>
+      timeoutFetch(url, 6000)
+        .then(r => r.ok ? r.json() : Promise.reject({ status: r.status || r.statusCode || r.statusText || r } ))
+        .then(normalizeHistoryResponse)
+    );
+    const points = await Promise.any(tries);
+    return Array.isArray(points) ? points : [];
   }
 
   function stringifyError(err){
@@ -1299,7 +1481,7 @@
     { id:"1h",  durationMs: 1 * 60 * 60 * 1000,  labelKey:"history_range_1h" },
     { id:"6h",  durationMs: 6 * 60 * 60 * 1000,  labelKey:"history_range_6h" },
     { id:"24h", durationMs: 24 * 60 * 60 * 1000, labelKey:"history_range_24h" },
-    { id:"all", durationMs: Infinity,            labelKey:"history_range_all" }
+    { id:"7d", durationMs: 7 * 24 * 60 * 60 * 1000, labelKey:"history_range_7d" }
   ]);
   let historyWindowId = HISTORY_DEFAULT_ID;
   try{
@@ -1326,11 +1508,13 @@
   }
 
   function showRateLimitMessage(errEl){
-    if(!errEl) return;
     const msRemaining = Math.max(0, cooldownUntil - Date.now());
     const secs = Math.max(1, Math.ceil(msRemaining / 1000));
-    errEl.style.display = "block";
-    errEl.textContent = t("fetch_err_rate", { s: secs });
+    if(errEl){
+      errEl.style.display = "none";
+      errEl.textContent = "";
+    }
+    console.warn("Rate limit cooldown active for", secs, "seconds");
   }
 
   function applyRateLimitCooldown(errEl){
@@ -1360,6 +1544,51 @@
 
   function savePriceHistory(){
     try{ localStorage.setItem(PRICE_HISTORY_KEY, JSON.stringify(priceHistory)); }catch{}
+  }
+
+  function normalizeHistoryPoints(points){
+    if(!Array.isArray(points)) return [];
+    return points
+      .map(pt => {
+        const time = Number(pt && pt.t);
+        const price = Number(pt && pt.p);
+        if(!isFinite(time) || !isFinite(price)) return null;
+        return { t: Math.round(time), p: price };
+      })
+      .filter(Boolean);
+  }
+
+  function mergePriceHistoryPoints(points){
+    const incoming = normalizeHistoryPoints(points);
+    const existing = normalizeHistoryPoints(priceHistory);
+    const combined = existing.concat(incoming).sort((a,b) => a.t - b.t);
+    if(!combined.length){
+      const hadData = priceHistory.length > 0;
+      priceHistory = [];
+      return hadData;
+    }
+
+    const deduped = [];
+    for(const pt of combined){
+      const last = deduped[deduped.length - 1];
+      if(last && last.t === pt.t){
+        deduped[deduped.length - 1] = pt;
+      }else{
+        deduped.push(pt);
+      }
+    }
+
+    if(deduped.length > PRICE_HISTORY_LIMIT){
+      deduped.splice(0, deduped.length - PRICE_HISTORY_LIMIT);
+    }
+
+    const prev = priceHistory;
+    const changed = deduped.length !== prev.length || deduped.some((pt, idx) => {
+      const old = prev[idx];
+      return !old || old.t !== pt.t || old.p !== pt.p;
+    });
+    priceHistory = deduped;
+    return changed;
   }
 
   function getHistoryWindowById(id){
@@ -1817,10 +2046,7 @@
         }
       }else{
         resetRateLimitStrikeTracking();
-        if(err){
-          err.style.display = "block";
-          err.textContent = t("fetch_err_prefix") + stringifyError(e);
-        }
+        console.warn("Failed to fetch spot price:", stringifyError(e), e);
       }
     }finally{
       if(btn) btn.disabled = false;
@@ -1990,7 +2216,7 @@
   langSel.addEventListener("change", onLangChange);
 
   /* boot */
-  window.addEventListener("load", () => {
+  window.addEventListener("load", async () => {
     $("y").textContent = new Date().getFullYear();
 
     const toastEl = $("toast");
@@ -2026,6 +2252,17 @@
         setLastUpdated(new Date(last.t || Date.now()));
       }
     }catch{}
+
+    try{
+      const preloadPoints = await fetchHistoricalPrices();
+      mergePriceHistoryPoints(preloadPoints);
+      savePriceHistory();
+    }catch(err){
+      console.warn("Failed to preload historical prices:", stringifyError(err), err);
+    }
+
+    renderHistorySection();
+    renderPriceDelta();
 
     setAuto(true);
   });
