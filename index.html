@@ -683,6 +683,7 @@
       history_range_all:"كل القراءات",
       history_hint:"عدد القراءات: {n} • أحدث قيمة: {p} دولار/أونصة.",
       history_empty:"لا بيانات ضمن {range}.",
+      history_preload_fail:"تعذّر تحميل سجل الأسعار الأخير. سيتم تحديثه عند وصول قراءات جديدة.",
       history_stat_high:"أعلى",
       history_stat_low:"أدنى",
       history_stat_avg:"متوسط",
@@ -789,6 +790,7 @@
       history_range_all:"All saved readings",
       history_hint:"Samples: {n} • Latest: {p} USD/oz.",
       history_empty:"No data inside {range} yet.",
+      history_preload_fail:"Couldn't preload price history. It will refresh when new readings arrive.",
       history_stat_high:"High",
       history_stat_low:"Low",
       history_stat_avg:"Average",
@@ -1225,6 +1227,10 @@
     "https://www.gold-api.com/price/XAU",
     "https://www.gold-api.com/price/XAU/USD"
   ];
+  const GOLDAPI_HISTORY_ENDPOINTS = Object.freeze([
+    "https://api.gold-api.com/history/XAU/USD?period=1d",
+    "https://www.gold-api.com/history/XAU/USD?period=1d"
+  ]);
 
   function pickOuncePrice(data){
     const candidates = [
@@ -1252,6 +1258,135 @@
         .then(v => (isFinite(v) && v>0) ? v : Promise.reject("bad data"))
     );
     return Promise.any(tries);
+  }
+
+  function normalizeHistoryTimestamp(val){
+    if(val == null) return NaN;
+    if(val instanceof Date) return val.getTime();
+    if(typeof val === "number"){
+      if(!isFinite(val)) return NaN;
+      if(val >= 1e15) return Math.round(val / 1000);
+      if(val >= 1e12) return Math.round(val);
+      if(val >= 1e9) return Math.round(val * 1000);
+      const parsed = Date.parse(String(val));
+      return Number.isNaN(parsed) ? NaN : parsed;
+    }
+    if(typeof val === "string"){
+      const trimmed = val.trim();
+      if(!trimmed) return NaN;
+      const asNum = Number(trimmed);
+      if(isFinite(asNum)) return normalizeHistoryTimestamp(asNum);
+      const isoLike = trimmed.includes(" ") ? trimmed.replace(" ", "T") : trimmed;
+      const parsed = Date.parse(isoLike);
+      if(!Number.isNaN(parsed)) return parsed;
+    }
+    return NaN;
+  }
+
+  function normalizeHistoryPoint(raw){
+    if(!raw) return null;
+    if(Array.isArray(raw)){
+      if(raw.length >= 2) return normalizeHistoryPoint({ t: raw[0], p: raw[1] });
+      return null;
+    }
+    if(typeof raw !== "object") return null;
+
+    const timeCandidates = [];
+    const timeKeys = ["t","time","timestamp","ts","date","datetime","time_unix","unix","created_at","updated_at","at"];
+    for(const key of timeKeys){
+      if(key in raw) timeCandidates.push(raw[key]);
+    }
+    if("key" in raw) timeCandidates.push(raw.key);
+    if(typeof raw.date === "string" && typeof raw.time === "string"){
+      timeCandidates.push(`${raw.date} ${raw.time}`);
+    }
+
+    let timeMs = NaN;
+    for(const candidate of timeCandidates){
+      const ts = normalizeHistoryTimestamp(candidate);
+      if(isFinite(ts)){ timeMs = ts; break; }
+    }
+    if(!isFinite(timeMs)) return null;
+
+    let price = pickOuncePrice(raw);
+    if(!isFinite(price)){
+      const priceKeys = ["p","price","usd","value","close","rate","price_close","price_ounce","price_oz","usd_ounce","last","ask","bid"];
+      for(const key of priceKeys){
+        if(key in raw){
+          const num = Number(raw[key]);
+          if(isFinite(num)){ price = num; break; }
+        }
+      }
+    }
+    if(!isFinite(price)){
+      const numericVals = Object.values(raw).filter(v => typeof v === "number" && isFinite(v));
+      if(numericVals.length === 1) price = numericVals[0];
+    }
+    if(!isFinite(price)) return null;
+
+    return { t: Math.round(timeMs), p: price };
+  }
+
+  function normalizeHistoryResponse(payload){
+    if(payload == null) return [];
+    let rows = [];
+    if(Array.isArray(payload)) rows = payload;
+    else if(typeof payload === "object"){
+      const keys = ["data","prices","history","result","records","values","items","entries"];
+      for(const key of keys){
+        const val = payload[key];
+        if(Array.isArray(val) && val.length){ rows = val; break; }
+      }
+      if(!rows.length){
+        rows = Object.entries(payload).map(([key, value]) => {
+          if(value && typeof value === "object" && !Array.isArray(value)) return Object.assign({ key }, value);
+          if(typeof value === "number" || typeof value === "string") return { key, value };
+          return null;
+        }).filter(Boolean);
+      }
+    }
+
+    const points = [];
+    const pushPoint = item => {
+      if(!item) return;
+      if(Array.isArray(item)){
+        item.forEach(pushPoint);
+        return;
+      }
+      if(typeof item === "object"){
+        const normalized = normalizeHistoryPoint(item);
+        if(normalized){
+          points.push(normalized);
+          return;
+        }
+        for(const val of Object.values(item)){
+          if(Array.isArray(val) || (val && typeof val === "object")) pushPoint(val);
+        }
+        return;
+      }
+      const normalized = normalizeHistoryPoint({ value: item });
+      if(normalized) points.push(normalized);
+    };
+    pushPoint(rows);
+
+    points.sort((a,b) => a.t - b.t);
+    const deduped = [];
+    for(const pt of points){
+      const last = deduped[deduped.length - 1];
+      if(last && last.t === pt.t){ deduped[deduped.length - 1] = pt; }
+      else deduped.push(pt);
+    }
+    return deduped;
+  }
+
+  async function fetchHistoricalPrices(){
+    const tries = GOLDAPI_HISTORY_ENDPOINTS.map(url =>
+      timeoutFetch(url, 6000)
+        .then(r => r.ok ? r.json() : Promise.reject({ status: r.status || r.statusCode || r.statusText || r } ))
+        .then(normalizeHistoryResponse)
+    );
+    const points = await Promise.any(tries);
+    return Array.isArray(points) ? points : [];
   }
 
   function stringifyError(err){
@@ -1360,6 +1495,51 @@
 
   function savePriceHistory(){
     try{ localStorage.setItem(PRICE_HISTORY_KEY, JSON.stringify(priceHistory)); }catch{}
+  }
+
+  function normalizeHistoryPoints(points){
+    if(!Array.isArray(points)) return [];
+    return points
+      .map(pt => {
+        const time = Number(pt && pt.t);
+        const price = Number(pt && pt.p);
+        if(!isFinite(time) || !isFinite(price)) return null;
+        return { t: Math.round(time), p: price };
+      })
+      .filter(Boolean);
+  }
+
+  function mergePriceHistoryPoints(points){
+    const incoming = normalizeHistoryPoints(points);
+    const existing = normalizeHistoryPoints(priceHistory);
+    const combined = existing.concat(incoming).sort((a,b) => a.t - b.t);
+    if(!combined.length){
+      const hadData = priceHistory.length > 0;
+      priceHistory = [];
+      return hadData;
+    }
+
+    const deduped = [];
+    for(const pt of combined){
+      const last = deduped[deduped.length - 1];
+      if(last && last.t === pt.t){
+        deduped[deduped.length - 1] = pt;
+      }else{
+        deduped.push(pt);
+      }
+    }
+
+    if(deduped.length > PRICE_HISTORY_LIMIT){
+      deduped.splice(0, deduped.length - PRICE_HISTORY_LIMIT);
+    }
+
+    const prev = priceHistory;
+    const changed = deduped.length !== prev.length || deduped.some((pt, idx) => {
+      const old = prev[idx];
+      return !old || old.t !== pt.t || old.p !== pt.p;
+    });
+    priceHistory = deduped;
+    return changed;
   }
 
   function getHistoryWindowById(id){
@@ -1990,7 +2170,7 @@
   langSel.addEventListener("change", onLangChange);
 
   /* boot */
-  window.addEventListener("load", () => {
+  window.addEventListener("load", async () => {
     $("y").textContent = new Date().getFullYear();
 
     const toastEl = $("toast");
@@ -2026,6 +2206,18 @@
         setLastUpdated(new Date(last.t || Date.now()));
       }
     }catch{}
+
+    try{
+      const preloadPoints = await fetchHistoricalPrices();
+      mergePriceHistoryPoints(preloadPoints);
+      savePriceHistory();
+    }catch(err){
+      console.warn("Failed to preload historical prices:", stringifyError(err), err);
+      if(toastEl) showToast(t("history_preload_fail"));
+    }
+
+    renderHistorySection();
+    renderPriceDelta();
 
     setAuto(true);
   });
