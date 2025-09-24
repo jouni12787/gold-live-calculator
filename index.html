@@ -175,7 +175,8 @@
   /* coin image */
   .coin-img{display:block;width:500px;max-width:100%;height:auto;margin:6px auto;border-radius:10px;border:1px solid color-mix(in oklab, var(--gold) 25%, transparent);background:#0b0b0b;box-shadow:0 6px 16px rgba(0,0,0,.35);object-fit:contain}
   html[data-theme="light"] .coin-img{background:#f1f1f1;border-color:#e0e0e0}
-
+ .ad-card figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+  .ad-card video{width:100%;max-width:320px;border-radius:12px;border:1px solid color-mix(in oklab, var(--gold) 22%, transparent);box-shadow:0 6px 16px rgba(0,0,0,.35)}
   /* compact boxes */
   #coin{white-space:normal;line-height:1.25;padding:6px 8px}
   #coin .prices{gap:2px 10px}
@@ -462,10 +463,20 @@
 
         <div class="mini" id="coinRule">مبيع = ٨ × مبيع ٢١ /غ<br>شراء = ٨ × شراء ٢١ /غ + ٨ دولار.</div>
       </div>
-    </section>
+       </section>
 
-    <!-- Totals -->
-    <section class="card" style="grid-column:1 / -1">
+  <section class="card ad-card" aria-labelledby="adPromoTitle">
+    <h2 id="adPromoTitle" data-i18n="ad_space_title">مساحة إعلانية</h2>
+    <figure>
+      <video width="300" height="150" autoplay muted loop playsinline>
+        <source src="assets/lebanonand france video with number 300-150.mp4" type="video/mp4">
+      </video>
+      <figcaption class="mini" data-i18n="ad_necklace_caption">قلادة لبنان وفرنسا</figcaption>
+    </figure>
+  </section>
+
+  <!-- Totals -->
+  <section class="card" style="grid-column:1 / -1">
       <h2 data-i18n="totals_title">حساب الإجمالي حسب الوزن</h2>
 
       <div class="totals-grid" style="margin-top:8px">
@@ -699,6 +710,9 @@
 
       ad_bar_aria:"التواصل للإعلانات",
       ad_for:"لإعلاناتكم:", ad_text:"التواصل عبر البريد الإلكتروني", copy_email:"نسخ الإيميل",
+        ad_space_title:"مساحة إعلانية",
+      ad_necklace_caption:"قلادة لبنان وفرنسا",
+
 
       coin_title:"ليرة ذهبية أنجليزية ٨ غ عيار ٢١",
       coin_sell:"ليرة — مبيع", coin_buy:"ليرة — شراء",
@@ -806,6 +820,8 @@
 
       ad_bar_aria:"Ads contact",
       ad_for:"For ads:", ad_text:"Contact via email", copy_email:"Copy email",
+      ad_space_title:"Ad space",
+      ad_necklace_caption:"Lebanon & France Necklace",
 
       coin_title:"English Gold Coin 8 g — 21K",
       coin_sell:"Coin — Sell", coin_buy:"Coin — Buy",
