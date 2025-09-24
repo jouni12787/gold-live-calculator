@@ -125,6 +125,8 @@
   .history-section{margin-top:12px;display:flex;flex-direction:column;gap:12px}
   .history-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
   .history-badge{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .history-body{display:flex;flex-direction:column;gap:12px}
+  .history-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-inline-start:auto;justify-content:flex-end}
   .history-label-sep{opacity:.45}
   .history-range{font-weight:700}
   .history-tabs{display:flex;gap:6px;flex-wrap:wrap}
@@ -133,6 +135,10 @@
   .history-tab:focus{outline:none;box-shadow:var(--outline)}
   .history-tab.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--accent-ink);border-color:transparent;
     box-shadow:0 6px 16px color-mix(in oklab, var(--gold) 28%, transparent)}
+  .history-section.collapsed .history-body{display:none}
+  .history-section.collapsed .history-badge{display:none}
+  .history-section.collapsed .history-tabs{display:none}
+  .history-section.collapsed .history-actions{margin-inline-start:0;justify-content:flex-start}
   .history-chart{padding:12px 14px;border-radius:12px;background:color-mix(in oklab, var(--bg) 82%, transparent);
     border:1px solid color-mix(in oklab, var(--gold) 22%, transparent)}
   .history-chart canvas{width:100%;height:120px;display:block}
@@ -368,48 +374,57 @@
         <span class="spacer"></span>
       </div>
 
-      <div class="history-section">
+      <div class="history-section collapsed" id="historySection">
         <div class="history-header">
           <span class="badge history-badge" id="historyLabel">
             <span data-i18n="history_label_base">منحنى السعر</span>
             <span class="history-label-sep">•</span>
             <span class="history-range" id="historyRangeText">—</span>
           </span>
-          <div class="history-tabs" role="group" data-i18n-aria="history_tabs_label">
-            <button type="button" class="history-tab" data-history-range="1h" data-i18n="history_tab_1h" aria-pressed="false">١س</button>
-            <button type="button" class="history-tab" data-history-range="6h" data-i18n="history_tab_6h" aria-pressed="false">٦س</button>
-            <button type="button" class="history-tab" data-history-range="24h" data-i18n="history_tab_24h" aria-pressed="false">٢٤س</button>
-            <button type="button" class="history-tab" data-history-range="all" data-i18n="history_tab_all" aria-pressed="false">الكل</button>
+          <div class="history-actions">
+            <label class="switch history-toggle" data-i18n-aria="history_toggle_aria">
+              <input id="historyToggle" type="checkbox" aria-expanded="false" aria-controls="historyBody">
+              <span class="slider" aria-hidden="true"></span>
+              <span class="txt" data-i18n="history_toggle_show">عرض منحنى السعر</span>
+            </label>
+            <div class="history-tabs" role="group" data-i18n-aria="history_tabs_label">
+              <button type="button" class="history-tab" data-history-range="1h" data-i18n="history_tab_1h" aria-pressed="false">١س</button>
+              <button type="button" class="history-tab" data-history-range="6h" data-i18n="history_tab_6h" aria-pressed="false">٦س</button>
+              <button type="button" class="history-tab" data-history-range="24h" data-i18n="history_tab_24h" aria-pressed="false">٢٤س</button>
+              <button type="button" class="history-tab" data-history-range="all" data-i18n="history_tab_all" aria-pressed="false">الكل</button>
+            </div>
           </div>
         </div>
-        <div class="history-chart">
-          <canvas id="priceSparkline" height="120" role="img" title="—"></canvas>
-        </div>
-        <div id="historyEmpty" class="history-empty" hidden>—</div>
-        <div class="history-stats" id="historyStats">
-          <div class="history-stat">
-            <span class="history-stat-label" data-i18n="history_stat_high">أعلى</span>
-            <strong id="historyHigh">—</strong>
+        <div class="history-body" id="historyBody" hidden>
+          <div class="history-chart">
+            <canvas id="priceSparkline" height="120" role="img" title="—"></canvas>
           </div>
-          <div class="history-stat">
-            <span class="history-stat-label" data-i18n="history_stat_low">أدنى</span>
-            <strong id="historyLow">—</strong>
-          </div>
-          <div class="history-stat">
-            <span class="history-stat-label" data-i18n="history_stat_avg">متوسط</span>
-            <strong id="historyAvg">—</strong>
-          </div>
-          <div class="history-stat">
-            <span class="history-stat-label" data-i18n="history_stat_change">التغير</span>
-            <strong id="historyChange" class="history-change">—</strong>
-          </div>
-          <div class="history-stat">
-            <span class="history-stat-label" data-i18n="history_stat_samples">القراءات</span>
-            <strong id="historySamples">—</strong>
-          </div>
-          <div class="history-stat">
-            <span class="history-stat-label" data-i18n="history_stat_updated">آخر قراءة</span>
-            <strong id="historyLastTime">—</strong>
+          <div id="historyEmpty" class="history-empty" hidden>—</div>
+          <div class="history-stats" id="historyStats">
+            <div class="history-stat">
+              <span class="history-stat-label" data-i18n="history_stat_high">أعلى</span>
+              <strong id="historyHigh">—</strong>
+            </div>
+            <div class="history-stat">
+              <span class="history-stat-label" data-i18n="history_stat_low">أدنى</span>
+              <strong id="historyLow">—</strong>
+            </div>
+            <div class="history-stat">
+              <span class="history-stat-label" data-i18n="history_stat_avg">متوسط</span>
+              <strong id="historyAvg">—</strong>
+            </div>
+            <div class="history-stat">
+              <span class="history-stat-label" data-i18n="history_stat_change">التغير</span>
+              <strong id="historyChange" class="history-change">—</strong>
+            </div>
+            <div class="history-stat">
+              <span class="history-stat-label" data-i18n="history_stat_samples">القراءات</span>
+              <strong id="historySamples">—</strong>
+            </div>
+            <div class="history-stat">
+              <span class="history-stat-label" data-i18n="history_stat_updated">آخر قراءة</span>
+              <strong id="historyLastTime">—</strong>
+            </div>
           </div>
         </div>
       </div>
@@ -688,6 +703,9 @@
       history_tab_6h:"٦س",
       history_tab_24h:"٢٤س",
       history_tab_all:"الكل",
+      history_toggle_show:"عرض منحنى السعر",
+      history_toggle_hide:"إخفاء منحنى السعر",
+      history_toggle_aria:"إظهار أو إخفاء منحنى السعر والإحصاءات",
       history_range_1h:"آخر ساعة",
       history_range_6h:"آخر ٦ ساعات",
       history_range_24h:"آخر ٢٤ ساعة",
@@ -798,6 +816,9 @@
       history_tab_6h:"6h",
       history_tab_24h:"24h",
       history_tab_all:"All",
+      history_toggle_show:"Show price history",
+      history_toggle_hide:"Hide price history",
+      history_toggle_aria:"Show or hide the price history and stats",
       history_range_1h:"Last hour",
       history_range_6h:"Last 6 hours",
       history_range_24h:"Last 24 hours",
@@ -926,6 +947,7 @@
     setLastUpdated();
     renderFormulas();
     renderHistorySection();
+    renderHistoryToggleLabel();
     renderAutoTexts();
     renderPriceDelta();
   }
@@ -1012,6 +1034,13 @@
   const CFG_KEY = "gold_cfg_v1";
   const SPOT_KEY = "last_spot_v1";
   const PRICE_HISTORY_KEY = "price_history_v1";
+  const HISTORY_COLLAPSED_KEY = "history_collapsed_v1";
+  let historyCollapsed = true;
+  try{
+    const savedCollapsed = localStorage.getItem(HISTORY_COLLAPSED_KEY);
+    if(savedCollapsed === "0" || savedCollapsed === "false") historyCollapsed = false;
+    if(savedCollapsed === "1" || savedCollapsed === "true") historyCollapsed = true;
+  }catch{}
   const DEFAULTS = Object.freeze({
     oztToG: 32,
     autoRefreshSec: 10,
@@ -1607,6 +1636,51 @@
     return sampled;
   }
 
+  function renderHistoryToggleLabel(){
+    const txt = document.querySelector(".history-toggle .txt");
+    if(!txt) return;
+    const key = historyCollapsed ? "history_toggle_show" : "history_toggle_hide";
+    txt.setAttribute("data-i18n", key);
+    txt.textContent = t(key);
+  }
+
+  function applyHistoryToggleState(){
+    const section = $("historySection");
+    const body = $("historyBody");
+    const toggle = $("historyToggle");
+    if(section) section.classList.toggle("collapsed", historyCollapsed);
+    if(body){
+      if(historyCollapsed){
+        body.setAttribute("hidden", "");
+      }else{
+        body.removeAttribute("hidden");
+      }
+    }
+    if(toggle){
+      toggle.checked = !historyCollapsed;
+      toggle.setAttribute("aria-expanded", historyCollapsed ? "false" : "true");
+    }
+    renderHistoryToggleLabel();
+    if(!historyCollapsed){
+      if(typeof requestAnimationFrame === "function"){
+        requestAnimationFrame(() => renderSparkline());
+      }else{
+        renderSparkline();
+      }
+    }
+  }
+
+  function initHistoryToggle(){
+    const toggle = $("historyToggle");
+    if(!toggle) return;
+    toggle.addEventListener("change", () => {
+      historyCollapsed = !toggle.checked;
+      try{ localStorage.setItem(HISTORY_COLLAPSED_KEY, historyCollapsed ? "1" : "0"); }catch{}
+      applyHistoryToggleState();
+    });
+    applyHistoryToggleState();
+  }
+
   function renderHistoryLabel(){
     const el = $("historyRangeText");
     if(el) el.textContent = getHistoryRangeLabel() || "—";
@@ -1698,7 +1772,9 @@
     renderHistoryLabel();
     renderHistoryTabs();
     renderHistoryStats(points);
-    renderSparkline(points);
+    if(!historyCollapsed){
+      renderSparkline(points);
+    }
   }
 
   function setHistoryWindow(id){
@@ -2208,6 +2284,8 @@
 
     applyTheme();
     applyI18n();
+
+    initHistoryToggle();
 
     bindOutputs();
     bindCfgInputs();
