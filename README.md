@@ -17,3 +17,4 @@ Totals by weight: four panels (sell/buy 18K & 21K) with optional making fee for 
 PWA: offline app-shell (service worker + manifest + icons).
 
 RTL Arabic UI, accessible labels, responsive layout.
+https://goldpricelb.store
