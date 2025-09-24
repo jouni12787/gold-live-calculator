@@ -684,6 +684,7 @@
       history_hint:"عدد القراءات: {n} • أحدث قيمة: {p} دولار/أونصة.",
       history_empty:"لا بيانات ضمن {range}.",
       history_preload_fail:"تعذّر تحميل سجل الأسعار الأخير. سيتم تحديثه عند وصول قراءات جديدة.",
+      history_preload_stale:"تم تحميل سجل محفوظ مؤقتًا. سيُحدَّث تلقائيًا عند وصول قراءات جديدة.",
       history_stat_high:"أعلى",
       history_stat_low:"أدنى",
       history_stat_avg:"متوسط",
@@ -791,6 +792,7 @@
       history_hint:"Samples: {n} • Latest: {p} USD/oz.",
       history_empty:"No data inside {range} yet.",
       history_preload_fail:"Couldn't preload price history. It will refresh when new readings arrive.",
+      history_preload_stale:"Loaded cached history. It will refresh when new readings arrive.",
       history_stat_high:"High",
       history_stat_low:"Low",
       history_stat_avg:"Average",
@@ -1231,6 +1233,8 @@
     "https://api.gold-api.com/history/XAU/USD?period=1d",
     "https://www.gold-api.com/history/XAU/USD?period=1d"
   ]);
+  const LOCAL_HISTORY_FALLBACK_URL = "/assets/history-preload.json";
+  let historyPreloadUsedFallback = false;
 
   function pickOuncePrice(data){
     const candidates = [
@@ -1379,14 +1383,37 @@
     return deduped;
   }
 
+  async function fetchLocalHistoryFallback(){
+    if(!LOCAL_HISTORY_FALLBACK_URL) return [];
+    const resp = await fetch(LOCAL_HISTORY_FALLBACK_URL, { cache:"no-store" });
+    if(!resp.ok) throw new Error("HTTP " + resp.status);
+    const data = await resp.json();
+    return normalizeHistoryResponse(data);
+  }
+
   async function fetchHistoricalPrices(){
+    historyPreloadUsedFallback = false;
     const tries = GOLDAPI_HISTORY_ENDPOINTS.map(url =>
       timeoutFetch(url, 6000)
         .then(r => r.ok ? r.json() : Promise.reject({ status: r.status || r.statusCode || r.statusText || r } ))
         .then(normalizeHistoryResponse)
     );
-    const points = await Promise.any(tries);
-    return Array.isArray(points) ? points : [];
+    try{
+      const points = await Promise.any(tries);
+      return Array.isArray(points) ? points : [];
+    }catch(err){
+      try{
+        const fallbackPoints = await fetchLocalHistoryFallback();
+        if(Array.isArray(fallbackPoints) && fallbackPoints.length){
+          historyPreloadUsedFallback = true;
+          console.warn("Falling back to bundled price history.");
+          return fallbackPoints;
+        }
+      }catch(fallbackErr){
+        throw new AggregateError([err, fallbackErr], "history preload failed");
+      }
+      throw err;
+    }
   }
 
   function stringifyError(err){
@@ -2211,6 +2238,9 @@
       const preloadPoints = await fetchHistoricalPrices();
       mergePriceHistoryPoints(preloadPoints);
       savePriceHistory();
+      if(historyPreloadUsedFallback && toastEl){
+        showToast(t("history_preload_stale"));
+      }
     }catch(err){
       console.warn("Failed to preload historical prices:", stringifyError(err), err);
       if(toastEl) showToast(t("history_preload_fail"));
