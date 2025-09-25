@@ -163,13 +163,14 @@
   .mini{font-size:12px;color:var(--muted)}
 
   /* switch */
-  .switch{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .switch{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;direction:ltr}
   .switch input{display:none}
   .slider{position:relative;width:44px;height:24px;border-radius:999px;background:color-mix(in oklab, var(--gold) 25%, transparent);border:1px solid color-mix(in oklab, var(--gold) 35%, transparent);transition:.25s}
   .slider::after{content:"";position:absolute;top:50%;left:2px;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));transition:.25s;box-shadow:0 4px 10px rgba(0,0,0,.35)}
   .switch input:checked + .slider{background:color-mix(in oklab, var(--gold2) 70%, #0000)}
   .switch input:checked + .slider::after{transform:translate(20px,-50%)}
-  .switch .txt{font-size:12px;color:var(--muted)}
+  .switch .txt{font-size:12px;color:var(--muted);text-align:left}
+  html[dir="rtl"] .switch .txt{direction:rtl;text-align:right}
 
   /* prices grid */
   .prices{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;align-items:center;white-space:normal;font-family:inherit}
