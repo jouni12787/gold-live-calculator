@@ -2308,7 +2308,6 @@
       savePriceHistory();
     }catch(err){
       console.warn("Failed to preload historical prices:", stringifyError(err), err);
-      if(toastEl) showToast(t("history_preload_fail"));
     }
 
     renderHistorySection();
