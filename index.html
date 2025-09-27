@@ -1273,10 +1273,7 @@
     "https://www.gold-api.com/price/XAU",
     "https://www.gold-api.com/price/XAU/USD"
   ];
-  const GOLDAPI_HISTORY_ENDPOINTS = Object.freeze([
-    "https://api.gold-api.com/history/XAU/USD?period=1d",
-    "https://www.gold-api.com/history/XAU/USD?period=1d"
-  ]);
+  const CHART_DATA_ENDPOINT = '/api/chart-data';
 
   function pickOuncePrice(data){
     const candidates = [
@@ -1373,66 +1370,33 @@
     return { t: Math.round(timeMs), p: price };
   }
 
-  function normalizeHistoryResponse(payload){
-    if(payload == null) return [];
-    let rows = [];
-    if(Array.isArray(payload)) rows = payload;
-    else if(typeof payload === "object"){
-      const keys = ["data","prices","history","result","records","values","items","entries"];
-      for(const key of keys){
-        const val = payload[key];
-        if(Array.isArray(val) && val.length){ rows = val; break; }
-      }
-      if(!rows.length){
-        rows = Object.entries(payload).map(([key, value]) => {
-          if(value && typeof value === "object" && !Array.isArray(value)) return Object.assign({ key }, value);
-          if(typeof value === "number" || typeof value === "string") return { key, value };
-          return null;
-        }).filter(Boolean);
-      }
-    }
-
-    const points = [];
-    const pushPoint = item => {
-      if(!item) return;
-      if(Array.isArray(item)){
-        item.forEach(pushPoint);
-        return;
-      }
-      if(typeof item === "object"){
-        const normalized = normalizeHistoryPoint(item);
-        if(normalized){
-          points.push(normalized);
-          return;
-        }
-        for(const val of Object.values(item)){
-          if(Array.isArray(val) || (val && typeof val === "object")) pushPoint(val);
-        }
-        return;
-      }
-      const normalized = normalizeHistoryPoint({ value: item });
-      if(normalized) points.push(normalized);
-    };
-    pushPoint(rows);
-
-    points.sort((a,b) => a.t - b.t);
-    const deduped = [];
-    for(const pt of points){
-      const last = deduped[deduped.length - 1];
-      if(last && last.t === pt.t){ deduped[deduped.length - 1] = pt; }
-      else deduped.push(pt);
-    }
-    return deduped;
+  function normalizeChartDataPoints(payload){
+    if(!Array.isArray(payload)) return [];
+    return payload
+      .map(item => {
+        if(!item || typeof item !== "object") return null;
+        const timeRaw = item.timestamp ?? item.t ?? item.time ?? item.ts ?? item.date ?? item.datetime;
+        const priceRaw = item.price_usd ?? item.price ?? item.usd ?? item.value ?? item.p ?? item.close;
+        const time = normalizeHistoryTimestamp(timeRaw);
+        const price = Number(priceRaw);
+        if(!isFinite(time) || !isFinite(price)) return null;
+        return { t: Math.round(time), p: price };
+      })
+      .filter(Boolean)
+      .sort((a,b) => a.t - b.t);
   }
 
-  async function fetchHistoricalPrices(){
-    const tries = GOLDAPI_HISTORY_ENDPOINTS.map(url =>
-      timeoutFetch(url, 6000)
-        .then(r => r.ok ? r.json() : Promise.reject({ status: r.status || r.statusCode || r.statusText || r } ))
-        .then(normalizeHistoryResponse)
-    );
-    const points = await Promise.any(tries);
-    return Array.isArray(points) ? points : [];
+  async function fetchHistoricalPrices(timeframe = 'all'){
+    const url = new URL(CHART_DATA_ENDPOINT, window.location.origin);
+    url.searchParams.set('timeframe', timeframe);
+    const response = await timeoutFetch(url.toString(), 8000);
+    if(!response.ok){
+      const err = { status: response.status };
+      if(response.statusText) err.statusText = response.statusText;
+      throw err;
+    }
+    const payload = await response.json();
+    return normalizeChartDataPoints(payload);
   }
 
   function stringifyError(err){
@@ -1491,6 +1455,8 @@
   }catch{}
   const PRICE_DELTA_EPS = 0.05;
   let priceHistory = loadPriceHistory();
+  const loadedHistoryWindows = new Set();
+  const historyFetchPromises = new Map();
 
   function inRateLimitCooldown(){
     return cooldownUntil && Date.now() < cooldownUntil;
@@ -1586,6 +1552,30 @@
     });
     priceHistory = deduped;
     return changed;
+  }
+
+  function ensureHistoryWindowLoaded(id){
+    if(!id) return Promise.resolve(false);
+    if(loadedHistoryWindows.has(id)) return Promise.resolve(false);
+    if(historyFetchPromises.has(id)) return historyFetchPromises.get(id);
+
+    const promise = fetchHistoricalPrices(id)
+      .then(points => {
+        loadedHistoryWindows.add(id);
+        const changed = mergePriceHistoryPoints(points);
+        if(changed) savePriceHistory();
+        return changed;
+      })
+      .catch(err => {
+        loadedHistoryWindows.delete(id);
+        throw err;
+      })
+      .finally(() => {
+        historyFetchPromises.delete(id);
+      });
+
+    historyFetchPromises.set(id, promise);
+    return promise;
   }
 
   function getHistoryWindowById(id){
@@ -1785,6 +1775,19 @@
     historyWindowId = win.id;
     try{ localStorage.setItem(HISTORY_WINDOW_KEY, historyWindowId); }catch{}
     renderHistorySection();
+    ensureHistoryWindowLoaded(win.id)
+      .then(changed => {
+        if(changed) renderPriceDelta();
+      })
+      .catch(err => {
+        console.warn(`Failed to load history window ${win.id}:`, stringifyError(err), err);
+      })
+      .finally(() => {
+        if(getActiveHistoryWindow().id === win.id){
+          renderHistorySection();
+          renderPriceDelta();
+        }
+      });
   }
 
   function recordPricePoint(price, timestamp = Date.now()){
@@ -2314,11 +2317,24 @@
 
       const loadHistory = async () => {
         try{
-          const preloadPoints = await fetchHistoricalPrices();
-          mergePriceHistoryPoints(preloadPoints);
-          savePriceHistory();
+          const activeId = getActiveHistoryWindow().id;
+          await ensureHistoryWindowLoaded(activeId);
           renderHistorySection();
           renderPriceDelta();
+          if(activeId !== 'all'){
+            ensureHistoryWindowLoaded('all')
+              .then(changed => {
+                if(changed){
+                  renderPriceDelta();
+                  if(getActiveHistoryWindow().id === 'all'){
+                    renderHistorySection();
+                  }
+                }
+              })
+              .catch(err => {
+                console.warn('Failed to preload long-term history:', stringifyError(err), err);
+              });
+          }
         }catch(err){
           console.warn("Failed to preload historical prices:", stringifyError(err), err);
         }
