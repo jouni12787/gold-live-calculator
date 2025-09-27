@@ -2263,7 +2263,7 @@
   langSel.addEventListener("change", onLangChange);
 
   /* boot */
-  window.addEventListener("load", async () => {
+  function boot(){
     $("y").textContent = new Date().getFullYear();
 
     const toastEl = $("toast");
@@ -2302,19 +2302,41 @@
       }
     }catch{}
 
-    try{
-      const preloadPoints = await fetchHistoricalPrices();
-      mergePriceHistoryPoints(preloadPoints);
-      savePriceHistory();
-    }catch(err){
-      console.warn("Failed to preload historical prices:", stringifyError(err), err);
-    }
-
     renderHistorySection();
     renderPriceDelta();
 
     setAuto(true);
-  });
+  }
+
+  (function(){
+    const start = () => {
+      boot();
+
+      const loadHistory = async () => {
+        try{
+          const preloadPoints = await fetchHistoricalPrices();
+          mergePriceHistoryPoints(preloadPoints);
+          savePriceHistory();
+          renderHistorySection();
+          renderPriceDelta();
+        }catch(err){
+          console.warn("Failed to preload historical prices:", stringifyError(err), err);
+        }
+      };
+
+      if('requestIdleCallback' in window){
+        requestIdleCallback(loadHistory, { timeout: 2000 });
+      }else{
+        setTimeout(loadHistory, 0);
+      }
+    };
+
+    if(document.readyState === "loading"){
+      document.addEventListener("DOMContentLoaded", start, { once: true });
+    }else{
+      start();
+    }
+  })();
   </script>
 </body>
 </html>
