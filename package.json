@@ -1,0 +1,13 @@
+{
+  "name": "gold-live-calculator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gold Price calculator with backend chart data service",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}
