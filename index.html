@@ -195,17 +195,9 @@
   #perg .prices > div{padding:2px 0}
   #perg .label{font-size:13px}
   .card h2 + #perg{margin-top:6px}
-
-  /* contact bar */
-  .contact-bar{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:8px 0;background:color-mix(in oklab, var(--bg) 86%, transparent);border:1px solid color-mix(in oklab, var(--gold) 28%, transparent);border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,.25);direction:rtl;font-size:14px;color:var(--ink)}
-  .contact-bar .icon{width:18px;height:18px;flex:0 0 18px;display:inline-block}
-  .contact-bar a{color:var(--gold);text-decoration:none;border-bottom:1px dashed color-mix(in oklab, var(--gold) 40%, transparent)}
-  .contact-bar .spacer{flex:1}
-
   /* ---------- Fixes ---------- */
-  .card,.panel,.out,.contact-bar,.prices,.totals-grid{min-width:0}
+  .card,.panel,.out,.prices,.totals-grid{min-width:0}
   .prices .value{min-width:0; overflow-wrap:anywhere}
-  .contact-bar a{overflow-wrap:anywhere}
   #formulaBox{white-space:pre; overflow-x:auto; direction:ltr; text-align:left; -webkit-overflow-scrolling:touch}
   footer{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
   body.no-scroll{height:100vh; overflow:hidden}
@@ -446,20 +438,6 @@
         </div>
       </div>
 
-      <!-- contact line -->
-      <div class="contact-bar" role="note" aria-label="التواصل للإعلانات" data-i18n-aria="ad_bar_aria">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/>
-        </svg>
-        <div>
-          <strong data-i18n="ad_for">لإعلاناتكم:</strong>
-          <span data-i18n="ad_text">التواصل عبر البريد الإلكتروني</span>
-          <a id="adEmail" href="mailto:ajouni178@gmail.com">ajouni178@gmail.com</a>
-        </div>
-        <span class="spacer"></span>
-        <button id="copyAdMail" class="btn-mini gold" type="button" data-i18n="copy_email">نسخ الإيميل</button>
-      </div>
-
       <h2 style="margin-top:4px" data-i18n="coin_title">ليرة ذهبية أنجليزية ٨ غ عيار ٢١</h2>
       <div class="out" id="coin">
         <div class="prices" id="coinPrices">
@@ -489,6 +467,7 @@
       </video>
       <figcaption class="mini" data-i18n="ad_necklace_caption">قلادة لبنان وفرنسا</figcaption>
     </figure>
+    <p class="mini" data-i18n="ad_space_contact">للإعلانات: <a href="mailto:ajouni178@gmail.com">ajouni178@gmail.com</a></p>
   </section>
 
   <!-- Totals -->
@@ -727,8 +706,7 @@
       h_basic:"الأسعار الأساسية من دون صياغة (دولار/غرام)",
       sell18:"مبيع 18K", buy18:"شراء 18K", sell21:"مبيع 21K", buy21:"شراء 21K", per_g:"/ غ",
 
-      ad_bar_aria:"التواصل للإعلانات",
-      ad_for:"لإعلاناتكم:", ad_text:"التواصل عبر البريد الإلكتروني", copy_email:"نسخ الإيميل",
+      ad_space_contact:"للإعلانات: <a href=\"mailto:ajouni178@gmail.com\">ajouni178@gmail.com</a>",
         ad_space_title:"مساحة إعلانية",
       ad_necklace_caption:"قلادة لبنان وفرنسا",
 
@@ -840,8 +818,7 @@
       h_basic:"Base prices without making (USD/gram)",
       sell18:"Sell 18K", buy18:"Buy 18K", sell21:"Sell 21K", buy21:"Buy 21K", per_g:"/ g",
 
-      ad_bar_aria:"Ads contact",
-      ad_for:"For ads:", ad_text:"Contact via email", copy_email:"Copy email",
+      ad_space_contact:"For ads: <a href=\"mailto:ajouni178@gmail.com\">ajouni178@gmail.com</a>",
       ad_space_title:"Ad space",
       ad_necklace_caption:"Lebanon & France Necklace",
 
@@ -2166,28 +2143,6 @@
       setTimeout(()=>$("btnCopyCfg").textContent = t("copy_settings"),1200);
     }catch{}
   });
-
-  /* copy email */
-  (function(){
-    const copyBtn = $("copyAdMail");
-    const emailEl = $("adEmail");
-    if(copyBtn && emailEl){
-      const emailText = emailEl.textContent.trim();
-      copyBtn.addEventListener("click", async () => {
-        try{
-          await navigator.clipboard.writeText(emailText);
-          copyBtn.textContent = CUR_LANG==="ar" ? "نُسخ!" : "Copied!";
-          setTimeout(()=> copyBtn.textContent = t("copy_email"), 1200);
-        }catch{
-          const ta = document.createElement("textarea");
-          ta.value = emailText; document.body.appendChild(ta);
-          ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
-          copyBtn.textContent = CUR_LANG==="ar" ? "نُسخ!" : "Copied!";
-          setTimeout(()=> copyBtn.textContent = t("copy_email"), 1200);
-        }
-      });
-    }
-  })();
 
   /* ============ A2HS banner logic ============ */
   (function(){
