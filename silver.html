@@ -6,6 +6,23 @@
   <title data-i18n="page_title">أسعار الفضة — الأونصة والكيلو (دولار)</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4797992845421121" crossorigin="anonymous"></script>
 
+  <script>
+  (function(){
+    const root = document.documentElement;
+    try{
+      const savedTheme = localStorage.getItem('gold_theme');
+      if(savedTheme){
+        root.setAttribute('data-theme', savedTheme);
+      }
+      const savedLang = localStorage.getItem('gold_lang');
+      if(savedLang){
+        root.lang = savedLang;
+        root.dir = (savedLang === 'ar') ? 'rtl' : 'ltr';
+      }
+    }catch(e){}
+  })();
+  </script>
+
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#17120a">
