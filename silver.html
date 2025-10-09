@@ -266,7 +266,7 @@
           <div id="ozSell" class="value">—</div>
         </div>
         <div>
-          <div class="label" data-i18n="kilo_price">الكيلوغرام (+2.5٪)</div>
+          <div class="label" data-i18n="kilo_price">الكيلوغرام (+2.25٪)</div>
           <div id="kiloSell" class="value">—</div>
         </div>
         <div>
@@ -368,12 +368,12 @@
       conversion_note:'تُحسَب القيم بإضافة الهامش المحدد لكل وزن اعتمادًا على سعر الأونصة الفوري.',
       spot_price:'السعر الفوري (من دون هامش)',
       ounce_price:'الأونصة (+5٪)',
-      kilo_price:'الكيلوغرام (+2.5٪)',
+      kilo_price:'الكيلوغرام (+2.25٪)',
       half_kilo_price:'نصف كيلوغرام (+2.5٪)',
       quarter_kilo_price:'ربع كيلوغرام (+2.75٪)',
       formula_title:'الصيغ المستخدمة',
       formula_line_oz:'الأونصة = السعر الفوري × (1 + 5٪).',
-      formula_line_kilo:'الكيلوغرام = السعر الفوري × {factor} × (1 + 2.5٪).',
+      formula_line_kilo:'الكيلوغرام = السعر الفوري × {factor} × (1 + 2.25٪).',
       formula_line_half:'نصف الكيلو = السعر الفوري × ({factor} ÷ 2) × (1 + 2.5٪).',
       formula_line_quarter:'ربع الكيلو = السعر الفوري × ({factor} ÷ 4) × (1 + 2.75٪).',
 
@@ -412,12 +412,12 @@
       conversion_note:'Each value applies its margin to the live ounce price.',
       spot_price:'Spot price (no margin)',
       ounce_price:'Ounce (+5%)',
-      kilo_price:'Kilogram (+2.5%)',
+      kilo_price:'Kilogram (+2.25%)',
       half_kilo_price:'Half kilogram (+2.5%)',
       quarter_kilo_price:'Quarter kilogram (+2.75%)',
       formula_title:'Formulas used',
       formula_line_oz:'Ounce = spot price × (1 + 5%).',
-      formula_line_kilo:'Kilogram = spot price × {factor} × (1 + 2.5%).',
+      formula_line_kilo:'Kilogram = spot price × {factor} × (1 + 2.25%).',
       formula_line_half:'Half kilo = spot price × ({factor} ÷ 2) × (1 + 2.5%).',
       formula_line_quarter:'Quarter kilo = spot price × ({factor} ÷ 4) × (1 + 2.75%).',
 
@@ -435,11 +435,28 @@
     }
   };
 
-  const LANG_KEY = 'silver_lang';
-  const THEME_KEY = 'silver_theme';
+  const LANG_KEY = 'gold_lang';
+  const THEME_KEY = 'gold_theme';
+  const LEGACY_LANG_KEY = 'silver_lang';
+  const LEGACY_THEME_KEY = 'silver_theme';
   const STORAGE_KEY = 'silver_spot_v1';
 
-  let CUR_LANG = (localStorage.getItem(LANG_KEY) || document.documentElement.lang || 'ar');
+  function readStored(key, legacyKey){
+    try{
+      const val = localStorage.getItem(key);
+      if(val) return val;
+      if(legacyKey){
+        const legacyVal = localStorage.getItem(legacyKey);
+        if(legacyVal){
+          try{ localStorage.setItem(key, legacyVal); }catch{}
+          return legacyVal;
+        }
+      }
+    }catch{}
+    return null;
+  }
+
+  let CUR_LANG = (readStored(LANG_KEY, LEGACY_LANG_KEY) || document.documentElement.lang || 'ar');
   let autoTimer = null;
   let lastUpdated = null;
   let isFetching = false;
@@ -543,7 +560,7 @@
     setOut('spotPrice', fmtMoney(val));
     const ounceSell = val * 1.05;
     const kiloBase = val * OUNCES_PER_KG;
-    const kiloSell = kiloBase * 1.025;
+    const kiloSell = kiloBase * 1.0225;
     const halfKiloSell = (kiloBase / 2) * 1.025;
     const quarterKiloSell = (kiloBase / 4) * 1.0275;
 
@@ -690,20 +707,22 @@
   function initThemeAndLang(){
     const themeSel = $('themeSel');
     const langSel = $('langSel');
-    try{
-      const savedTheme = localStorage.getItem(THEME_KEY);
-      if(savedTheme) themeSel.value = savedTheme;
-      const savedLang = localStorage.getItem(LANG_KEY);
-      if(savedLang) CUR_LANG = savedLang;
-    }catch{}
-    applyTheme(themeSel.value || 'dark');
-    langSel.value = CUR_LANG;
-    langSel.addEventListener('change', () => {
-      CUR_LANG = langSel.value || 'ar';
-      try{ localStorage.setItem(LANG_KEY, CUR_LANG); }catch{}
-      applyI18n();
-    });
-    themeSel.addEventListener('change', () => applyTheme(themeSel.value));
+    const savedTheme = readStored(THEME_KEY, LEGACY_THEME_KEY);
+    if(savedTheme) themeSel.value = savedTheme;
+    const savedLang = readStored(LANG_KEY, LEGACY_LANG_KEY);
+    if(savedLang) CUR_LANG = savedLang;
+    applyTheme((themeSel && themeSel.value) || 'dark');
+    if(langSel) langSel.value = CUR_LANG;
+    if(langSel){
+      langSel.addEventListener('change', () => {
+        CUR_LANG = langSel.value || 'ar';
+        try{ localStorage.setItem(LANG_KEY, CUR_LANG); }catch{}
+        applyI18n();
+      });
+    }
+    if(themeSel){
+      themeSel.addEventListener('change', () => applyTheme(themeSel.value));
+    }
   }
 
   function initControls(){
