@@ -146,32 +146,6 @@
     background:color-mix(in oklab,#ff8d7a 18%, transparent)}
   .badge.delta.flat{color:var(--muted);border-color:color-mix(in oklab, var(--gold) 25%, transparent);
     background:color-mix(in oklab, var(--bg) 86%, transparent)}
-  .popup-backdrop{
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;
-    background:rgba(15,11,6,.78);z-index:1100;
-  }
-  .popup-card{
-    position:relative;background:linear-gradient(180deg,color-mix(in oklab,var(--card) 96%, transparent) 0%,var(--card) 100%);
-    border:1px solid color-mix(in oklab,var(--gold) 28%, transparent);border-radius:var(--radius);
-    padding:28px 24px 24px;max-width:min(420px,100%);text-align:center;
-    box-shadow:0 24px 50px rgba(0,0,0,.45);
-  }
-  .popup-card h3{margin:0 0 12px;font-size:18px}
-  .popup-card p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.6}
-  .popup-card .popup-link{
-    display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:999px;
-    background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--accent-ink);
-    font-weight:700;text-decoration:none;margin-bottom:10px;box-shadow:0 10px 22px color-mix(in oklab,var(--gold) 35%, transparent);
-    transition:transform .2s ease;
-  }
-  .popup-card .popup-link:hover{transform:translateY(-1px)}
-  .popup-card .popup-link:focus{outline:none;box-shadow:var(--outline)}
-  .popup-close{
-    position:absolute;top:8px;inset-inline-start:12px;background:transparent;border:0;color:var(--muted);
-    font-size:20px;cursor:pointer;line-height:1;padding:4px;border-radius:50%;transition:color .2s ease,background .2s ease;
-  }
-  .popup-close:hover,.popup-close:focus{color:var(--ink);background:color-mix(in oklab,var(--bg) 80%, transparent);outline:none}
-  .popup-timer{font-size:13px;color:var(--muted);margin:0}
   .history-section{margin-top:12px;display:flex;flex-direction:column;gap:12px}
   .history-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
   .history-badge{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -343,16 +317,6 @@
 </head>
 
 <body>
-
-  <div id="updatePopup" class="popup-backdrop" hidden aria-hidden="true">
-    <div class="popup-card" role="dialog" aria-modal="true" aria-labelledby="updatePopupTitle">
-      <button type="button" class="popup-close" aria-label="إغلاق التنبيه">×</button>
-      <h3 id="updatePopupTitle">تحديث جديد</h3>
-      <p>أصبح بإمكانك الآن متابعة سعر الفضة في الصفحة المخصصة.</p>
-      <a class="popup-link" href="silver.html">مشاهدة سعر الفضة</a>
-      <p class="popup-timer">سيتم إغلاق التنبيه خلال <span data-counter>5</span> ثوانٍ.</p>
-    </div>
-  </div>
 
   <!-- A2HS Banner -->
   <div id="a2hsBanner" aria-hidden="true">
@@ -2274,66 +2238,6 @@
       if (isStandalone() || dismissed === '1') return;
       if (isIOS){ setTimeout(showBanner, 600); }
     });
-  })();
-
-  /* Update popup */
-  (function(){
-    const popup = document.getElementById("updatePopup");
-    if(!popup) return;
-
-    const closeBtn = popup.querySelector(".popup-close");
-    const counterEl = popup.querySelector("[data-counter]");
-    let countdownTimer = null;
-
-    function updateCounter(value){
-      if(counterEl) counterEl.textContent = String(value);
-    }
-
-    function hidePopup(){
-      if(popup.hasAttribute("hidden")) return;
-      popup.setAttribute("hidden", "");
-      popup.setAttribute("aria-hidden", "true");
-      if(countdownTimer){
-        clearInterval(countdownTimer);
-        countdownTimer = null;
-      }
-    }
-
-    function startCountdown(){
-      let remaining = 5;
-      updateCounter(remaining);
-      countdownTimer = window.setInterval(() => {
-        remaining -= 1;
-        if(remaining <= 0){
-          updateCounter(0);
-          if(countdownTimer){
-            clearInterval(countdownTimer);
-            countdownTimer = null;
-          }
-          hidePopup();
-        }else{
-          updateCounter(remaining);
-        }
-      }, 1000);
-    }
-
-    function showPopup(){
-      popup.removeAttribute("hidden");
-      popup.setAttribute("aria-hidden", "false");
-      startCountdown();
-    }
-
-    if(closeBtn){
-      closeBtn.addEventListener("click", hidePopup);
-    }
-
-    const bootPopup = () => showPopup();
-
-    if(document.readyState === "loading"){
-      document.addEventListener("DOMContentLoaded", bootPopup, { once: true });
-    }else{
-      bootPopup();
-    }
   })();
 
   /* PWA */
