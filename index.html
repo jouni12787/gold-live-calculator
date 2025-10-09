@@ -313,6 +313,113 @@
   @media (prefers-reduced-motion: reduce){
     * { transition: none !important; animation: none !important }
   }
+
+  /* ===== Update Popup (centered & fancy) ===== */
+  .update-pop{
+    position:fixed; inset:0; z-index:10010; display:none;
+  }
+  .update-pop.open{
+    /* نعرضها كشبكة ونوسّط المحتوى تمامًا */
+    display:grid; place-items:center;
+  }
+  .update-pop__backdrop{
+    position:absolute; inset:0;
+    background:rgba(10,10,14,.55);
+    backdrop-filter: blur(6px) saturate(120%);
+  }
+
+  .update-pop__sheet{
+    position:relative;
+    /* حجم لطيف ومتجاوب */
+    width:min(560px,92vw);
+    /* نلغي المارجن القديم كي تتوسّط تمامًا عبر الـgrid */
+    margin:0;
+    /* مظهر زجاجي بفخامة خفيفة */
+    background:linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:20px;
+    padding:18px 16px 16px;
+    box-shadow:
+      0 25px 80px rgba(0,0,0,.55),
+      0 0 0 1px rgba(255,255,255,.06) inset;
+
+    /* حركة دخول ناعمة */
+    opacity:0; transform: translateY(10px) scale(.98);
+    animation: popIn .35s cubic-bezier(.2,.8,.2,1) forwards;
+    direction: rtl; /* لأن المحتوى عربي */
+    color: #f8fafc; /* حروف صريحة فوق الخلفية */
+  }
+
+  /* عنوان ونص */
+  .update-pop__sheet h3{
+    margin:0 0 8px; font-size:1.15rem; letter-spacing:.2px;
+  }
+  .update-pop__sheet p{ margin:0 0 10px; line-height:1.6 }
+
+  /* زر الإغلاق (x) في الزاوية اليسرى */
+  .update-pop .x{
+    position:absolute; top:10px; left:12px;
+    width:30px; height:30px; border-radius:999px;
+    display:grid; place-items:center;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.25);
+    color:#e2e8f0; font-size:18px; line-height:1; cursor:pointer;
+    transition: transform .15s ease, background .15s ease, opacity .15s;
+  }
+  .update-pop .x:hover{ transform: scale(1.06); background:rgba(255,255,255,.16) }
+  .update-pop .x:active{ transform: scale(.98) }
+
+  /* الروابط والأزرار */
+  .update-pop__link{
+    color:#fff; font-weight:700; text-decoration:underline;
+    text-underline-offset:3px;
+  }
+
+  .btn-mini{
+    appearance:none; border:0; cursor:pointer;
+    padding:10px 14px; border-radius:12px; font-weight:600;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.22);
+    color:#f8fafc;
+    transition: transform .12s ease, background .12s ease, border-color .12s ease;
+  }
+  .btn-mini:hover{ transform: translateY(-1px); background:rgba(255,255,255,.16) }
+  .btn-mini:active{ transform: translateY(0) scale(.99) }
+
+  .btn-mini.gold{
+    background: linear-gradient(135deg, #b89237, #e0c36d);
+    color:#111; border:1px solid rgba(255,255,255,.3);
+  }
+  .btn-mini.gold:hover{ filter: brightness(1.05) }
+  .btn-mini.gold:active{ filter: brightness(.98) }
+
+  /* نص صغير للعدّاد */
+  .mini{ opacity:.9; font-size:.92rem }
+
+  /* حركة الدخول */
+  @keyframes popIn{
+    to{ opacity:1; transform: translateY(0) scale(1) }
+  }
+
+  /* تحسينات يسيرة للوضع الفاتح إن وُجد */
+  @media (prefers-color-scheme: light){
+    .update-pop__backdrop{ background:rgba(0,0,0,.45) }
+    .update-pop__sheet{
+      color:#0f172a;
+      background:linear-gradient(135deg, rgba(255,255,255,.75), rgba(255,255,255,.6));
+      border-color: rgba(0,0,0,.08);
+    }
+    .update-pop .x{ color:#0f172a; background:rgba(0,0,0,.06); border-color:rgba(0,0,0,.12) }
+    .btn-mini{ color:#0f172a; background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.12) }
+    .btn-mini.gold{ color:#111 }
+  }
+
+  /* إمكانية تقليل الحركة */
+  @media (prefers-reduced-motion: reduce){
+    .update-pop__sheet{ animation:none; opacity:1; transform:none }
+  }
   </style>
 </head>
 
@@ -2354,6 +2461,96 @@
     }else{
       start();
     }
+  })();
+  </script>
+
+  <!-- Update Popup -->
+  <div id="updatePopup" class="update-pop" aria-hidden="true" role="dialog" aria-labelledby="updateTitle">
+    <div class="update-pop__backdrop" aria-hidden="true"></div>
+
+    <div class="update-pop__sheet">
+      <!-- زر الإغلاق في الزاوية اليسرى -->
+      <button class="x" type="button" aria-label="إغلاق">×</button>
+
+      <h3 id="updateTitle" style="margin:0 0 8px">تحديث جديد</h3>
+      <p style="margin:0 0 6px">
+        يمكنك الآن مشاهدة
+        <a href="silver.html" class="update-pop__link">سعر الفضة</a>
+        في الصفحة الأخرى.
+      </p>
+
+      <p class="mini" style="margin:6px 0 12px">سيُغلق خلال
+        <strong id="updateCountdown">5</strong> ثوانٍ.
+      </p>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <a href="silver.html" class="btn-mini gold">اذهب لصفحة الفضة</a>
+        <button id="updateOk" class="btn-mini" type="button">حسنًا</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const POP_ID = "updatePopup";
+    const COUNT_ID = "updateCountdown";
+    const OK_ID = "updateOk";
+    const LS_KEY = "seen_update_popup_v1";   // احذف هذا المفتاح لو حابب يظهر كل مرة
+
+    function $(id){ return document.getElementById(id); }
+
+    function openPopup(){
+      const pop = $(POP_ID);
+      if(!pop) return;
+      pop.classList.add("open");
+      document.body.classList.add("no-scroll");
+      pop.setAttribute("aria-hidden", "false");
+    }
+    function closePopup(){
+      const pop = $(POP_ID);
+      if(!pop) return;
+      pop.classList.remove("open");
+      document.body.classList.remove("no-scroll");
+      pop.setAttribute("aria-hidden", "true");
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+      // لو أردته يظهر دائمًا، احذف الجزء التالي (الـ localStorage):
+      try{
+        if(localStorage.getItem(LS_KEY) === "1"){ return; }
+      }catch(e){}
+
+      const pop = $(POP_ID);
+      if(!pop) return;
+
+      openPopup();
+
+      // أزرار الإغلاق
+      const xBtn = pop.querySelector(".x");
+      const okBtn = $(OK_ID);
+      function handleClose(){
+        closePopup();
+        try{ localStorage.setItem(LS_KEY, "1"); }catch(e){}
+      }
+      if(xBtn) xBtn.addEventListener("click", handleClose);
+      if(okBtn) okBtn.addEventListener("click", handleClose);
+      pop.addEventListener("click", (e)=>{
+        if(e.target.classList.contains("update-pop__backdrop")) handleClose();
+      });
+
+      // عدّاد 5 ثوانٍ ثم إغلاق تلقائيًا
+      const cEl = $(COUNT_ID);
+      let remain = 5;
+      if(cEl) cEl.textContent = String(remain);
+      const timer = setInterval(()=>{
+        remain -= 1;
+        if(cEl) cEl.textContent = String(Math.max(remain,0));
+        if(remain <= 0){
+          clearInterval(timer);
+          handleClose();
+        }
+      }, 1000);
+    });
   })();
   </script>
 </body>
