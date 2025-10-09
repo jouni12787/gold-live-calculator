@@ -73,6 +73,13 @@
     background:linear-gradient(180deg, color-mix(in oklab, var(--card) 85%, transparent), color-mix(in oklab, var(--bg) 85%, transparent));
     border-bottom:1px solid color-mix(in oklab, var(--gold) 35%, transparent); padding:14px 16px}
   header .bar{max-width:980px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .mini-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-inline-end:auto}
+  .mini-nav a{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;
+    border:1px solid color-mix(in oklab, var(--gold) 28%, transparent);background:color-mix(in oklab, var(--bg) 86%, transparent);
+    color:var(--ink);font-size:12px;text-decoration:none;transition:.2s ease}
+  .mini-nav a.current{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--accent-ink);border-color:transparent;
+    box-shadow:0 6px 14px color-mix(in oklab, var(--gold) 25%, transparent)}
+  .mini-nav a:focus{outline:none;box-shadow:var(--outline)}
   header h1{margin:0;font-size:18px;flex:1 1 260px}
   header p{margin:0;color:var(--muted);font-size:12px;flex:1 1 100%}
   .hdr-controls{display:flex;gap:8px;align-items:center}
@@ -319,6 +326,10 @@
 
   <header>
     <div class="bar">
+      <nav class="mini-nav" aria-label="اختيار المعدن" data-i18n-aria="nav_label">
+        <a href="index.html" class="current" data-i18n="nav_gold">الذهب</a>
+        <a href="silver.html" data-i18n="nav_silver">الفضة</a>
+      </nav>
       <h1 data-i18n="hdr_title">أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)</h1>
       <div class="hdr-controls">
         <div class="select-wrap">
@@ -674,6 +685,9 @@
     ar: {
       page_title:"أسعار الذهب — 18 و 21 قيراط (دولار/غرام)",
       hdr_title:"أسعار الذهب — 18 قيراط و 21 قيراط (دولار/غرام)",
+      nav_label:"اختيار المعدن",
+      nav_gold:"الذهب",
+      nav_silver:"الفضة",
       hdr_hint:"حاليًا نحدّث السعر تلقائيًا كل {label}. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.",
       h_ounce:"سعر الأونصة بالدولار",
       usd_oz_label:"USD/oz",
@@ -786,6 +800,9 @@
     en: {
       page_title:"Gold Prices — 18K & 21K (USD/gram)",
       hdr_title:"Gold Prices — 18K & 21K (USD/gram)",
+      nav_label:"Metal selection",
+      nav_gold:"Gold",
+      nav_silver:"Silver",
       hdr_hint:"We auto-refresh every {label}. To enter manually, turn off auto-refresh, then type the ounce price.",
       h_ounce:"Ounce Price (USD)",
       usd_oz_label:"USD/oz",

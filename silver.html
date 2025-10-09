@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title data-i18n="page_title">أسعار الفضة — الأونصة والكيلو (دولار)</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4797992845421121" crossorigin="anonymous"></script>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#17120a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Hint the browser early -->
+  <link rel="preconnect" href="https://api.gold-api.com" crossorigin>
+  <link rel="preconnect" href="https://www.gold-api.com" crossorigin>
+
+  <style>
+  :root{
+    --bg:#17120a; --bg2:#0f0b06; --card:#211a0e;
+    --ink:#fff7e6; --muted:#e8d9b3;
+    --gold:#d4af37; --gold2:#b88a1a; --radius:16px; --gap:7px;
+
+    --bar-font: clamp(.98rem, .9rem + .35vw, 1.15rem);
+    --bar-pad-y: 14px; --bar-pad-x: 18px; --bar-gap: 12px;
+    --bar-icon: 28px; --bar-close: 32px; --bar-btn-py: 8px; --bar-btn-px: 16px;
+
+    --outline: 0 0 0 2px rgba(212,175,55,.35), 0 0 0 4px rgba(212,175,55,.2);
+    --accent-ink:#2b1f10;
+  }
+
+  html[data-theme="navy"]{
+    --bg:#0c1a2b; --bg2:#0a1523; --card:#121e32;
+    --ink:#eef3fb; --muted:#b9c7dc;
+    --gold:#E9C46A; --gold2:#D4AF37; --accent-ink:#0b1220;
+  }
+
+  html[data-theme="light"]{
+    --bg:#f7f5ef; --bg2:#f2efe7; --card:#ffffff;
+    --ink:#0e1420; --muted:#5b6a80;
+    --gold:#D4AF37; --gold2:#BB9729; --accent-ink:#0e1420;
+  }
+
+  html[data-theme="plum"]{
+    --bg:#160d18; --bg2:#0e0810; --card:#231226;
+    --ink:#f8eefc; --muted:#cfb9dc;
+    --gold:#E7B9FF;
+    --gold2:#B387F9;
+    --accent-ink:#170a1b;
+  }
+
+  *{box-sizing:border-box}
+  html,body{max-width:100%}
+  body{
+    margin:0; color:var(--ink);
+    background:
+      radial-gradient(1100px 520px at 110% -10%, color-mix(in oklab, var(--gold) 22%, transparent), transparent 60%),
+      radial-gradient(800px 520px at -10% -10%, color-mix(in oklab, var(--gold2) 20%, transparent), transparent 60%),
+      linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+    font-family:"Noto Naskh Arabic","Segoe UI",system-ui,-apple-system,Arial;
+    min-height:100vh;
+  }
+
+  header{position:sticky;top:0;z-index:10;backdrop-filter:blur(8px);
+    background:linear-gradient(180deg, color-mix(in oklab, var(--card) 85%, transparent), color-mix(in oklab, var(--bg) 85%, transparent));
+    border-bottom:1px solid color-mix(in oklab, var(--gold) 35%, transparent); padding:14px 16px}
+  header .bar{max-width:980px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .mini-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-inline-end:auto}
+  .mini-nav a{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;
+    border:1px solid color-mix(in oklab, var(--gold) 28%, transparent);background:color-mix(in oklab, var(--bg) 86%, transparent);
+    color:var(--ink);font-size:12px;text-decoration:none;transition:.2s ease}
+  .mini-nav a.current{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--accent-ink);border-color:transparent;
+    box-shadow:0 6px 14px color-mix(in oklab, var(--gold) 25%, transparent)}
+  .mini-nav a:focus{outline:none;box-shadow:var(--outline)}
+  header h1{margin:0;font-size:18px;flex:1 1 260px}
+  header p{margin:0;color:var(--muted);font-size:12px;flex:1 1 100%}
+  .hdr-controls{display:flex;gap:8px;align-items:center}
+  .select{appearance:none;background:var(--card);border:1px solid color-mix(in oklab, var(--gold) 28%, transparent);color:var(--ink);padding:8px 28px 8px 10px;border-radius:10px;position:relative;font-size:13px;cursor:pointer}
+  .select:focus{outline:none;box-shadow:var(--outline)}
+  .select-wrap{position:relative}
+  .select-wrap::after{content:"▾";position:absolute;inset-inline-end:8px;top:50%;translate:0 -50%;opacity:.8;font-size:12px;pointer-events:none}
+
+  main{max-width:980px;margin:20px auto;padding:0 16px 40px}
+  .grid{display:grid;gap:var(--gap)}
+  @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
+
+  .card{background:linear-gradient(180deg,color-mix(in oklab, var(--card) 96%, transparent) 0%,var(--card) 100%);
+    border:1px solid color-mix(in oklab, var(--gold) 25%, transparent); border-radius:var(--radius); padding:16px;
+    box-shadow:0 10px 26px rgba(0,0,0,.25)}
+  h2{margin:0 0 6px;font-size:17px}
+  label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}
+
+  input{
+    width:100%; background:color-mix(in oklab, var(--bg) 80%, #0000);
+    color:var(--ink); border:1px solid color-mix(in oklab, var(--gold) 40%, transparent);
+    padding:12px; border-radius:12px; outline:none; caret-color:var(--ink);
+    box-shadow:0 0 0 rgba(0,0,0,0); transition:all .2s ease;
+  }
+  input:focus{ box-shadow:var(--outline); border-color:var(--gold) }
+  input::placeholder{ color:color-mix(in oklab, var(--gold) 55%, #fff0); font-style:italic }
+  input:hover{ border-color:var(--gold2) }
+
+  .num{direction:ltr;text-align:left}
+  .spot-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+  .priceField{flex:1 1 180px;min-width:170px}
+  .btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;
+    background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--accent-ink);
+    box-shadow:0 10px 22px color-mix(in oklab, var(--gold) 35%, transparent)}
+  .btn:focus{outline:none;box-shadow:var(--outline)}
+  .switch{position:relative;display:inline-flex;align-items:center;gap:8px}
+  .switch input{position:absolute;opacity:0;width:0;height:0}
+  .slider{position:relative;width:44px;height:24px;border-radius:999px;background:color-mix(in oklab, var(--gold) 25%, transparent);border:1px solid color-mix(in oklab, var(--gold) 35%, transparent);transition:.25s}
+  .slider::after{content:"";position:absolute;top:50%;left:2px;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));transition:.25s;box-shadow:0 4px 10px rgba(0,0,0,.35)}
+  .switch input:checked + .slider{background:color-mix(in oklab, var(--gold2) 70%, #0000)}
+  .switch input:checked + .slider::after{transform:translate(18px,-50%)}
+  .switch .txt{font-size:12px;color:var(--muted)}
+
+  .spot-meta{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:color-mix(in oklab, var(--bg) 82%, transparent);
+    border:1px solid color-mix(in oklab, var(--gold) 25%, transparent);color:var(--muted);font-size:12px}
+  .spacer{flex:1 1 auto}
+
+  .error{background:#3a120c;border:1px solid rgba(255,150,120,.6);color:#ffe1db;padding:10px;border-radius:10px;font-size:12px;display:none}
+  html[data-theme="light"] .error{background:#ffe9e6;color:#8a1d12;border-color:#ffb2a0}
+
+  .prices{display:grid;gap:10px}
+  .prices > div{padding:4px 0;border-bottom:1px dashed color-mix(in oklab, var(--gold) 18%, transparent)}
+  .prices .label{color:var(--muted);font-size:13px}
+  .prices .value{font-size:20px;font-weight:700;letter-spacing:.3px}
+
+  .mini{font-size:12px;color:var(--muted)}
+  .ad-card video{width:100%;max-width:320px;border-radius:12px;border:1px solid color-mix(in oklab, var(--gold) 22%, transparent);box-shadow:0 6px 16px rgba(0,0,0,.35)}
+  .out{font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;background:color-mix(in oklab, var(--bg) 82%, transparent);
+    border:1px solid color-mix(in oklab, var(--gold) 22%, transparent);padding:12px;border-radius:12px;white-space:pre-line}
+
+  #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,120%);
+    background:color-mix(in oklab, var(--card) 92%, transparent);
+    border:1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+    color:var(--ink);
+    padding:10px 16px;border-radius:12px;box-shadow:0 14px 28px rgba(0,0,0,.35);
+    transition:transform .35s ease, opacity .35s ease;opacity:0;z-index:2000;
+    max-width:min(92vw,420px);text-align:center;font-size:13px}
+  #toast.show{transform:translate(-50%,0);opacity:1}
+
+  #a2hsBanner{position:fixed; top:0; left:0; right:0; z-index:9999;transform:translateY(-110%); transition:transform .45s ease;
+    background:color-mix(in oklab, var(--bg) 88%, transparent); color:var(--ink);
+    border-bottom:1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+    font-size: var(--bar-font);
+  }
+  #a2hsBanner.show{ transform:translateY(0) }
+  #a2hsBanner .wrap{max-width:1100px; margin:0 auto; padding: var(--bar-pad-y) var(--bar-pad-x); display:flex; align-items:center; gap: var(--bar-gap);}
+  #a2hsBanner img.icon{ width: var(--bar-icon); height: var(--bar-icon); border-radius:6px; flex:0 0 var(--bar-icon) }
+  #a2hsBanner .txt{ flex:1; line-height:1.35 }
+  #a2hsBanner .cta{ background:linear-gradient(135deg,var(--gold),var(--gold2)); color:var(--accent-ink); border:0; border-radius:999px; padding: var(--bar-btn-py) var(--bar-btn-px); font-weight:800; cursor:pointer; font-size:1em }
+  #a2hsBanner .close{ background:transparent; color:var(--ink); border:0; width: var(--bar-close); height: var(--bar-close); font-size: calc(var(--bar-close) * 0.56); line-height: var(--bar-close); cursor:pointer; flex:0 0 var(--bar-close) }
+
+  #a2hsModal{position:fixed; inset:0; z-index:10001; display:none; align-items:center; justify-content:center; padding:24px 12px;}
+  #a2hsModal.open{ display:flex }
+  #a2hsModal::before{content:""; position:absolute; inset:0; background:rgba(0,0,0,.6)}
+  #a2hsModal .sheet{position:relative; width:min(680px,92vw); max-height:calc(100vh - 48px); overflow:auto;
+    background:color-mix(in oklab, var(--bg) 86%, transparent); color:var(--ink);
+    border:1px solid color-mix(in oklab, var(--gold) 28%, transparent); border-radius:16px; padding:14px;
+    box-shadow:0 20px 50px rgba(0,0,0,.65);}
+  #a2hsModal .sheet h3{margin:0 0 8px}
+  #a2hsModal .sheet img.main{display:block; width:100%; height:auto; border-radius:10px; border:1px solid color-mix(in oklab, var(--gold) 22%, transparent); background:#0b0b0b}
+  #a2hsModal .steps{margin-top:10px; font-size:14px; line-height:1.7}
+  #a2hsModal .steps .row{display:flex; align-items:center; gap:10px; margin:6px 0}
+  #a2hsModal .steps img.icon{width:22px; height:22px}
+  #a2hsModal .x{position:absolute; top:8px; left:10px; background:transparent; border:0; color:var(--ink); font-size:20px; cursor:pointer}
+
+  footer{padding-bottom:calc(18px + env(safe-area-inset-bottom));text-align:center;color:var(--muted);font-size:12px;padding-top:18px}
+  body.no-scroll{height:100vh; overflow:hidden}
+  body.has-topbar{ padding-top:68px }
+
+  @media (prefers-reduced-motion: reduce){
+    * { transition: none !important; animation: none !important }
+  }
+  </style>
+</head>
+<body>
+  <div id="a2hsBanner" aria-hidden="true">
+    <div class="wrap">
+      <button class="close" type="button" aria-label="إغلاق" data-i18n-aria="a2hs_close">×</button>
+      <img class="icon" src="icons/icon-192.png" alt="">
+      <div class="txt" data-i18n="a2hs_text">احصل على النسخة السريعة — أضِف الموقع إلى الشاشة الرئيسية.</div>
+      <button class="cta" type="button" id="a2hsGet" data-i18n="a2hs_get">الحصول</button>
+    </div>
+  </div>
+
+  <div id="a2hsModal" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="a2hsTitle">
+      <button class="x" type="button" aria-label="إغلاق" data-i18n-aria="a2hs_close">×</button>
+      <h3 id="a2hsTitle" data-i18n="a2hs_title">إضافة إلى الشاشة الرئيسية</h3>
+      <img class="main" src="assets/save_to_home_screen.jpg" alt="">
+      <div class="steps">
+        <div class="row"><strong>1.</strong> <span data-i18n="a2hs_step1">اضغط <em>مشاركة</em></span> <img class="icon" src="assets/share.jpg" alt=""></div>
+        <div class="row"><strong>2.</strong> <span data-i18n="a2hs_step2">اختر <em>Add to Home Screen</em> ثم <em>تثبيت</em>.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="bar">
+      <nav class="mini-nav" aria-label="اختيار المعدن" data-i18n-aria="nav_label">
+        <a href="index.html" data-i18n="nav_gold">الذهب</a>
+        <a href="silver.html" class="current" data-i18n="nav_silver">الفضة</a>
+      </nav>
+      <h1 data-i18n="hdr_title">أسعار الفضة — الأونصة والكيلو (دولار)</h1>
+      <div class="hdr-controls">
+        <div class="select-wrap">
+          <select id="langSel" class="select" aria-label="Language" title="Language">
+            <option value="ar">العربية</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div class="select-wrap">
+          <select id="themeSel" class="select" aria-label="Theme" title="Theme">
+            <option value="dark">Classic Dark</option>
+            <option value="navy">Royal Navy</option>
+            <option value="light">Luxe Light</option>
+            <option value="plum">Opulent Plum</option>
+          </select>
+        </div>
+      </div>
+      <p data-i18n="hdr_hint">نحدّث سعر الأونصة كل ١٠ ثوانٍ تلقائيًا. لإدخال قيمة يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.</p>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2 data-i18n="h_ounce">سعر الأونصة بالدولار</h2>
+      <div class="spot-toolbar">
+        <div class="priceField">
+          <label data-i18n="usd_oz_label">USD/oz</label>
+          <input id="oz" class="num" type="tel" inputmode="decimal" data-ph="oz_placeholder" placeholder="مثال: 25" value="">
+        </div>
+        <button id="btnFetch" class="btn" data-i18n="btn_refresh">تحديث • Refresh</button>
+        <label class="switch" aria-label="تحديث تلقائي" title="تحديث تلقائي" data-i18n-title="auto_title" data-i18n-aria="auto_title">
+          <input id="auto" type="checkbox" checked>
+          <span class="slider" aria-hidden="true"></span>
+          <span class="txt" data-i18n="auto_txt">تحديث تلقائي</span>
+        </label>
+      </div>
+      <div class="spot-meta">
+        <span id="meta" class="badge">—</span>
+        <span id="last" class="badge" aria-live="polite" title="وقت آخر تحديث" data-i18n-title="last_title">آخر تحديث: —</span>
+        <span class="spacer"></span>
+      </div>
+      <div id="err" class="error" role="alert"></div>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="conversion_title">أسعار الفضة المحسوبة</h2>
+      <p class="mini" data-i18n="conversion_note">تُحسَب القيم بإضافة الهامش المحدد لكل وزن اعتمادًا على سعر الأونصة الفوري.</p>
+      <div class="prices">
+        <div>
+          <div class="label" data-i18n="spot_price">السعر الفوري (من دون هامش)</div>
+          <div id="spotPrice" class="value">—</div>
+        </div>
+        <div>
+          <div class="label" data-i18n="ounce_price">الأونصة (+5٪)</div>
+          <div id="ozSell" class="value">—</div>
+        </div>
+        <div>
+          <div class="label" data-i18n="kilo_price">الكيلوغرام (+2.5٪)</div>
+          <div id="kiloSell" class="value">—</div>
+        </div>
+        <div>
+          <div class="label" data-i18n="half_kilo_price">نصف كيلوغرام (+2.5٪)</div>
+          <div id="halfKiloSell" class="value">—</div>
+        </div>
+        <div>
+          <div class="label" data-i18n="quarter_kilo_price">ربع كيلوغرام (+2.75٪)</div>
+          <div id="quarterKiloSell" class="value">—</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card ad-card" aria-labelledby="adPromoTitle">
+      <h2 id="adPromoTitle" data-i18n="ad_space_title">مساحة إعلانية</h2>
+      <figure>
+        <video width="300" height="150" autoplay muted loop playsinline>
+          <source src="assets/lebanonand france video with number 300-150.mp4" type="video/mp4">
+        </video>
+        <figcaption class="mini" data-i18n="ad_necklace_caption">قلادة لبنان وفرنسا</figcaption>
+      </figure>
+      <p class="mini" data-i18n="ad_space_contact">للإعلانات: <a href="mailto:ajouni178@gmail.com">ajouni178@gmail.com</a></p>
+    </section>
+
+    <section class="card" style="text-align:center; padding:20px 12px">
+      <h2 data-i18n="ad_space_title">مساحة إعلانية</h2>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-format="fluid"
+           data-ad-layout-key="-5f+bp-1l-1i+tr"
+           data-ad-client="ca-pub-4797992845421121"
+           data-ad-slot="2193382327"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="formula_title">الصيغ المستخدمة</h2>
+      <div id="formulaBox" class="out" style="direction:ltr;text-align:left"></div>
+    </section>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <footer>
+    <span data-i18n="footer">© <span id="y"></span> <strong>goldpricelb.store</strong> — جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني (Ali Jouni).</span>
+  </footer>
+
+  <script>
+  const $ = id => document.getElementById(id);
+  const cleanDec = s => (s||"").replace(/[^\d.,-]/g,"").replace(",",".");
+  const fmtNumber = (n, opts={}) => isFinite(n)
+    ? n.toLocaleString(document.documentElement.lang === 'ar' ? 'ar' : undefined, opts)
+    : '—';
+  const fmtMoney = n => {
+    if(!isFinite(n)) return '—';
+    const locale = document.documentElement.lang === 'ar' ? 'ar' : undefined;
+    const formatted = n.toLocaleString(locale, { minimumFractionDigits:2, maximumFractionDigits:2 });
+    return document.documentElement.lang === 'ar' ? `${formatted} $` : `$ ${formatted}`;
+  };
+  const outRefs = {};
+  ['spotPrice','ozSell','kiloSell','halfKiloSell','quarterKiloSell'].forEach(id => outRefs[id] = $(id));
+  const setOut = (id, val) => { if(outRefs[id]) outRefs[id].textContent = val; };
+
+  const AUTO_INTERVAL_SEC = 10;
+  const AUTO_INTERVAL_MS = AUTO_INTERVAL_SEC * 1000;
+  const OZT_TO_G = 31.1034768;
+  const OUNCES_PER_KG = 1000 / OZT_TO_G;
+
+  const SPOT_ENDPOINTS = [
+    'https://api.gold-api.com/price/XAG',
+    'https://api.gold-api.com/price/XAG/USD',
+    'https://www.gold-api.com/price/XAG',
+    'https://www.gold-api.com/price/XAG/USD'
+  ];
+
+  const DICT = {
+    ar: {
+      page_title:'أسعار الفضة — الأونصة والكيلو (دولار)',
+      hdr_title:'أسعار الفضة — الأونصة والكيلو (دولار)',
+      nav_label:'اختيار المعدن',
+      nav_gold:'الذهب',
+      nav_silver:'الفضة',
+      hdr_hint:'نحدّث سعر الأونصة تلقائيًا كل {label}. لإدخال قيمة يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.',
+      h_ounce:'سعر الأونصة بالدولار',
+      usd_oz_label:'USD/oz',
+      oz_placeholder:'مثال: 25',
+      btn_refresh:'تحديث • Refresh',
+      auto_title:'تحديث تلقائي كل {label}',
+      auto_txt:'تحديث تلقائي',
+      last_title:'وقت آخر تحديث',
+      last_prefix:'آخر تحديث: ',
+      auto_meta_refresh:'تحديث تلقائي كل {label}',
+      auto_meta_manual:'التحديث اليدوي مفعّل',
+      fetch_err_prefix:'فشل الجلب من gold-api.com.\n',
+
+      conversion_title:'أسعار الفضة المحسوبة',
+      conversion_note:'تُحسَب القيم بإضافة الهامش المحدد لكل وزن اعتمادًا على سعر الأونصة الفوري.',
+      spot_price:'السعر الفوري (من دون هامش)',
+      ounce_price:'الأونصة (+5٪)',
+      kilo_price:'الكيلوغرام (+2.5٪)',
+      half_kilo_price:'نصف كيلوغرام (+2.5٪)',
+      quarter_kilo_price:'ربع كيلوغرام (+2.75٪)',
+      formula_title:'الصيغ المستخدمة',
+      formula_line_oz:'الأونصة = السعر الفوري × (1 + 5٪).',
+      formula_line_kilo:'الكيلوغرام = السعر الفوري × {factor} × (1 + 2.5٪).',
+      formula_line_half:'نصف الكيلو = السعر الفوري × ({factor} ÷ 2) × (1 + 2.5٪).',
+      formula_line_quarter:'ربع الكيلو = السعر الفوري × ({factor} ÷ 4) × (1 + 2.75٪).',
+
+      ad_space_title:'مساحة إعلانية',
+      ad_necklace_caption:'قلادة لبنان وفرنسا',
+      ad_space_contact:'للإعلانات: <a href="mailto:ajouni178@gmail.com">ajouni178@gmail.com</a>',
+      footer:'© <span id="y"></span> <strong>goldpricelb.store</strong> — جميع الحقوق محفوظة — صُمِّم بواسطة علي جوني (Ali Jouni).',
+
+      a2hs_text:'احصل على النسخة السريعة — أضِف الموقع إلى الشاشة الرئيسية.',
+      a2hs_get:'الحصول',
+      a2hs_title:'إضافة إلى الشاشة الرئيسية',
+      a2hs_step1:'اضغط <em>مشاركة</em>',
+      a2hs_step2:'اختر <em>Add to Home Screen</em> ثم <em>تثبيت</em>.',
+      a2hs_close:'إغلاق'
+    },
+    en: {
+      page_title:'Silver prices — ounce & kilo (USD)',
+      hdr_title:'Silver prices — ounce & kilo (USD)',
+      nav_label:'Metal selection',
+      nav_gold:'Gold',
+      nav_silver:'Silver',
+      hdr_hint:'We refresh the ounce price automatically every {label}. To enter manually, pause auto refresh first.',
+      h_ounce:'Ounce price (USD)',
+      usd_oz_label:'USD/oz',
+      oz_placeholder:'e.g. 25',
+      btn_refresh:'Refresh',
+      auto_title:'Auto refresh every {label}',
+      auto_txt:'Auto refresh',
+      last_title:'Last update time',
+      last_prefix:'Last update: ',
+      auto_meta_refresh:'Auto refresh every {label}',
+      auto_meta_manual:'Manual update enabled',
+      fetch_err_prefix:'Failed to fetch from gold-api.com.\n',
+
+      conversion_title:'Calculated silver prices',
+      conversion_note:'Each value applies its margin to the live ounce price.',
+      spot_price:'Spot price (no margin)',
+      ounce_price:'Ounce (+5%)',
+      kilo_price:'Kilogram (+2.5%)',
+      half_kilo_price:'Half kilogram (+2.5%)',
+      quarter_kilo_price:'Quarter kilogram (+2.75%)',
+      formula_title:'Formulas used',
+      formula_line_oz:'Ounce = spot price × (1 + 5%).',
+      formula_line_kilo:'Kilogram = spot price × {factor} × (1 + 2.5%).',
+      formula_line_half:'Half kilo = spot price × ({factor} ÷ 2) × (1 + 2.5%).',
+      formula_line_quarter:'Quarter kilo = spot price × ({factor} ÷ 4) × (1 + 2.75%).',
+
+      ad_space_title:'Ad space',
+      ad_necklace_caption:'Lebanon & France necklace',
+      ad_space_contact:'For ads: <a href="mailto:ajouni178@gmail.com">ajouni178@gmail.com</a>',
+      footer:'© <span id="y"></span> <strong>goldpricelb.store</strong> — All rights reserved — Designed by Ali Jouni.',
+
+      a2hs_text:'Get the fast version — add this site to your Home screen.',
+      a2hs_get:'Get',
+      a2hs_title:'Add to Home Screen',
+      a2hs_step1:'Tap <em>Share</em>',
+      a2hs_step2:'Choose <em>Add to Home Screen</em> then <em>Install</em>.',
+      a2hs_close:'Close'
+    }
+  };
+
+  const LANG_KEY = 'silver_lang';
+  const THEME_KEY = 'silver_theme';
+  const STORAGE_KEY = 'silver_spot_v1';
+
+  let CUR_LANG = (localStorage.getItem(LANG_KEY) || document.documentElement.lang || 'ar');
+  let autoTimer = null;
+  let lastUpdated = null;
+  let isFetching = false;
+  let autoEnabled = true;
+
+  function t(key, vars){
+    const dict = DICT[CUR_LANG] || DICT.ar;
+    let str = dict[key];
+    if(str == null) str = key;
+    if(vars && typeof vars === 'object'){
+      for(const [k,v] of Object.entries(vars)){
+        const pattern = new RegExp(`\\{${k}\\}`, 'g');
+        str = str.replace(pattern, v);
+      }
+    }
+    return str;
+  }
+
+  function formatAutoLabel(){
+    const secs = AUTO_INTERVAL_SEC;
+    const locale = CUR_LANG === 'ar' ? 'ar' : undefined;
+    const formatted = secs.toLocaleString(locale);
+    return CUR_LANG === 'ar' ? `${formatted} ثانية` : `${formatted} seconds`;
+  }
+
+  function applyI18n(){
+    document.documentElement.lang = CUR_LANG;
+    document.documentElement.dir = (CUR_LANG === 'ar') ? 'rtl' : 'ltr';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.innerHTML = t(key);
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const key = el.getAttribute('data-i18n-title');
+      el.title = t(key);
+    });
+
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+      const key = el.getAttribute('data-i18n-aria');
+      el.setAttribute('aria-label', t(key));
+    });
+
+    document.querySelectorAll('[data-ph]').forEach(el => {
+      const key = el.getAttribute('data-ph');
+      el.placeholder = t(key);
+    });
+
+    document.title = t('page_title');
+    updateDynamicTexts();
+    updateMetaText();
+    setLastUpdated(lastUpdated);
+    renderOutputs();
+    renderFormulas();
+  }
+
+  function updateDynamicTexts(){
+    const label = formatAutoLabel();
+    const hdrHint = document.querySelector('[data-i18n="hdr_hint"]');
+    if(hdrHint) hdrHint.innerHTML = t('hdr_hint', { label });
+    const autoToggle = document.querySelector('[data-i18n-title="auto_title"]');
+    if(autoToggle){
+      const text = t('auto_title', { label });
+      autoToggle.title = text;
+      autoToggle.setAttribute('aria-label', text);
+    }
+  }
+
+  function setLastUpdated(date){
+    const el = $('last');
+    if(!el) return;
+    if(!(date instanceof Date)){
+      el.textContent = t('last_prefix') + '—';
+      return;
+    }
+    const locale = CUR_LANG === 'ar' ? 'ar' : undefined;
+    const formatted = date.toLocaleTimeString(locale, { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    el.textContent = t('last_prefix') + formatted;
+  }
+
+  function updateMetaText(){
+    const el = $('meta');
+    if(!el) return;
+    el.textContent = autoEnabled ? t('auto_meta_refresh', { label: formatAutoLabel() }) : t('auto_meta_manual');
+  }
+
+  function renderOutputs(){
+    const ozInput = $('oz');
+    if(!ozInput) return;
+    const val = parseFloat(cleanDec(ozInput.value));
+    if(!isFinite(val) || val <= 0){
+      setOut('spotPrice', '—');
+      setOut('ozSell', '—');
+      setOut('kiloSell', '—');
+      setOut('halfKiloSell', '—');
+      setOut('quarterKiloSell', '—');
+      return;
+    }
+
+    setOut('spotPrice', fmtMoney(val));
+    const ounceSell = val * 1.05;
+    const kiloBase = val * OUNCES_PER_KG;
+    const kiloSell = kiloBase * 1.025;
+    const halfKiloSell = (kiloBase / 2) * 1.025;
+    const quarterKiloSell = (kiloBase / 4) * 1.0275;
+
+    setOut('ozSell', fmtMoney(ounceSell));
+    setOut('kiloSell', fmtMoney(kiloSell));
+    setOut('halfKiloSell', fmtMoney(halfKiloSell));
+    setOut('quarterKiloSell', fmtMoney(quarterKiloSell));
+  }
+
+  function renderFormulas(){
+    const box = $('formulaBox');
+    if(!box) return;
+    const factor = fmtNumber(OUNCES_PER_KG, { minimumFractionDigits:3, maximumFractionDigits:3 });
+    const lines = [
+      t('formula_line_oz'),
+      t('formula_line_kilo', { factor }),
+      t('formula_line_half', { factor }),
+      t('formula_line_quarter', { factor })
+    ];
+    box.innerHTML = lines.join('\n');
+  }
+
+  function showError(msg){
+    const el = $('err');
+    if(!el) return;
+    if(!msg){
+      el.style.display = 'none';
+      el.textContent = '';
+    }else{
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+  }
+
+  function stringifyError(err){
+    if(!err) return 'Unknown error';
+    if(typeof err === 'string') return err;
+    if(err.message) return err.message;
+    return String(err);
+  }
+
+  function fetchWithTimeout(url, timeoutMs){
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { cache:'no-store', signal: controller.signal })
+      .finally(() => clearTimeout(id));
+  }
+
+  function pickSilverPrice(data){
+    const candidates = [
+      data && data.price, data && data.usd, data && data.usd_ounce,
+      data && data.price_ounce, data && data.ounce, data && data.oz,
+      data && data.result && data.result.price, data && data.XAG && data.XAG.USD
+    ].map(Number).filter(x => isFinite(x) && x > 0);
+    if(candidates.length) return candidates[0];
+    const gram = Number(data && (data.gram_24k || data.price_gram_24k || data.g24 || data.per_gram || data.price_gram));
+    if(isFinite(gram) && gram > 0) return gram * OZT_TO_G;
+    return NaN;
+  }
+
+  async function requestSpot(){
+    let lastErr = null;
+    for(const url of SPOT_ENDPOINTS){
+      try{
+        const res = await fetchWithTimeout(url, 5000);
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const price = pickSilverPrice(data);
+        if(isFinite(price) && price > 0) return price;
+        lastErr = new Error('Invalid data');
+      }catch(err){
+        lastErr = err;
+      }
+    }
+    throw lastErr || new Error('Unable to fetch');
+  }
+
+  async function fetchSpot(source='manual'){
+    if(isFetching) return;
+    isFetching = true;
+    const btn = $('btnFetch');
+    if(btn) btn.disabled = true;
+    showError('');
+    try{
+      const price = await requestSpot();
+      const now = new Date();
+      $('oz').value = price.toFixed(2);
+      renderOutputs();
+      lastUpdated = now;
+      setLastUpdated(lastUpdated);
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({ p: price, t: now.getTime() })); }catch{}
+    }catch(err){
+      showError(t('fetch_err_prefix') + stringifyError(err));
+    }finally{
+      isFetching = false;
+      if(btn && !autoEnabled) btn.disabled = false;
+      if(btn && autoEnabled) btn.disabled = false;
+    }
+  }
+
+  function stopAuto(){
+    if(autoTimer){
+      clearInterval(autoTimer);
+      autoTimer = null;
+    }
+  }
+
+  function setAuto(on){
+    autoEnabled = !!on;
+    const auto = $('auto');
+    if(auto) auto.checked = autoEnabled;
+    stopAuto();
+    updateMetaText();
+    if(autoEnabled){
+      fetchSpot('auto');
+      autoTimer = setInterval(() => fetchSpot('auto'), AUTO_INTERVAL_MS);
+    }
+  }
+
+  function loadStoredSpot(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      const price = Number(raw && raw.p);
+      const ts = Number(raw && raw.t);
+      if(isFinite(price) && price > 0){
+        $('oz').value = price.toFixed(2);
+        renderOutputs();
+      }
+      if(isFinite(ts) && ts > 0){
+        lastUpdated = new Date(ts);
+        setLastUpdated(lastUpdated);
+      }
+    }catch{}
+  }
+
+  function applyTheme(theme){
+    const th = theme || 'dark';
+    document.documentElement.setAttribute('data-theme', th);
+    const themeSel = $('themeSel');
+    if(themeSel) themeSel.value = th;
+    try{ localStorage.setItem(THEME_KEY, th); }catch{}
+  }
+
+  function initThemeAndLang(){
+    const themeSel = $('themeSel');
+    const langSel = $('langSel');
+    try{
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      if(savedTheme) themeSel.value = savedTheme;
+      const savedLang = localStorage.getItem(LANG_KEY);
+      if(savedLang) CUR_LANG = savedLang;
+    }catch{}
+    applyTheme(themeSel.value || 'dark');
+    langSel.value = CUR_LANG;
+    langSel.addEventListener('change', () => {
+      CUR_LANG = langSel.value || 'ar';
+      try{ localStorage.setItem(LANG_KEY, CUR_LANG); }catch{}
+      applyI18n();
+    });
+    themeSel.addEventListener('change', () => applyTheme(themeSel.value));
+  }
+
+  function initControls(){
+    $('btnFetch').addEventListener('click', () => fetchSpot('manual'));
+    $('auto').addEventListener('change', e => setAuto(e.target.checked));
+    $('oz').addEventListener('input', renderOutputs);
+  }
+
+  function initFooterYear(){
+    const y = $('y');
+    if(y) y.textContent = new Date().getFullYear();
+  }
+
+  const toastEl = $('toast');
+  if(toastEl){
+    toastEl.addEventListener('click', () => toastEl.classList.remove('show'));
+  }
+
+  (function(){
+    var banner = document.getElementById('a2hsBanner');
+    var getBtn = document.getElementById('a2hsGet');
+    var modal = document.getElementById('a2hsModal');
+    var deferredPrompt = null;
+    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    window.addEventListener('beforeinstallprompt', function(e){
+      e.preventDefault();
+      deferredPrompt = e;
+      try{
+        if (!isStandalone() && sessionStorage.getItem('a2hs_dismissed') !== '1' && !isIOS){
+          showBanner();
+        }
+      }catch{}
+    });
+
+    function isStandalone(){
+      var mql = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+      var ios = window.navigator && window.navigator.standalone === true;
+      return !!(mql || ios);
+    }
+    function showBanner(){ banner.classList.add('show'); document.body.classList.add('has-topbar'); }
+    function hideBanner(){ banner.classList.remove('show'); document.body.classList.remove('has-topbar'); }
+    function openGuide(){ hideBanner(); modal.classList.add('open'); document.body.classList.add('no-scroll'); }
+    function closeGuide(){ modal.classList.remove('open'); document.body.classList.remove('no-scroll'); }
+
+    banner.querySelector('.close').addEventListener('click', function(){
+      hideBanner(); try{ sessionStorage.setItem('a2hs_dismissed','1'); }catch(e){}
+    });
+    modal.querySelector('.x').addEventListener('click', closeGuide);
+    modal.addEventListener('click', function(e){ if(e.target === modal) closeGuide(); });
+
+    getBtn.addEventListener('click', async function(){
+      if (deferredPrompt){
+        try{ deferredPrompt.prompt(); await deferredPrompt.userChoice; }catch(e){}
+        deferredPrompt = null; hideBanner();
+      } else if (isIOS){ openGuide(); }
+    });
+
+    window.addEventListener('load', function(){
+      var dismissed = '0';
+      try{ dismissed = sessionStorage.getItem('a2hs_dismissed') || '0'; }catch(e){}
+      if (isStandalone() || dismissed === '1') return;
+      if (isIOS){ setTimeout(showBanner, 600); }
+    });
+  })();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    });
+  }
+
+  function boot(){
+    initFooterYear();
+    initThemeAndLang();
+    applyI18n();
+    loadStoredSpot();
+    initControls();
+    autoEnabled = $('auto').checked;
+    updateMetaText();
+    if(autoEnabled){
+      setAuto(true);
+    }else{
+      fetchSpot('manual');
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot);
+  }else{
+    boot();
+  }
+  </script>
+</body>
+</html>

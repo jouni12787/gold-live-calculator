@@ -1,8 +1,8 @@
 /* PWA Service Worker */
-const CACHE = "gold-app-v3.2.0"; // 🔁 bump on every deploy
+const CACHE = "gold-app-v3.3.0"; // 🔁 bump on every deploy
 
 const ASSETS = [
-  "/", "/index.html", "/manifest.json", "/favicon.svg",
+  "/", "/index.html", "/silver.html", "/manifest.json", "/favicon.svg",
   "/icons/icon-192.png", "/icons/icon-512.png",
   "/icons/maskable-512.png", "/icons/apple-touch-icon.png",
   // new images
@@ -35,9 +35,14 @@ self.addEventListener("fetch", (e) => {
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req).then(res => {
-        caches.open(CACHE).then(c => c.put("/index.html", res.clone()));
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy));
         return res;
-      }).catch(() => caches.match("/index.html"))
+      }).catch(async () => {
+        const cached = await caches.match(req);
+        if (cached) return cached;
+        return caches.match("/index.html");
+      })
     );
     return;
   }
