@@ -2480,7 +2480,7 @@
       </p>
 
       <p class="mini" style="margin:6px 0 12px">سيُغلق خلال
-        <strong id="updateCountdown">5</strong> ثوانٍ.
+        <strong id="updateCountdown">15</strong> ثانية.
       </p>
 
       <div style="display:flex;gap:8px;justify-content:flex-end">
@@ -2538,9 +2538,9 @@
         if(e.target.classList.contains("update-pop__backdrop")) handleClose();
       });
 
-      // عدّاد 5 ثوانٍ ثم إغلاق تلقائيًا
+      // عدّاد 15 ثانية ثم إغلاق تلقائيًا
       const cEl = $(COUNT_ID);
-      let remain = 5;
+      let remain = 15;
       if(cEl) cEl.textContent = String(remain);
       const timer = setInterval(()=>{
         remain -= 1;
