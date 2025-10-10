@@ -243,7 +243,7 @@
           </select>
         </div>
       </div>
-      <p data-i18n="hdr_hint">نحدّث سعر الأونصة كل ١٠ ثوانٍ تلقائيًا. لإدخال قيمة يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.</p>
+      <p data-i18n="hdr_hint">نحدّث سعر الأونصة كل ١٠ ثوانٍ تلقائيًا. لإدخال قيمة يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة. الأسعار مقدّمة من <a href="https://gold-api.com/" target="_blank" rel="noopener noreferrer">gold-api.com</a>.</p>
     </div>
   </header>
 
@@ -368,7 +368,7 @@
       nav_label:'اختيار المعدن',
       nav_gold:'الذهب',
       nav_silver:'الفضة',
-      hdr_hint:'نحدّث سعر الأونصة تلقائيًا كل {label}. لإدخال قيمة يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.',
+      hdr_hint:'نحدّث سعر الأونصة تلقائيًا كل {label}. لإدخال قيمة يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة. الأسعار مقدّمة من <a href="https://gold-api.com/" target="_blank" rel="noopener noreferrer">gold-api.com</a>.',
       h_ounce:'سعر الأونصة بالدولار',
       usd_oz_label:'USD/oz',
       oz_placeholder:'مثال: 25',
@@ -412,7 +412,7 @@
       nav_label:'Metal selection',
       nav_gold:'Gold',
       nav_silver:'Silver',
-      hdr_hint:'We refresh the ounce price automatically every {label}. To enter manually, pause auto refresh first.',
+      hdr_hint:'We refresh the ounce price automatically every {label}. To enter manually, pause auto refresh first. Prices sourced from <a href="https://gold-api.com/" target="_blank" rel="noopener noreferrer">gold-api.com</a>.',
       h_ounce:'Ounce price (USD)',
       usd_oz_label:'USD/oz',
       oz_placeholder:'e.g. 25',
@@ -449,6 +449,9 @@
       a2hs_step1:'Tap <em>Share</em>',
       a2hs_step2:'Choose <em>Add to Home Screen</em> then <em>Install</em>.',
       a2hs_close:'Close'
+    },
+    fr: {
+      hdr_hint:"Actualisation automatique toutes les {label}. Pour saisir manuellement, désactivez l'actualisation automatique puis indiquez le prix de l'once. Prix fournis par <a href=\"https://gold-api.com/\" target=\"_blank\" rel=\"noopener noreferrer\">gold-api.com</a>."
     }
   };
 
@@ -482,6 +485,9 @@
   function t(key, vars){
     const dict = DICT[CUR_LANG] || DICT.ar;
     let str = dict[key];
+    if(str == null && DICT.en && DICT.en[key] != null){
+      str = DICT.en[key];
+    }
     if(str == null) str = key;
     if(vars && typeof vars === 'object'){
       for(const [k,v] of Object.entries(vars)){
@@ -494,9 +500,15 @@
 
   function formatAutoLabel(){
     const secs = AUTO_INTERVAL_SEC;
-    const locale = CUR_LANG === 'ar' ? 'ar' : undefined;
+    const locale = CUR_LANG === 'ar' ? 'ar' : CUR_LANG === 'fr' ? 'fr' : undefined;
     const formatted = secs.toLocaleString(locale);
-    return CUR_LANG === 'ar' ? `${formatted} ثانية` : `${formatted} seconds`;
+    if(CUR_LANG === 'ar'){
+      return `${formatted} ثانية`;
+    }
+    if(CUR_LANG === 'fr'){
+      return secs === 1 ? `${formatted} seconde` : `${formatted} secondes`;
+    }
+    return `${formatted} seconds`;
   }
 
   function applyI18n(){

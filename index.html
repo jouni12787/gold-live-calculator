@@ -471,7 +471,7 @@
           </select>
         </div>
       </div>
-      <p data-i18n="hdr_hint">حاليًا نحدّث السعر تلقائيًا. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.</p>
+      <p data-i18n="hdr_hint">حاليًا نحدّث السعر تلقائيًا. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة. الأسعار مقدّمة من <a href="https://gold-api.com/" target="_blank" rel="noopener noreferrer">gold-api.com</a>.</p>
     </div>
   </header>
 
@@ -812,7 +812,7 @@
       nav_label:"اختيار المعدن",
       nav_gold:"الذهب",
       nav_silver:"الفضة",
-      hdr_hint:"حاليًا نحدّث السعر تلقائيًا كل {label}. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة.",
+      hdr_hint:"حاليًا نحدّث السعر تلقائيًا كل {label}. إذا أردت الإدخال يدويًا، أوقف التحديث التلقائي ثم اكتب سعر الأونصة. الأسعار مقدّمة من <a href='https://gold-api.com/' target='_blank' rel='noopener noreferrer'>gold-api.com</a>.",
       h_ounce:"سعر الأونصة بالدولار",
       usd_oz_label:"USD/oz",
       oz_placeholder:"مثال: 2350",
@@ -927,7 +927,7 @@
       nav_label:"Metal selection",
       nav_gold:"Gold",
       nav_silver:"Silver",
-      hdr_hint:"We auto-refresh every {label}. To enter manually, turn off auto-refresh, then type the ounce price.",
+      hdr_hint:"We auto-refresh every {label}. To enter manually, turn off auto-refresh, then type the ounce price. Prices sourced from <a href='https://gold-api.com/' target='_blank' rel='noopener noreferrer'>gold-api.com</a>.",
       h_ounce:"Ounce Price (USD)",
       usd_oz_label:"USD/oz",
       oz_placeholder:"e.g. 2350",
@@ -1034,6 +1034,9 @@
       a2hs_close:"Close",
 
       store_line:"(18/21 buy) +{m} $/g store margin before making"
+    },
+    fr: {
+      hdr_hint:"Actualisation automatique toutes les {label}. Pour saisir manuellement, désactivez l'actualisation automatique puis saisissez le prix de l'once. Prix fournis par <a href='https://gold-api.com/' target='_blank' rel='noopener noreferrer'>gold-api.com</a>."
     }
   };
 
@@ -1043,6 +1046,9 @@
   function t(k, vars){
     const d = DICT[CUR_LANG] || DICT.ar;
     let str = d[k];
+    if(str == null && DICT.en && DICT.en[k] != null){
+      str = DICT.en[k];
+    }
     if(str == null) str = k;
     if(vars && typeof vars === "object"){
       for(const [key, value] of Object.entries(vars)){
@@ -1103,6 +1109,9 @@
       if(n >= 3 && n <= 10) return `${n} ثوانٍ`;
       return `${n} ثانية`;
     }
+    if(CUR_LANG === "fr"){
+      return n === 1 ? "1 seconde" : `${n} secondes`;
+    }
     return n === 1 ? "1 second" : `${n} seconds`;
   }
 
@@ -1110,7 +1119,7 @@
     const auto = $("auto");
     const label = formatSecondsLocalized(getAutoSeconds());
     const hintEl = document.querySelector("[data-i18n='hdr_hint']");
-    if(hintEl) hintEl.textContent = t("hdr_hint", { label });
+    if(hintEl) hintEl.innerHTML = t("hdr_hint", { label });
     const autoSwitch = document.querySelector("[data-i18n-title='auto_title']");
     if(autoSwitch){
       const title = t("auto_title", { label });
